@@ -1,0 +1,20 @@
+import { requireAuth } from "@/lib/session";
+import { Sidebar } from "@/components/layout/sidebar";
+import { Header } from "@/components/layout/header";
+import type { PropsWithChildren } from "react";
+
+export default async function AppLayout({ children }: PropsWithChildren) {
+  await requireAuth();
+
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <div className="w-full bg-gray-2 dark:bg-[#111827]">
+        <Header />
+        <main className="isolate mx-auto w-full max-w-screen-2xl overflow-hidden p-4 md:p-6 2xl:p-10">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}

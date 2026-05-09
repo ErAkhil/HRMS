@@ -1,6 +1,6 @@
 import type { IconProps } from "@/types/icon.types";
 
-export function MenuIcon(props: IconProps) {
+export function MenuIcon(props: Readonly<IconProps>) {
   return (
     <svg
       width="25"

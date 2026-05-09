@@ -1,15 +1,16 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useSidebarContext } from "../sidebar/sidebar-context";
 import { Notification } from "./notification";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
-  "/": { title: "Dashboard", subtitle: "Welcome back, John" },
+  "/": { title: "Dashboard", subtitle: "Overview" },
   "/employees": { title: "Employees", subtitle: "Directory & profiles" },
   "/attendance": { title: "Attendance", subtitle: "Track & manage time" },
   "/leave": { title: "Leave", subtitle: "Manage time off" },
@@ -37,7 +38,9 @@ function getPageMeta(pathname: string) {
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const pathname = usePathname();
+  const router = useRouter();
   const meta = getPageMeta(pathname);
+  const [query, setQuery] = useState("");
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center border-b border-gray-3 bg-white/95 backdrop-blur-sm dark:border-dark-3 dark:bg-dark-2/95">
@@ -93,7 +96,14 @@ export function Header() {
             <input
               type="search"
               placeholder="Search employees, tasks, documents..."
-              className="h-9 w-full rounded-lg border border-gray-3 bg-gray-2 pl-9 pr-16 text-sm outline-none transition-colors placeholder:text-dark-5 focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-dark-3 dark:bg-dark-3 dark:placeholder:text-dark-6 dark:focus:border-indigo-500 dark:focus:bg-dark-2 dark:focus:ring-indigo-900/30"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && query.trim()) {
+                  router.push(`/ai?q=${encodeURIComponent(query.trim())}`);
+                }
+              }}
+              className="h-9 w-full rounded-lg border border-gray-3 bg-gray-2 pl-9 pr-16 text-sm outline-none transition-colors placeholder:text-dark-5 focus:border-primary-600 focus:bg-white focus:ring-2 focus:ring-primary-100 dark:border-dark-3 dark:bg-dark-3 dark:placeholder:text-dark-6 dark:focus:border-primary-600 dark:focus:bg-dark-2 dark:focus:ring-primary-900/30"
             />
             <kbd className="pointer-events-none absolute right-3 hidden items-center gap-1 rounded border border-gray-3 bg-white px-1.5 py-0.5 text-[10px] font-medium text-dark-5 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6 sm:flex">
               <span>⌘</span>K
@@ -106,6 +116,7 @@ export function Header() {
 
           {/* AI Assistant */}
           <button
+            onClick={() => router.push("/ai")}
             className="hidden items-center gap-1.5 rounded-lg bg-gradient-ai px-3 py-1.5 text-xs font-semibold text-white shadow-indigo-glow transition-opacity hover:opacity-90 sm:flex"
             aria-label="Open AI Assistant"
           >
