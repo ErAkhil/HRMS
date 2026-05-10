@@ -21,9 +21,10 @@ export const NAV_DATA = [
         icon: Icons.UsersIcon,
         roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER"],
         items: [
-          { title: "Directory",  url: "/employees",          roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER"] },
-          { title: "Profiles",   url: "/employees/profile",  roles: ["SUPER_ADMIN","HR_ADMIN"] },
-          { title: "Org Chart",  url: "/employees/org-chart",roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER"] },
+          { title: "Directory",    url: "/employees",             roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER"] },
+          { title: "Departments", url: "/employees/departments", roles: ["SUPER_ADMIN","HR_ADMIN"] },
+          { title: "Profiles",    url: "/employees/profile",     roles: ["SUPER_ADMIN","HR_ADMIN"] },
+          { title: "Org Chart",   url: "/employees/org-chart",   roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER"] },
         ],
       },
       {

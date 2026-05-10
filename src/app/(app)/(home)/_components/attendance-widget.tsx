@@ -58,7 +58,7 @@ export function AttendanceWidget({ todayRecord }: Props) {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+    <div className="flex h-full flex-col card-p">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export function AttendanceWidget({ todayRecord }: Props) {
               <path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <h3 className="text-sm font-semibold text-dark dark:text-white">Attendance</h3>
+          <h3 className="section-title">Attendance</h3>
         </div>
         <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
           isClockedIn
@@ -82,8 +82,8 @@ export function AttendanceWidget({ todayRecord }: Props) {
 
       {/* Shift info */}
       <div className="mt-3 rounded-lg bg-gray-2 px-3 py-2 dark:bg-dark-3">
-        <p className="text-xs text-dark-5 dark:text-dark-6">Today&apos;s Shift</p>
-        <p className="text-sm font-semibold text-dark dark:text-white">9:00 AM – 6:00 PM</p>
+        <p className="text-muted">Today&apos;s Shift</p>
+        <p className="text-body-medium font-semibold">9:00 AM – 6:00 PM</p>
       </div>
 
       {error && (
@@ -93,14 +93,14 @@ export function AttendanceWidget({ todayRecord }: Props) {
       {/* Clock in/out button */}
       <div className="mt-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs text-dark-5 dark:text-dark-6">
+          <p className="text-muted">
             {isClockedIn || isCheckedOut ? "Clocked in at" : "Not clocked in"}
           </p>
-          <p className="text-sm font-bold text-dark dark:text-white">
+          <p className="text-body font-bold">
             {formatTime(todayRecord?.checkIn)}
           </p>
           {(isClockedIn || isCheckedOut) && (
-            <p className="text-xs text-dark-5 dark:text-dark-6">
+            <p className="text-muted">
               Working: <span className="font-medium text-dark dark:text-white">
                 {formatHours(todayRecord?.checkIn, todayRecord?.checkOut)}
               </span>
@@ -124,8 +124,8 @@ export function AttendanceWidget({ todayRecord }: Props) {
       </div>
 
       {/* Weekly mini chart placeholder */}
-      <div className="mt-4 border-t border-gray-3 pt-4 dark:border-dark-3">
-        <p className="mb-2 text-xs font-medium text-dark-5 dark:text-dark-6">This Week</p>
+      <div className="mt-4 divider pt-4">
+        <p className="mb-2 text-muted font-medium">This Week</p>
         <div className="flex items-end gap-1.5">
           {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, i) => {
             const isToday = new Date().getDay() === i + 1;
@@ -139,7 +139,7 @@ export function AttendanceWidget({ todayRecord }: Props) {
                     style={{ height: isToday && (isClockedIn || isCheckedOut) ? "70%" : "20%" }}
                   />
                 </div>
-                <span className="text-[10px] text-dark-5 dark:text-dark-6">{day}</span>
+                <span className="text-muted text-[10px]">{day}</span>
               </div>
             );
           })}

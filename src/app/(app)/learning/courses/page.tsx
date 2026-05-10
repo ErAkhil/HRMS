@@ -57,12 +57,12 @@ export default function CoursesPage() {
   });
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Course Catalog</h1>
-          <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Browse {COURSES.length} courses across all categories</p>
+          <h1 className="page-title">Course Catalog</h1>
+          <p className="text-muted mt-0.5">Browse {COURSES.length} courses across all categories</p>
         </div>
         <div className="relative">
           <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-5 dark:text-dark-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,13 +97,13 @@ export default function CoursesPage() {
 
       {/* Course Grid */}
       {filteredCourses.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-xl bg-white shadow-card dark:border dark:border-dark-3 dark:bg-dark-2">
-          <p className="text-sm text-dark-5 dark:text-dark-6">No courses found matching your search.</p>
+        <div className="card flex h-40 items-center justify-center">
+          <p className="text-body text-dark-5 dark:text-dark-6">No courses found matching your search.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filteredCourses.map((course) => (
-            <div key={course.id} className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
+            <div key={course.id} className="card overflow-hidden">
               <div className={`h-36 bg-gradient-to-br ${course.gradient} flex items-center justify-center`}>
                 <svg className="h-12 w-12 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -116,12 +116,12 @@ export default function CoursesPage() {
                   </span>
                   <span className={levelColors[course.level]}>{course.level}</span>
                 </div>
-                <p className="text-sm font-semibold text-dark dark:text-white mb-2">{course.title}</p>
+                <p className="text-body-medium mb-2">{course.title}</p>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-dark-5 dark:text-dark-6">{course.duration}</span>
+                  <span className="text-muted">{course.duration}</span>
                   <StarRating rating={course.rating} />
                 </div>
-                <p className="text-xs text-dark-5 dark:text-dark-6 mb-3">
+                <p className="text-muted mb-3">
                   {course.enrolled.toLocaleString()} enrolled
                 </p>
                 <button
@@ -130,10 +130,10 @@ export default function CoursesPage() {
                       ? setToast("Resuming course...")
                       : setToast("Enrolled successfully! Check My Learning for progress.")
                   }
-                  className={`w-full rounded-lg py-1.5 text-sm font-semibold transition-colors ${
+                  className={`w-full py-1.5 ${
                     course.enrolled2
-                      ? "bg-primary-600 text-white hover:bg-primary-700"
-                      : "border border-gray-3 text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+                      ? "btn-primary"
+                      : "btn-secondary"
                   }`}
                 >
                   {course.enrolled2 ? "Continue" : "Enroll"}

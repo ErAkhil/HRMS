@@ -3,11 +3,10 @@
 import { useState, useMemo } from "react";
 import { OVERDUE_TASKS, type Task, type TaskGroup } from "./tasks-data";
 import { TaskRow } from "./task-row";
+import { TasksFilterBar, type FilterTab, type PriorityFilter } from "./tasks-filter-bar";
+import { NewTaskModal } from "./new-task-modal";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-
-type FilterTab = "All" | "Today" | "This Week" | "Overdue";
-type PriorityFilter = "All" | "High" | "Medium" | "Low";
 
 type DbTask = {
   id: string;
@@ -140,11 +139,11 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-dark dark:text-white">
+          <h1 className="page-title">
             My Tasks
           </h1>
           <span className="rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-dark dark:bg-sky-dark/10 dark:text-sky">
@@ -153,7 +152,7 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
         </div>
         <button
           onClick={() => setShowNewTaskModal(true)}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="btn-primary"
         >
           + New Task
         </button>
@@ -164,51 +163,28 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-xl bg-white p-5 shadow-card dark:border dark:border-dark-3 dark:bg-dark-2"
+            className="card-p"
           >
-            <p className="text-xs text-dark-5 dark:text-dark-6">{s.label}</p>
+            <p className="stat-label">{s.label}</p>
             <p className={`mt-1 text-2xl font-bold ${s.color}`}>{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-3 shadow-card dark:border dark:border-dark-3 dark:bg-dark-2">
-        <div className="flex gap-1">
-          {(["All", "Today", "This Week", "Overdue"] as FilterTab[]).map(
-            (t) => (
-              <button
-                key={t}
-                onClick={() => setFilterTab(t)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  filterTab === t
-                    ? "bg-primary-600 text-white"
-                    : "text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3"
-                }`}
-              >
-                {t}
-              </button>
-            ),
-          )}
-        </div>
-        <select
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value as PriorityFilter)}
-          className="h-9 rounded-lg border border-gray-3 bg-gray-2 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-        >
-          <option value="All">All Priorities</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-      </div>
+      <TasksFilterBar
+        filterTab={filterTab}
+        setFilterTab={setFilterTab}
+        priorityFilter={priorityFilter}
+        setPriorityFilter={setPriorityFilter}
+      />
 
       {/* Overdue section */}
       {showOverdue && overdueFiltered.length > 0 && (
-        <div className="rounded-xl bg-white shadow-card dark:border dark:border-dark-3 dark:bg-dark-2">
+        <div className="card">
           <div className="flex items-center gap-2 border-b border-gray-3 px-5 py-3 dark:border-dark-3">
             <span className="size-2 rounded-full bg-rose-dark" />
-            <h2 className="text-sm font-semibold text-rose-dark">
+            <h2 className="section-title text-rose-dark">
               Overdue ({overdueFiltered.length})
             </h2>
           </div>
@@ -234,13 +210,13 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
           return (
             <div
               key={group}
-              className="rounded-xl bg-white shadow-card dark:border dark:border-dark-3 dark:bg-dark-2"
+              className="card"
             >
               <div className="flex items-center justify-between border-b border-gray-3 px-5 py-3 dark:border-dark-3">
-                <h2 className="text-sm font-semibold text-dark dark:text-white">
+                <h2 className="section-title">
                   {group}
                 </h2>
-                <span className="text-xs text-dark-5 dark:text-dark-6">
+                <span className="text-muted">
                   {groupTasks.length} tasks
                 </span>
               </div>
@@ -260,9 +236,9 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
 
       {/* Empty state */}
       {showGroups && filtered.length === 0 && overdueFiltered.length === 0 && (
-        <div className="rounded-xl bg-white p-12 text-center shadow-card dark:border dark:border-dark-3 dark:bg-dark-2">
-          <p className="text-sm font-medium text-dark dark:text-white">No tasks found</p>
-          <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">
+        <div className="card empty-state">
+          <p className="text-body-medium">No tasks found</p>
+          <p className="empty-state-text">
             {filterTab !== "All" ? "Try switching to the All tab." : "Create a new task to get started."}
           </p>
         </div>
@@ -270,10 +246,10 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
 
       {/* Overdue-only view */}
       {!showGroups && (
-        <div className="rounded-xl bg-white shadow-card dark:border dark:border-dark-3 dark:bg-dark-2">
+        <div className="card">
           <div className="flex items-center gap-2 border-b border-gray-3 px-5 py-3 dark:border-dark-3">
             <span className="size-2 rounded-full bg-rose-dark" />
-            <h2 className="text-sm font-semibold text-rose-dark">
+            <h2 className="section-title text-rose-dark">
               Overdue ({overdueFiltered.length})
             </h2>
           </div>
@@ -299,81 +275,10 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
 
       {/* New Task Modal */}
       {showNewTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-modal dark:bg-dark-2">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-dark dark:text-white">New Task</h2>
-              <button
-                onClick={() => setShowNewTaskModal(false)}
-                className="flex size-8 items-center justify-center rounded-lg text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3"
-              >
-                <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <form onSubmit={handleCreateTask} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
-                  Task Title <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter task title"
-                  className="w-full rounded-lg border border-gray-3 bg-white px-3 py-2 text-sm text-dark outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="Describe the task..."
-                  className="w-full rounded-lg border border-gray-3 bg-white px-3 py-2 text-sm text-dark outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white resize-none"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
-                    Priority
-                  </label>
-                  <select className="w-full rounded-lg border border-gray-3 bg-white px-3 py-2 text-sm text-dark outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white">
-                    <option value="">Select priority</option>
-                    <option value="HIGH">High</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="LOW">Low</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
-                    Due Date
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full rounded-lg border border-gray-3 bg-white px-3 py-2 text-sm text-dark outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowNewTaskModal(false)}
-                  className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
-                >
-                  Create Task
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <NewTaskModal
+          onClose={() => setShowNewTaskModal(false)}
+          onSubmit={handleCreateTask}
+        />
       )}
 
       <Toast message={toast} />

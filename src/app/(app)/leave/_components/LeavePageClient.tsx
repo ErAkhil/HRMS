@@ -22,16 +22,16 @@ export function LeavePageClient({ balances, requests }: LeavePageClientProps) {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="page-header">
         <div>
-          <h1 className="text-heading-5 font-bold text-dark dark:text-white">My Leave</h1>
-          <p className="text-xs text-dark-5 dark:text-dark-6 mt-0.5">Manage your leave requests and balances</p>
+          <h1 className="page-title">My Leave</h1>
+          <p className="text-muted mt-0.5">Manage your leave requests and balances</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 flex items-center gap-1.5 w-fit"
+          className="btn-primary flex items-center gap-1.5 w-fit"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -44,7 +44,7 @@ export function LeavePageClient({ balances, requests }: LeavePageClientProps) {
       <LeaveBalanceCards balances={balances} />
 
       {/* Tabs */}
-      <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+      <div className="card-p">
         <div className="flex items-center gap-1 border-b border-gray-3 dark:border-dark-3 -mx-5 px-5 mb-5">
           {(["My Requests", "Team Calendar", "History"] as Tab[]).map((tab) => (
             <button
@@ -70,8 +70,8 @@ export function LeavePageClient({ balances, requests }: LeavePageClientProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-dark dark:text-white">Team Calendar</p>
-            <p className="text-xs text-dark-5 dark:text-dark-6 mt-1">
+            <p className="text-body-medium">Team Calendar</p>
+            <p className="text-muted mt-1">
               View the full team calendar at{" "}
               <a href="/leave/calendar" className="text-primary-600 hover:underline">Leave Calendar</a>
             </p>
@@ -85,8 +85,8 @@ export function LeavePageClient({ balances, requests }: LeavePageClientProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-dark dark:text-white">Leave History</p>
-            <p className="text-xs text-dark-5 dark:text-dark-6 mt-1">All past leave records are shown in My Requests.</p>
+            <p className="text-body-medium">Leave History</p>
+            <p className="text-muted mt-1">All past leave records are shown in My Requests.</p>
           </div>
         )}
       </div>

@@ -72,9 +72,9 @@ const TYPE_ICONS: Record<string, string> = {
 
 export function TeamActivityFeed() {
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+    <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-dark dark:text-white">Team Activity</h3>
+        <h3 className="section-title">Team Activity</h3>
         <Link href="/collaboration" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
           View all
         </Link>

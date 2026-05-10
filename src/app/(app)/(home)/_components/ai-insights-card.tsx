@@ -69,13 +69,13 @@ export async function AIInsightsCard() {
   ] as const;
 
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
+    <div className="flex h-full flex-col card overflow-hidden">
       <div className="bg-gradient-ai px-5 py-4">
         <div className="flex items-center gap-2">
           <svg className="size-4 text-white/90" viewBox="0 0 24 24" fill="none">
             <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <h3 className="text-sm font-semibold text-white">AI Productivity Insights</h3>
+          <h3 className="section-title text-white dark:text-white">AI Productivity Insights</h3>
         </div>
         <p className="mt-0.5 text-xs text-white/60">Live · based on your data</p>
       </div>
@@ -92,7 +92,7 @@ export async function AIInsightsCard() {
         ))}
       </div>
 
-      <div className="border-t border-gray-3 px-5 py-3 dark:border-dark-3">
+      <div className="divider px-5 py-3">
         <Link href="/ai" className="flex items-center gap-1 text-xs font-semibold text-violet-DEFAULT hover:text-violet-dark dark:text-violet-300">
           Ask AI for more insights
           <svg className="size-3.5" viewBox="0 0 24 24" fill="none">

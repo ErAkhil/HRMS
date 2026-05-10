@@ -48,6 +48,7 @@ export async function getNotifications(): Promise<NotificationItem[]> {
   if (user.employeeId) {
     const overdueTasks = await db.task.findMany({
       where: {
+        orgId: user.orgId,
         assigneeId: user.employeeId,
         dueDate: { lt: today },
         status: { notIn: ["DONE"] },
@@ -71,6 +72,7 @@ export async function getNotifications(): Promise<NotificationItem[]> {
     const pendingReviews = await db.performanceReview.findMany({
       where: {
         revieweeId: user.employeeId,
+        reviewee: { orgId: user.orgId },
         status: "PENDING",
       },
       take: 2,
@@ -91,6 +93,7 @@ export async function getNotifications(): Promise<NotificationItem[]> {
     const myLeaveUpdates = await db.leaveRequest.findMany({
       where: {
         employeeId: user.employeeId,
+        employee: { orgId: user.orgId },
         status: { in: ["APPROVED", "REJECTED"] },
         updatedAt: { gte: new Date(Date.now() - 7 * 86_400_000) },
       },

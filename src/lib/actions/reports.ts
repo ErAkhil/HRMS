@@ -139,7 +139,7 @@ export async function getCalendarData(month: number, year: number) {
     title: t.title,
     status: t.status as string,
     priority: t.priority as string,
-    dueDate: t.dueDate!.toISOString(),
+    dueDate: t.dueDate?.toISOString() ?? "",
     assignee: t.assignee ? `${t.assignee.firstName} ${t.assignee.lastName.charAt(0)}.` : null,
   }));
 

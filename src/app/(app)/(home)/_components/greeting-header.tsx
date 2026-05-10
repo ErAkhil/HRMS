@@ -59,14 +59,14 @@ export function GreetingHeader() {
   const org = session?.user?.orgName ?? "Unikove";
 
   return (
-    <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 md:p-6">
+    <div className="card-p md:p-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: greeting */}
         <div className="space-y-1">
-          <p className="text-xs font-medium text-dark-5 dark:text-dark-6">
+          <p className="text-muted font-medium">
             {formatDate()}
           </p>
-          <h2 className="text-xl font-bold text-dark dark:text-white md:text-2xl capitalize">
+          <h2 className="page-title md:text-2xl capitalize">
             {getGreeting()}, {name}
           </h2>
           <p className="text-sm text-dark-5 dark:text-dark-6 capitalize">

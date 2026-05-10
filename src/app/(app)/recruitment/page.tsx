@@ -35,12 +35,12 @@ export default async function RecruitmentPage() {
   const openJobs = jobs.filter((j) => j.isActive).length;
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Recruitment Pipeline</h1>
-          <p className="text-xs text-dark-5 dark:text-dark-6">
+          <h1 className="page-title">Recruitment Pipeline</h1>
+          <p className="text-muted">
             <span className="inline-flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               {openJobs} open position{openJobs !== 1 ? "s" : ""}
@@ -50,13 +50,13 @@ export default async function RecruitmentPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/recruitment/jobs"
-            className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+            className="btn-secondary"
           >
             View Jobs
           </Link>
           <Link
             href="/recruitment/candidates"
-            className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+            className="btn-secondary"
           >
             All Candidates
           </Link>
@@ -64,16 +64,16 @@ export default async function RecruitmentPage() {
       </div>
 
       {/* Pipeline Stats Bar */}
-      <div className="rounded-xl bg-white p-4 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+      <div className="card-p">
         <div className="flex flex-wrap items-center gap-6">
           {columns.map((col) => (
             <div key={col.stage} className="flex items-center gap-2">
               <span className={`h-2.5 w-2.5 rounded-full ${col.dotColor}`} />
-              <span className="text-xs text-dark-5 dark:text-dark-6">{col.title}</span>
+              <span className="text-muted">{col.title}</span>
               <span className="text-xs font-bold text-dark dark:text-white">{col.candidates.length}</span>
             </div>
           ))}
-          <div className="ml-auto text-xs text-dark-5 dark:text-dark-6">
+          <div className="ml-auto text-muted">
             Total: <span className="font-bold text-dark dark:text-white">{totalCandidates} candidate{totalCandidates !== 1 ? "s" : ""}</span>
           </div>
         </div>

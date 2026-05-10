@@ -44,9 +44,9 @@ const ACTIVE_MEETINGS = [
 
 export function CollaborationPreview() {
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+    <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-dark dark:text-white">Collaboration</h3>
+        <h3 className="section-title">Collaboration</h3>
         <Link href="/collaboration" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
           Open
         </Link>
@@ -121,7 +121,7 @@ export function CollaborationPreview() {
         <svg className="size-4 shrink-0 text-dark-5" viewBox="0 0 24 24" fill="none">
           <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span className="flex-1 text-xs text-dark-5 dark:text-dark-6">New message...</span>
+        <span className="flex-1 text-muted">New message...</span>
         <kbd className="hidden rounded border border-gray-3 bg-gray-2 px-1 py-0.5 text-[9px] text-dark-5 dark:border-dark-3 dark:bg-dark-3 sm:block">⌘N</kbd>
       </div>
     </div>

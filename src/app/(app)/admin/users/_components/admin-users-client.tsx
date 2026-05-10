@@ -29,10 +29,10 @@ const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const ROLE_COLORS: Record<UserRole, string> = {
-  SUPER_ADMIN: "rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark",
-  HR_ADMIN: "rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
-  MANAGER: "rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark",
-  EMPLOYEE: "rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
+  SUPER_ADMIN: "badge-error",
+  HR_ADMIN: "badge-indigo",
+  MANAGER: "badge-warning",
+  EMPLOYEE: "badge-success",
 };
 
 function getInitials(name: string) {
@@ -87,16 +87,16 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">User Management</h1>
-          <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">{users.length} users · Manage roles and access</p>
+          <h1 className="page-title">User Management</h1>
+          <p className="mt-0.5 text-muted">{users.length} users · Manage roles and access</p>
         </div>
         <button
           onClick={() => setShowInviteModal(true)}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="btn-primary"
         >
           + Invite User
         </button>
@@ -109,12 +109,12 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
           placeholder="Search by name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-lg border border-gray-3 bg-white px-3 py-2 text-sm text-dark outline-none focus:border-indigo-500 dark:border-dark-3 dark:bg-dark-2 dark:text-white w-full sm:w-64"
+          className="input-field w-full sm:w-64"
         />
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value as UserRole | "All")}
-          className="rounded-lg border border-gray-3 bg-white px-3 py-2 text-sm text-dark outline-none focus:border-indigo-500 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+          className="input-field"
         >
           <option value="All">All Roles</option>
           <option value="SUPER_ADMIN">Super Admin</option>
@@ -125,23 +125,23 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
       </div>
 
       {/* Users Table */}
-      <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-3 dark:border-dark-3 bg-gray-1 dark:bg-dark-3/40">
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">User</th>
-                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Role</th>
-                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Department</th>
-                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Status</th>
-                <th className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Last Active</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Actions</th>
+              <tr className="thead-row">
+                <th className="th">User</th>
+                <th className="th">Role</th>
+                <th className="th">Department</th>
+                <th className="th">Status</th>
+                <th className="th">Last Active</th>
+                <th className="th text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-3 dark:divide-dark-3">
+            <tbody>
               {filtered.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-1 dark:hover:bg-dark-3/40 transition-colors">
-                  <td className="px-5 py-3">
+                <tr key={u.id} className="tr-body">
+                  <td className="td">
                     <div className="flex items-center gap-3">
                       {u.avatarUrl ? (
                         <img src={u.avatarUrl} alt={u.name} className="h-8 w-8 rounded-full object-cover" />
@@ -151,16 +151,16 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
                         </span>
                       )}
                       <div>
-                        <p className="text-sm font-medium text-dark dark:text-white">{u.name}</p>
-                        <p className="text-xs text-dark-5 dark:text-dark-6">{u.email}</p>
+                        <p className="text-body-medium">{u.name}</p>
+                        <p className="text-muted">{u.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="td">
                     <select
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
-                      className="rounded-lg border border-gray-3 bg-white px-2 py-1 text-xs text-dark outline-none focus:border-indigo-500 dark:border-dark-3 dark:bg-dark-3 dark:text-white"
+                      className="input-field py-1 text-xs"
                     >
                       <option value="SUPER_ADMIN">Super Admin</option>
                       <option value="HR_ADMIN">HR Admin</option>
@@ -168,14 +168,14 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
                       <option value="EMPLOYEE">Employee</option>
                     </select>
                   </td>
-                  <td className="px-3 py-3 text-sm text-dark-5 dark:text-dark-6">{u.department}</td>
-                  <td className="px-3 py-3">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${u.isActive ? "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald" : "bg-rose-light text-rose-dark"}`}>
+                  <td className="td text-muted">{u.department}</td>
+                  <td className="td">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${u.isActive ? "badge-success" : "badge-error"}`}>
                       {u.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-xs text-dark-5 dark:text-dark-6">{formatDate(u.lastLoginAt)}</td>
-                  <td className="px-5 py-3 text-right">
+                  <td className="td text-muted">{formatDate(u.lastLoginAt)}</td>
+                  <td className="td text-right">
                     <button
                       onClick={() => handleToggleActive(u.id, u.isActive)}
                       className={`rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
@@ -191,7 +191,7 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-sm text-dark-5 dark:text-dark-6">
+                  <td colSpan={6} className="px-5 py-8 text-center text-muted">
                     No users match your filter.
                   </td>
                 </tr>
@@ -203,9 +203,9 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
 
       {/* Invite Modal */}
       {showInviteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-modal dark:bg-dark-2">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="modal-overlay">
+          <div className="modal-panel w-full max-w-md">
+            <div className="modal-header">
               <h2 className="text-lg font-bold text-dark dark:text-white">Invite User</h2>
               <button onClick={() => setShowInviteModal(false)} className="flex size-8 items-center justify-center rounded-lg text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3">
                 <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -213,16 +213,18 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
                 </svg>
               </button>
             </div>
-            <p className="text-sm text-dark-5 dark:text-dark-6 mb-4">
-              User invitations are managed through the employee onboarding flow. Create an employee profile first, then they&apos;ll receive login credentials.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button onClick={() => setShowInviteModal(false)} className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white">
-                Close
-              </button>
-              <a href="/employees" className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
-                Go to Employees
-              </a>
+            <div className="p-6">
+              <p className="text-muted mb-4">
+                User invitations are managed through the employee onboarding flow. Create an employee profile first, then they&apos;ll receive login credentials.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setShowInviteModal(false)} className="btn-secondary">
+                  Close
+                </button>
+                <a href="/employees" className="btn-primary">
+                  Go to Employees
+                </a>
+              </div>
             </div>
           </div>
         </div>

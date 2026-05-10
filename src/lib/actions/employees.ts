@@ -23,11 +23,26 @@ const employeeSchema = z.object({
 export async function getEmployees() {
   const user = await requireAuth();
 
-  return db.employee.findMany({
+  const rows = await db.employee.findMany({
     where: { orgId: user.orgId, isActive: true },
     include: { department: { select: { name: true } } },
     orderBy: { firstName: "asc" },
   });
+
+  return rows.map((e) => ({
+    id: e.id,
+    firstName: e.firstName,
+    lastName: e.lastName,
+    email: e.email,
+    phone: e.phone,
+    title: e.title,
+    employeeCode: e.employeeCode,
+    employmentType: e.employmentType,
+    avatarUrl: e.avatarUrl,
+    isActive: e.isActive,
+    startDate: e.startDate.toISOString(),
+    department: e.department,
+  }));
 }
 
 export async function getEmployee(id: string) {

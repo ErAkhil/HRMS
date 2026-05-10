@@ -17,9 +17,9 @@ const total = 248;
 
 export function LiveStatusPanel() {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 h-full">
+    <div className="card-p h-full">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-dark dark:text-white">Live Status</h3>
+        <h3 className="section-title">Live Status</h3>
         <span className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-xs text-emerald-dark dark:text-emerald">Live</span>
@@ -65,7 +65,7 @@ export function LiveStatusPanel() {
           </svg>
           <div className="absolute flex flex-col items-center">
             <span className="text-xl font-bold text-dark dark:text-white">{total}</span>
-            <span className="text-xs text-dark-5 dark:text-dark-6">Total</span>
+            <span className="text-muted">Total</span>
           </div>
         </div>
       </div>
@@ -76,7 +76,7 @@ export function LiveStatusPanel() {
           <div key={item.label} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className={`h-2.5 w-2.5 rounded-full ${item.dotColor}`} />
-              <span className="text-xs text-dark-5 dark:text-dark-6">{item.label}</span>
+              <span className="text-muted">{item.label}</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-20 h-1.5 rounded-full bg-gray-3 dark:bg-dark-3 overflow-hidden">
@@ -85,14 +85,14 @@ export function LiveStatusPanel() {
                   style={{ width: `${(item.count / total) * 100}%` }}
                 />
               </div>
-              <span className="w-6 text-right text-sm font-semibold text-dark dark:text-white">{item.count}</span>
+              <span className="w-6 text-right text-body font-semibold">{item.count}</span>
             </div>
           </div>
         ))}
       </div>
 
       <div className="mt-4 rounded-lg bg-gray-1 dark:bg-dark-3 p-3">
-        <p className="text-xs text-dark-5 dark:text-dark-6">
+        <p className="text-muted">
           Last updated: <span className="font-medium text-dark dark:text-white">3:47 PM today</span>
         </p>
       </div>

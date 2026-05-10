@@ -25,21 +25,21 @@ export default function CertificationsPage() {
   const { toast, setToast } = useToast();
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-dark dark:text-white">Certifications</h1>
-        <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Manage your earned certificates and explore new ones</p>
+        <h1 className="page-title">Certifications</h1>
+        <p className="text-muted mt-0.5">Manage your earned certificates and explore new ones</p>
       </div>
 
       {/* My Certifications */}
       <div>
-        <h2 className="text-sm font-semibold text-dark dark:text-white mb-3">My Certifications</h2>
+        <h2 className="section-title mb-3">My Certifications</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MY_CERTIFICATIONS.map((cert) => (
             <div
               key={cert.id}
-              className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3"
+              className="card-p"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
@@ -51,16 +51,16 @@ export default function CertificationsPage() {
                   Active
                 </span>
               </div>
-              <p className="text-sm font-semibold text-dark dark:text-white mb-1">{cert.name}</p>
-              <p className="text-xs text-dark-5 dark:text-dark-6 mb-3">{cert.issuer}</p>
-              <div className="space-y-1 text-xs text-dark-5 dark:text-dark-6 mb-3">
+              <p className="text-body-medium mb-1">{cert.name}</p>
+              <p className="text-muted mb-3">{cert.issuer}</p>
+              <div className="text-muted space-y-1 mb-3">
                 <p>Earned: <span className="text-dark dark:text-white">{cert.earned}</span></p>
                 <p>Expires: <span className="text-dark dark:text-white">{cert.expiry}</span></p>
                 <p className="font-mono text-xs truncate">{cert.credential}</p>
               </div>
               <button
                 onClick={() => setToast("Downloading certificate PDF...")}
-                className="w-full rounded-lg border border-gray-3 py-1.5 text-xs font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+                className="btn-secondary w-full py-1.5 text-xs"
               >
                 Download Certificate
               </button>
@@ -71,12 +71,12 @@ export default function CertificationsPage() {
 
       {/* Available Certifications */}
       <div>
-        <h2 className="text-sm font-semibold text-dark dark:text-white mb-3">Available Certifications</h2>
+        <h2 className="section-title mb-3">Available Certifications</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {AVAILABLE_CERTIFICATIONS.map((cert) => (
             <div
               key={cert.id}
-              className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3"
+              className="card-p"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-light dark:bg-violet-dark/20">
@@ -88,15 +88,15 @@ export default function CertificationsPage() {
                   {cert.fee}
                 </span>
               </div>
-              <p className="text-sm font-semibold text-dark dark:text-white mb-1">{cert.name}</p>
-              <p className="text-xs text-dark-5 dark:text-dark-6 mb-3">{cert.provider}</p>
-              <div className="space-y-1 text-xs text-dark-5 dark:text-dark-6 mb-3">
+              <p className="text-body-medium mb-1">{cert.name}</p>
+              <p className="text-muted mb-3">{cert.provider}</p>
+              <div className="text-muted space-y-1 mb-3">
                 <p>Requires: {cert.requirements}</p>
                 <p>Next Exam: <span className="text-dark dark:text-white font-medium">{cert.examDate}</span></p>
               </div>
               <button
                 onClick={() => setToast("Registration confirmed! Check your email for details.")}
-                className="w-full rounded-lg bg-primary-600 py-1.5 text-sm font-semibold text-white hover:bg-primary-700"
+                className="btn-primary w-full py-1.5"
               >
                 Register
               </button>

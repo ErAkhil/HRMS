@@ -71,9 +71,9 @@ const ACTIONS = [
 
 export function QuickActionsGrid() {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-      <h3 className="mb-4 text-sm font-semibold text-dark dark:text-white">Quick Actions</h3>
-      <div className="grid grid-cols-3 gap-2.5">
+    <div className="card-p">
+      <h3 className="section-title mb-4">Quick Actions</h3>
+      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-3">
         {ACTIONS.map((a) => (
           <Link
             key={a.label}

@@ -115,8 +115,8 @@ export function Header() {
         <div className="flex shrink-0 items-center gap-1">
 
           {/* AI Assistant */}
-          <button
-            onClick={() => router.push("/ai")}
+          <Link
+            href="/ai"
             className="hidden items-center gap-1.5 rounded-lg bg-gradient-ai px-3 py-1.5 text-xs font-semibold text-white shadow-indigo-glow transition-opacity hover:opacity-90 sm:flex"
             aria-label="Open AI Assistant"
           >
@@ -124,7 +124,7 @@ export function Header() {
               <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             Ask AI
-          </button>
+          </Link>
 
           {/* Calendar shortcut */}
           <Link

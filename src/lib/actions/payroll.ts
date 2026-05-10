@@ -35,7 +35,7 @@ export async function getPayslip(id: string) {
   const user = await requireAuth();
 
   const payslip = await db.payslip.findFirst({
-    where: { id },
+    where: { id, employee: { orgId: user.orgId } },
     include: {
       employee: {
         select: {

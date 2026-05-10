@@ -1,68 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { AI_GRADIENT, AI_ICON_PATH, SUGGESTIONS, RECENT } from "../_data/ai-data";
+import { MessageContent } from "./ai-message-content";
 
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
 };
-
-const SUGGESTIONS = [
-  { icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", label: "Summarize my performance this quarter" },
-  { icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4", label: "How do I apply for annual leave?" },
-  { icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z", label: "Explain my latest payslip deductions" },
-  { icon: "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z", label: "What is the work from home policy?" },
-];
-
-const RECENT = [
-  "Leave policy for remote employees",
-  "Payroll deduction breakdown",
-  "Q2 performance summary",
-  "Onboarding checklist",
-  "Attendance regularisation process",
-];
-
-function parseInline(text: string): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  const re = /\*\*(.*?)\*\*|`([^`]+)`/g;
-  let last = 0;
-  let match: RegExpExecArray | null;
-  let idx = 0;
-  while ((match = re.exec(text)) !== null) {
-    if (match.index > last) nodes.push(<span key={idx++}>{text.slice(last, match.index)}</span>);
-    if (match[1] !== undefined) nodes.push(<strong key={idx++}>{match[1]}</strong>);
-    else nodes.push(<code key={idx++} className="bg-gray-2 dark:bg-dark-3 px-1 rounded text-xs">{match[2]}</code>);
-    last = match.index + match[0].length;
-  }
-  if (last < text.length) nodes.push(<span key={idx++}>{text.slice(last)}</span>);
-  return nodes;
-}
-
-function MessageContent({ content }: { content: string }) {
-  const lines = content.split("\n");
-  return (
-    <div className="space-y-0.5 text-sm">
-      {lines.map((line, i) => {
-        if (line.startsWith("### ")) return <p key={i} className="font-bold text-dark dark:text-white mt-2">{line.slice(4)}</p>;
-        if (line.startsWith("## ")) return <p key={i} className="font-bold text-dark dark:text-white text-base mt-2">{line.slice(3)}</p>;
-        if (line.startsWith("**") && line.endsWith("**") && !line.slice(2, -2).includes("**")) {
-          return <p key={i} className="font-semibold text-dark dark:text-white mt-1.5">{line.slice(2, -2)}</p>;
-        }
-        if (line.startsWith("- ") || line.startsWith("* ")) {
-          return <li key={i} className="ml-4 list-disc">{parseInline(line.slice(2))}</li>;
-        }
-        if (/^\d+\. /.test(line)) {
-          return <li key={i} className="ml-4 list-decimal">{parseInline(line.replace(/^\d+\. /, ""))}</li>;
-        }
-        if (line.startsWith("| ") && line.endsWith(" |")) return null;
-        if (/^\|[-| ]+\|$/.test(line)) return null;
-        if (!line.trim()) return <div key={i} className="h-1" />;
-        return <p key={i}>{parseInline(line)}</p>;
-      })}
-    </div>
-  );
-}
 
 interface Props {
   context: string;
@@ -154,9 +100,9 @@ export function AIChat({ context, userName }: Props) {
       <div className="w-60 shrink-0 border-r border-gray-3 bg-white dark:border-dark-3 dark:bg-dark-2 flex flex-col">
         <div className="p-4 border-b border-gray-3 dark:border-dark-3">
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{ background: "linear-gradient(135deg,#4F46E5,#8B5CF6)" }}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{ background: AI_GRADIENT }}>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={AI_ICON_PATH} />
               </svg>
             </div>
             <span className="text-sm font-semibold text-dark dark:text-white">AI Assistant</span>
@@ -192,9 +138,9 @@ export function AIChat({ context, userName }: Props) {
       <div className="flex flex-1 flex-col bg-gray-1 dark:bg-[#111827] overflow-hidden">
         {/* Header */}
         <div className="border-b border-gray-3 dark:border-dark-3 bg-white dark:bg-dark-2 px-5 py-3.5 flex items-center gap-3 shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl text-white shrink-0" style={{ background: "linear-gradient(135deg,#4F46E5,#8B5CF6)" }}>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl text-white shrink-0" style={{ background: AI_GRADIENT }}>
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={AI_ICON_PATH} />
             </svg>
           </div>
           <div>
@@ -211,9 +157,9 @@ export function AIChat({ context, userName }: Props) {
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {showWelcome && (
             <div className="flex flex-col items-center justify-center h-full py-10">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-white mb-4" style={{ background: "linear-gradient(135deg,#4F46E5,#8B5CF6)" }}>
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-white mb-4" style={{ background: AI_GRADIENT }}>
                 <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={AI_ICON_PATH} />
                 </svg>
               </div>
               <h2 className="text-xl font-bold text-dark dark:text-white mb-1">Hello, {userName}!</h2>
@@ -236,9 +182,9 @@ export function AIChat({ context, userName }: Props) {
           {!showWelcome && messages.map((msg) => (
             <div key={msg.id} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
               {msg.role === "assistant" && (
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white mt-0.5" style={{ background: "linear-gradient(135deg,#4F46E5,#8B5CF6)" }}>
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white mt-0.5" style={{ background: AI_GRADIENT }}>
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={AI_ICON_PATH} />
                   </svg>
                 </div>
               )}

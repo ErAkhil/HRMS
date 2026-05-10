@@ -36,9 +36,9 @@ const statusBadge: Record<AttendanceStatus, string> = {
 
 export function AttendanceTable() {
   return (
-    <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
-      <div className="flex items-center justify-between p-5 border-b border-gray-3 dark:border-dark-3">
-        <h3 className="text-sm font-semibold text-dark dark:text-white">Today&apos;s Attendance</h3>
+    <div className="card overflow-hidden">
+      <div className="flex items-center justify-between p-5 divider">
+        <h3 className="section-title">Today&apos;s Attendance</h3>
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -50,19 +50,19 @@ export function AttendanceTable() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-3 dark:border-dark-3">
-              <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Employee</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Clock In</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Clock Out</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Hours</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Status</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Action</th>
+            <tr className="thead-row">
+              <th className="th">Employee</th>
+              <th className="th">Clock In</th>
+              <th className="th">Clock Out</th>
+              <th className="th">Hours</th>
+              <th className="th">Status</th>
+              <th className="th">Action</th>
             </tr>
           </thead>
           <tbody>
             {employees.map((emp) => (
-              <tr key={emp.id} className="border-b border-gray-3 last:border-0 hover:bg-gray-1 dark:border-dark-3 dark:hover:bg-dark-3">
-                <td className="px-5 py-3">
+              <tr key={emp.id} className="tr-body">
+                <td className="td">
                   <div className="flex items-center gap-3">
                     <Image
                       src={emp.avatar}
@@ -72,25 +72,19 @@ export function AttendanceTable() {
                       className="rounded-full object-cover"
                     />
                     <div>
-                      <p className="text-sm font-medium text-dark dark:text-white">{emp.name}</p>
-                      <p className="text-xs text-dark-5 dark:text-dark-6">{emp.role}</p>
+                      <p className="text-body-medium">{emp.name}</p>
+                      <p className="text-muted">{emp.role}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-5 py-3">
-                  <span className="text-sm text-dark dark:text-white">{emp.clockIn}</span>
-                </td>
-                <td className="px-5 py-3">
-                  <span className="text-sm text-dark dark:text-white">{emp.clockOut}</span>
-                </td>
-                <td className="px-5 py-3">
-                  <span className="text-sm font-medium text-dark dark:text-white">{emp.hours}</span>
-                </td>
-                <td className="px-5 py-3">
+                <td className="td">{emp.clockIn}</td>
+                <td className="td">{emp.clockOut}</td>
+                <td className="td font-medium">{emp.hours}</td>
+                <td className="td">
                   <span className={statusBadge[emp.status]}>{emp.status}</span>
                 </td>
-                <td className="px-5 py-3">
-                  <button className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6">
+                <td className="td">
+                  <button className="btn-secondary">
                     View
                   </button>
                 </td>

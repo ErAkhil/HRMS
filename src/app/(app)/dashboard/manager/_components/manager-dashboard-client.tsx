@@ -57,13 +57,13 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
   const totalTasks = todo + inProgress + inReview + done;
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="page-container">
       {/* Section 1: Greeting Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-3">
             <div>
-              <h1 className="text-xl font-bold text-white">Good morning, {userName} 👋</h1>
+              <h1 className="page-title text-white">Good morning, {userName} 👋</h1>
               <p className="text-sm text-white/70 mt-0.5">
                 {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                 &nbsp;|&nbsp;{data.teamSize} reports
@@ -99,46 +99,46 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
       </div>
 
       {/* Section 2: KPI Row */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-        <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
+        <div className="card-p">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Team Size</p>
               <p className="mt-1.5 text-3xl font-bold text-dark dark:text-white">{data.teamSize}</p>
-              <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">{data.onLeaveCount} on leave today</p>
+              <p className="text-muted mt-1">{data.onLeaveCount} on leave today</p>
             </div>
             <span className="rounded-lg bg-indigo-50 p-2 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300 text-lg">👥</span>
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+        <div className="card-p">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Present Today</p>
               <p className="mt-1.5 text-3xl font-bold text-dark dark:text-white">{data.presentCount}</p>
-              <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">{data.attendancePct}% attendance</p>
+              <p className="text-muted mt-1">{data.attendancePct}% attendance</p>
             </div>
             <span className="rounded-lg bg-emerald-light p-2 text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald text-lg">✅</span>
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+        <div className="card-p">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Pending Approvals</p>
               <p className="mt-1.5 text-3xl font-bold text-dark dark:text-white">{data.pendingLeave}</p>
-              <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">Leave requests</p>
+              <p className="text-muted mt-1">Leave requests</p>
             </div>
             <span className="rounded-lg bg-amber-light p-2 text-amber-dark dark:bg-amber-dark/20 dark:text-amber text-lg">⏳</span>
           </div>
         </div>
 
-        <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+        <div className="card-p">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Tasks</p>
               <p className="mt-1.5 text-3xl font-bold text-dark dark:text-white">{inProgress}</p>
-              <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">In progress</p>
+              <p className="text-muted mt-1">In progress</p>
             </div>
             <span className="rounded-lg bg-violet-light p-2 text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300 text-lg">🎯</span>
           </div>
@@ -153,11 +153,11 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
 
       {/* Section 3: Team Status Table + Quick Actions */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-6">
-        <div className="md:col-span-8 rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+        <div className="md:col-span-8 card">
           <div className="flex items-center justify-between px-5 pt-5 pb-3">
             <div>
-              <h2 className="font-semibold text-dark dark:text-white">Team Status Today</h2>
-              <p className="text-xs text-dark-5 dark:text-dark-6">
+              <h2 className="section-title">Team Status Today</h2>
+              <p className="text-muted">
                 {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               </p>
             </div>
@@ -169,18 +169,18 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
             ) : (
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-3 dark:border-dark-3">
-                    <th className="px-5 pb-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Member</th>
-                    <th className="px-3 pb-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Status</th>
-                    <th className="px-3 pb-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Check-in</th>
-                    <th className="px-3 pb-2.5 text-left text-[10px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Department</th>
-                    <th className="px-5 pb-2.5 text-right text-[10px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Action</th>
+                  <tr className="thead-row">
+                    <th className="th">Member</th>
+                    <th className="th">Status</th>
+                    <th className="th">Check-in</th>
+                    <th className="th">Department</th>
+                    <th className="th text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-3 dark:divide-dark-3">
+                <tbody>
                   {data.teamMembers.map((member) => (
-                    <tr key={member.id} className="hover:bg-gray-1 dark:hover:bg-dark-3/40 transition-colors">
-                      <td className="px-5 py-2.5">
+                    <tr key={member.id} className="tr-body">
+                      <td className="td">
                         <div className="flex items-center gap-2">
                           {member.avatarUrl ? (
                             <img src={member.avatarUrl} alt={member.name} width={28} height={28} className="rounded-full object-cover w-7 h-7" />
@@ -192,17 +192,17 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
                           <span className="text-xs font-medium text-dark dark:text-white whitespace-nowrap">{member.name}</span>
                         </div>
                       </td>
-                      <td className="px-3 py-2.5">
+                      <td className="td">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass[member.statusColor] ?? statusBadgeClass.rose}`}>
                           <span>{statusIcon[member.statusColor] ?? "❓"}</span>
                           {member.status}
                         </span>
                       </td>
-                      <td className="px-3 py-2.5 text-xs text-dark-5 dark:text-dark-6 whitespace-nowrap">{member.checkin}</td>
-                      <td className="px-3 py-2.5 max-w-[160px]">
-                        <span className="block truncate text-xs text-dark-5 dark:text-dark-6">{member.department}</span>
+                      <td className="td text-muted whitespace-nowrap">{member.checkin}</td>
+                      <td className="td max-w-[160px]">
+                        <span className="block truncate text-muted">{member.department}</span>
                       </td>
-                      <td className="px-5 py-2.5 text-right">
+                      <td className="td text-right">
                         <Link href="/employees" className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">View</Link>
                       </td>
                     </tr>
@@ -215,9 +215,9 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
 
         <div className="md:col-span-4 flex flex-col gap-4">
           {/* Sprint Tasks */}
-          <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+          <div className="card-p">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-dark dark:text-white">Sprint Tasks</h2>
+              <h2 className="section-title">Sprint Tasks</h2>
               <Link href="/tasks/kanban" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View Kanban →</Link>
             </div>
             <div className="space-y-3">
@@ -230,7 +230,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
                 <div key={item.label}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-dark dark:text-white">{item.label}</span>
-                    <span className="text-xs text-dark-5 dark:text-dark-6">{item.count} tasks</span>
+                    <span className="text-muted">{item.count} tasks</span>
                   </div>
                   <div className="relative h-1.5 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
                     <div
@@ -250,9 +250,9 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
           </div>
 
           {/* Manager Actions */}
-          <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+          <div className="card-p">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-dark dark:text-white">Manager Actions</h2>
+              <h2 className="section-title">Manager Actions</h2>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
               <Link href="/reports" className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-3 p-3 text-xs font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3 transition-colors">

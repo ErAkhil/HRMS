@@ -9,10 +9,10 @@ export function ScoreCard() {
       style={{ background: "linear-gradient(135deg, #4F46E5, #8B5CF6)" }}
     >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-5">
           {/* Progress Ring */}
           <div className="relative flex-shrink-0">
-            <svg width="128" height="128" viewBox="0 0 128 128">
+            <svg width="112" height="112" viewBox="0 0 128 128">
               <circle
                 cx="64"
                 cy="64"
@@ -48,13 +48,13 @@ export function ScoreCard() {
         </div>
 
         {/* Sub-scores */}
-        <div className="flex gap-8">
+        <div className="flex flex-wrap gap-6 sm:gap-8">
           {[
             { label: "Goals", value: 92 },
             { label: "Skills", value: 84 },
             { label: "Collaboration", value: 85 },
           ].map((item) => (
-            <div key={item.label} className="text-center">
+            <div key={item.label} className="text-center min-w-[64px]">
               <div className="text-2xl font-bold text-white">{item.value}%</div>
               <div className="mt-0.5 text-xs text-white/70">{item.label}</div>
               <div className="mt-2 h-1.5 w-16 overflow-hidden rounded-full bg-white/20">

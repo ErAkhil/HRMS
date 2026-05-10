@@ -85,25 +85,25 @@ export function LeaveCalendarClient({ events: initialEvents, currentMonth, curre
   const rejectedCount = events.filter((e) => e.status === "REJECTED").length;
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-dark dark:text-white">Leave Calendar</h1>
+            <h1 className="page-title">Leave Calendar</h1>
             {pendingCount > 0 && (
               <span className="rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark dark:bg-amber-dark/20 dark:text-amber">
                 {pendingCount} pending
               </span>
             )}
           </div>
-          <p className="text-xs text-dark-5 dark:text-dark-6 mt-0.5">Team leave overview</p>
+          <p className="text-muted mt-0.5">Team leave overview</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/leave/approvals" className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6">
+          <Link href="/leave/approvals" className="btn-secondary">
             Approvals {pendingCount > 0 && `(${pendingCount})`}
           </Link>
-          <Link href="/leave" className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+          <Link href="/leave" className="btn-primary">
             Apply Leave
           </Link>
         </div>
@@ -117,31 +117,31 @@ export function LeaveCalendarClient({ events: initialEvents, currentMonth, curre
           { label: "Rejected", value: rejectedCount, color: "text-rose-dark dark:text-rose" },
           { label: "Unique Employees", value: new Set(events.map((e) => e.name)).size, color: "text-violet-dark dark:text-violet-300" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl bg-white p-4 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-            <p className="text-xs text-dark-5 dark:text-dark-6">{stat.label}</p>
-            <p className={`mt-1 text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+          <div key={stat.label} className="stat-card">
+            <p className="stat-label">{stat.label}</p>
+            <p className={`stat-value ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Calendar */}
-      <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+      <div className="card-p">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-dark dark:text-white">
+          <h2 className="section-title">
             {MONTHS[month]} {year}
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigateMonth(-1)}
               disabled={loading}
-              className="rounded-lg border border-gray-3 px-3 py-1.5 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6 disabled:opacity-50"
+              className="btn-secondary btn-sm"
             >
               ‹ Prev
             </button>
             <button
               onClick={() => navigateMonth(1)}
               disabled={loading}
-              className="rounded-lg border border-gray-3 px-3 py-1.5 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6 disabled:opacity-50"
+              className="btn-secondary btn-sm"
             >
               Next ›
             </button>
@@ -151,7 +151,7 @@ export function LeaveCalendarClient({ events: initialEvents, currentMonth, curre
         {/* Day labels */}
         <div className="grid grid-cols-7 mb-1">
           {DAY_LABELS.map((d) => (
-            <div key={d} className="py-1 text-center text-xs font-semibold uppercase text-dark-5 dark:text-dark-6">{d}</div>
+            <div key={d} className="py-1 text-center text-muted text-xs font-semibold uppercase">{d}</div>
           ))}
         </div>
 
@@ -187,7 +187,7 @@ export function LeaveCalendarClient({ events: initialEvents, currentMonth, curre
                         </div>
                       ))}
                       {dayEvents.length > 2 && (
-                        <div className="text-[10px] text-dark-5 dark:text-dark-6">+{dayEvents.length - 2} more</div>
+                        <div className="text-muted text-[10px]">+{dayEvents.length - 2} more</div>
                       )}
                     </div>
                   </>
@@ -207,29 +207,29 @@ export function LeaveCalendarClient({ events: initialEvents, currentMonth, curre
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-1.5">
             <span className={`h-3 w-3 rounded-full ${item.color}`} />
-            <span className="text-xs text-dark-5 dark:text-dark-6">{item.label}</span>
+            <span className="text-muted">{item.label}</span>
           </div>
         ))}
       </div>
 
       {/* Event List */}
       {events.length > 0 && (
-        <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-          <h2 className="font-semibold text-dark dark:text-white mb-3">All Leave Events — {MONTHS[month]} {year}</h2>
+        <div className="card-p">
+          <h2 className="section-title mb-3">All Leave Events — {MONTHS[month]} {year}</h2>
           <div className="space-y-2">
             {events.map((ev) => (
               <div key={ev.id} className="flex items-center justify-between rounded-lg border border-gray-2 p-3 dark:border-dark-3">
                 <div className="flex items-center gap-3">
                   <div className={`h-2 w-2 rounded-full ${STATUS_COLORS[ev.status] ?? "bg-gray-400"}`} />
                   <div>
-                    <p className="text-sm font-medium text-dark dark:text-white">{ev.name}</p>
-                    <p className="text-xs text-dark-5 dark:text-dark-6">
+                    <p className="text-body-medium">{ev.name}</p>
+                    <p className="text-muted">
                       {ev.dept} · {ev.leaveType.toLowerCase()} · {ev.days} day{ev.days !== 1 ? "s" : ""}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-dark-5 dark:text-dark-6">
+                  <p className="text-muted">
                     {new Date(ev.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} –{" "}
                     {new Date(ev.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   </p>

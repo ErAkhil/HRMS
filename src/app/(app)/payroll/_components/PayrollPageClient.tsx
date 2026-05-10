@@ -33,7 +33,7 @@ export function PayrollPageClient({ payrollRuns, latestStats, isAdmin }: Props) 
   const router = useRouter();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
-  const [year] = useState(now.getFullYear());
+  const year = now.getFullYear();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast, setToast } = useToast();
@@ -55,12 +55,12 @@ export function PayrollPageClient({ payrollRuns, latestStats, isAdmin }: Props) 
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Payroll</h1>
-          <p className="text-xs text-dark-5 dark:text-dark-6">Manage and process employee payroll</p>
+          <h1 className="page-title">Payroll</h1>
+          <p className="text-muted">Manage and process employee payroll</p>
         </div>
         {isAdmin && (
           <div className="flex flex-wrap items-center gap-3">
@@ -89,7 +89,7 @@ export function PayrollPageClient({ payrollRuns, latestStats, isAdmin }: Props) 
             <button
               onClick={() => setShowConfirmModal(true)}
               disabled={isPending}
-              className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+              className="btn-primary flex items-center gap-2 disabled:opacity-60"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -119,8 +119,8 @@ export function PayrollPageClient({ payrollRuns, latestStats, isAdmin }: Props) 
 
       {/* Run Payroll Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-modal dark:bg-dark-2">
+        <div className="modal-overlay">
+          <div className="modal-panel max-w-md p-6">
             <div className="mb-4 flex justify-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20">
                 <svg className="h-7 w-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

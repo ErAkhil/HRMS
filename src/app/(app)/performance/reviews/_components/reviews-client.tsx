@@ -42,16 +42,16 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
     : 0;
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Performance Reviews</h1>
-          <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Manage review cycles and track progress</p>
+          <h1 className="page-title">Performance Reviews</h1>
+          <p className="text-muted mt-0.5">Manage review cycles and track progress</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="btn-primary"
         >
           + New Review Cycle
         </button>
@@ -65,8 +65,8 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
           { label: "Completed", value: completed, color: "text-emerald-dark dark:text-emerald" },
           { label: "Avg Score", value: avgScore > 0 ? `${avgScore}/100` : "—", color: "text-violet-dark dark:text-violet-300" },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl bg-white p-4 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-            <p className="text-xs text-dark-5 dark:text-dark-6">{s.label}</p>
+          <div key={s.label} className="card-p">
+            <p className="stat-label">{s.label}</p>
             <p className={`mt-1 text-2xl font-bold ${s.color}`}>{s.value}</p>
           </div>
         ))}
@@ -99,9 +99,9 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-3 px-5 py-4 dark:border-dark-3">
-          <h2 className="text-sm font-semibold text-dark dark:text-white">All Reviews</h2>
+      <div className="card overflow-hidden">
+        <div className="page-header border-b border-gray-3 px-5 py-4 dark:border-dark-3">
+          <h2 className="section-title">All Reviews</h2>
           <div className="flex gap-2">
             {["All", "PENDING", "COMPLETED"].map((s) => (
               <button
@@ -121,29 +121,29 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-1 dark:bg-dark-3">
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Employee</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Period</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Reviewer</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Score</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Status</th>
+              <tr className="thead-row">
+                <th className="th">Employee</th>
+                <th className="th">Period</th>
+                <th className="th">Reviewer</th>
+                <th className="th">Score</th>
+                <th className="th">Status</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-sm text-dark-5 dark:text-dark-6">No reviews found.</td>
+                  <td colSpan={5} className="td py-10 text-center text-dark-5 dark:text-dark-6">No reviews found.</td>
                 </tr>
               ) : (
                 filtered.map((r) => (
-                  <tr key={r.id} className="border-b border-gray-3 last:border-0 hover:bg-gray-1 dark:border-dark-3 dark:hover:bg-dark-3">
-                    <td className="px-5 py-3.5">
-                      <p className="font-medium text-dark dark:text-white">{r.revieweeName}</p>
-                      <p className="text-xs text-dark-5 dark:text-dark-6">{r.revieweeTitle} · {r.revieweeDept}</p>
+                  <tr key={r.id} className="tr-body">
+                    <td className="td">
+                      <p className="text-body-medium">{r.revieweeName}</p>
+                      <p className="text-muted">{r.revieweeTitle} · {r.revieweeDept}</p>
                     </td>
-                    <td className="px-5 py-3.5 text-dark-5 dark:text-dark-6">{r.period}</td>
-                    <td className="px-5 py-3.5 text-dark-5 dark:text-dark-6">{r.reviewerName}</td>
-                    <td className="px-5 py-3.5">
+                    <td className="td text-dark-5 dark:text-dark-6">{r.period}</td>
+                    <td className="td text-dark-5 dark:text-dark-6">{r.reviewerName}</td>
+                    <td className="td">
                       {r.score !== null ? (
                         <>
                           <span className="font-semibold text-dark dark:text-white">{r.score}</span>
@@ -153,7 +153,7 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
                         <span className="text-dark-5 dark:text-dark-6">—</span>
                       )}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="td">
                       <span className={STATUS_BADGE[r.status] ?? STATUS_BADGE.PENDING}>{r.status}</span>
                     </td>
                   </tr>
@@ -166,22 +166,22 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-floating dark:bg-dark-2">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-base font-bold text-dark dark:text-white">Create Review Cycle</h2>
+        <div className="modal-overlay">
+          <div className="modal-panel w-full max-w-md p-6">
+            <div className="modal-header mb-5 flex items-center justify-between">
+              <h2 className="section-title">Create Review Cycle</h2>
               <button onClick={() => setShowModal(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Cycle Name</label>
-                <input type="text" value={cycleName} onChange={(e) => setCycleName(e.target.value)} placeholder="e.g. Q3 2026 Review" className="h-9 w-full rounded-lg border border-gray-3 bg-gray-1 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white" />
+                <label className="label-field mb-1.5">Cycle Name</label>
+                <input type="text" value={cycleName} onChange={(e) => setCycleName(e.target.value)} placeholder="e.g. Q3 2026 Review" className="input-field h-9 w-full" />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Type</label>
-                <select value={reviewType} onChange={(e) => setReviewType(e.target.value)} className="h-9 w-full rounded-lg border border-gray-3 bg-gray-1 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white">
+                <label className="label-field mb-1.5">Type</label>
+                <select value={reviewType} onChange={(e) => setReviewType(e.target.value)} className="input-field h-9 w-full">
                   <option value="Annual">Annual</option>
                   <option value="Mid-year">Mid-year</option>
                   <option value="Quarterly">Quarterly</option>
@@ -189,18 +189,18 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Start Date</label>
-                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="h-9 w-full rounded-lg border border-gray-3 bg-gray-1 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white" />
+                  <label className="label-field mb-1.5">Start Date</label>
+                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input-field h-9 w-full" />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">End Date</label>
-                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="h-9 w-full rounded-lg border border-gray-3 bg-gray-1 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white" />
+                  <label className="label-field mb-1.5">End Date</label>
+                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="input-field h-9 w-full" />
                 </div>
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6">Cancel</button>
-              <button onClick={() => { setShowModal(false); setToast("Review cycle created!"); router.refresh(); }} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Create</button>
+              <button onClick={() => setShowModal(false)} className="btn-secondary">Cancel</button>
+              <button onClick={() => { setShowModal(false); setToast("Review cycle created!"); router.refresh(); }} className="btn-primary">Create</button>
             </div>
           </div>
         </div>

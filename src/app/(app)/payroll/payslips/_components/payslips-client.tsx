@@ -58,19 +58,19 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
 
   if (payslips.length === 0) {
     return (
-      <div className="space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-container">
+        <div className="page-header">
           <div>
-            <div className="flex items-center gap-2 text-xs text-dark-5 dark:text-dark-6 mb-1">
+            <div className="flex items-center gap-2 text-muted mb-1">
               <Link href="/payroll" className="hover:text-primary-600">Payroll</Link>
               <span>/</span>
               <span>Payslips</span>
             </div>
-            <h1 className="text-xl font-bold text-dark dark:text-white">Payslips</h1>
+            <h1 className="page-title">Payslips</h1>
           </div>
         </div>
-        <div className="rounded-xl bg-white p-10 text-center shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-          <p className="text-sm text-dark-5 dark:text-dark-6">No payslips found. Payslips will appear here once payroll is processed.</p>
+        <div className="card empty-state">
+          <p className="empty-state-text">No payslips found. Payslips will appear here once payroll is processed.</p>
         </div>
       </div>
     );
@@ -79,29 +79,29 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
   const totalDeductions = active.taxDeduction + active.pfDeduction + active.otherDeductions;
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <div className="flex items-center gap-2 text-xs text-dark-5 dark:text-dark-6 mb-1">
+          <div className="flex items-center gap-2 text-muted mb-1">
             <Link href="/payroll" className="hover:text-primary-600">Payroll</Link>
             <span>/</span>
             <span>Payslips</span>
           </div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Payslips</h1>
+          <h1 className="page-title">Payslips</h1>
         </div>
         {/* YTD summary */}
         <div className="flex items-center gap-6 text-right">
           <div>
-            <p className="text-xs text-dark-5 dark:text-dark-6">YTD Gross</p>
+            <p className="text-muted">YTD Gross</p>
             <p className="text-sm font-bold text-dark dark:text-white">{fmt(ytdGross)}</p>
           </div>
           <div>
-            <p className="text-xs text-dark-5 dark:text-dark-6">YTD Net</p>
+            <p className="text-muted">YTD Net</p>
             <p className="text-sm font-bold text-emerald-600 dark:text-emerald">{fmt(ytdNet)}</p>
           </div>
           <div>
-            <p className="text-xs text-dark-5 dark:text-dark-6">YTD Tax</p>
+            <p className="text-muted">YTD Tax</p>
             <p className="text-sm font-bold text-rose-600 dark:text-rose">{fmt(ytdTax)}</p>
           </div>
         </div>
@@ -110,9 +110,9 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
       <div className="grid gap-5 lg:grid-cols-12">
         {/* Month List */}
         <div className="lg:col-span-3">
-          <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
-            <div className="p-4 border-b border-gray-3 dark:border-dark-3">
-              <p className="text-sm font-semibold text-dark dark:text-white">Select Period</p>
+          <div className="card overflow-hidden">
+            <div className="p-4 divider">
+              <p className="section-title">Select Period</p>
             </div>
             <div className="p-2">
               {monthLabels.map((label, idx) => (
@@ -134,20 +134,20 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
 
         {/* Payslip Document */}
         <div className="lg:col-span-9">
-          <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
+          <div className="card overflow-hidden">
             {/* Payslip Header */}
-            <div className="border-b border-gray-3 bg-gray-1 p-6 dark:border-dark-3 dark:bg-dark-3">
+            <div className="divider bg-gray-1 p-6 dark:bg-dark-3">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h2 className="text-lg font-bold text-dark dark:text-white">Your Organisation</h2>
-                  <p className="text-xs text-dark-5 dark:text-dark-6">Payroll document</p>
+                  <p className="text-muted">Payroll document</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-dark dark:text-white">PAYSLIP</p>
-                  <p className="text-xs text-dark-5 dark:text-dark-6">
+                  <p className="text-body-medium">PAYSLIP</p>
+                  <p className="text-muted">
                     {MONTH_NAMES[active.payrollRun.month]} {active.payrollRun.year}
                   </p>
-                  <p className="text-xs text-dark-5 dark:text-dark-6">
+                  <p className="text-muted">
                     Status:{" "}
                     <span className="font-semibold capitalize">{active.payrollRun.status.toLowerCase()}</span>
                   </p>
@@ -158,7 +158,7 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
             <div className="p-6 space-y-5">
               {/* Period label */}
               <div>
-                <p className="text-xs text-dark-5 dark:text-dark-6">
+                <p className="text-muted">
                   Pay Period:{" "}
                   <span className="font-semibold text-dark dark:text-white">
                     {MONTH_NAMES[active.payrollRun.month]} {active.payrollRun.year}
@@ -171,65 +171,69 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
                 {/* Earnings */}
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Earnings</p>
+                  <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-1 dark:bg-dark-3">
-                        <th className="px-3 py-2 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Component</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-dark-5 dark:text-dark-6">Amount</th>
+                      <tr className="thead-row">
+                        <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Component</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-3 dark:border-dark-3">
+                      <tr className="tr-body">
                         <td className="px-3 py-2 text-dark dark:text-white">Basic Salary</td>
                         <td className="px-3 py-2 text-right font-medium text-emerald-dark dark:text-emerald">{fmt(active.basicSalary)}</td>
                       </tr>
-                      <tr className="border-b border-gray-3 dark:border-dark-3">
+                      <tr className="tr-body">
                         <td className="px-3 py-2 text-dark dark:text-white">HRA</td>
                         <td className="px-3 py-2 text-right font-medium text-emerald-dark dark:text-emerald">{fmt(active.hra)}</td>
                       </tr>
-                      <tr className="border-b border-gray-3 dark:border-dark-3">
+                      <tr className="tr-body">
                         <td className="px-3 py-2 text-dark dark:text-white">Allowances</td>
                         <td className="px-3 py-2 text-right font-medium text-emerald-dark dark:text-emerald">{fmt(active.allowances)}</td>
                       </tr>
-                      <tr className="bg-gray-1 dark:bg-dark-3">
+                      <tr className="thead-row">
                         <td className="px-3 py-2 text-sm font-bold text-dark dark:text-white">Gross Earnings</td>
                         <td className="px-3 py-2 text-right text-sm font-bold text-dark dark:text-white">{fmt(active.grossPay)}</td>
                       </tr>
                     </tbody>
                   </table>
+                  </div>
                 </div>
 
                 {/* Deductions */}
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Deductions</p>
+                  <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-1 dark:bg-dark-3">
-                        <th className="px-3 py-2 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Component</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-dark-5 dark:text-dark-6">Amount</th>
+                      <tr className="thead-row">
+                        <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Component</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b border-gray-3 dark:border-dark-3">
+                      <tr className="tr-body">
                         <td className="px-3 py-2 text-dark dark:text-white">Provident Fund</td>
                         <td className="px-3 py-2 text-right font-medium text-rose-dark dark:text-rose">{fmt(active.pfDeduction)}</td>
                       </tr>
-                      <tr className="border-b border-gray-3 dark:border-dark-3">
+                      <tr className="tr-body">
                         <td className="px-3 py-2 text-dark dark:text-white">Income Tax (TDS)</td>
                         <td className="px-3 py-2 text-right font-medium text-rose-dark dark:text-rose">{fmt(active.taxDeduction)}</td>
                       </tr>
                       {active.otherDeductions > 0 && (
-                        <tr className="border-b border-gray-3 dark:border-dark-3">
+                        <tr className="tr-body">
                           <td className="px-3 py-2 text-dark dark:text-white">Other Deductions</td>
                           <td className="px-3 py-2 text-right font-medium text-rose-dark dark:text-rose">{fmt(active.otherDeductions)}</td>
                         </tr>
                       )}
-                      <tr className="bg-gray-1 dark:bg-dark-3">
+                      <tr className="thead-row">
                         <td className="px-3 py-2 text-sm font-bold text-dark dark:text-white">Total Deductions</td>
                         <td className="px-3 py-2 text-right text-sm font-bold text-rose-dark dark:text-rose">{fmt(totalDeductions)}</td>
                       </tr>
                     </tbody>
                   </table>
+                  </div>
                 </div>
               </div>
 
@@ -237,24 +241,24 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
               <div className="rounded-xl border-2 border-primary-600 bg-indigo-50 p-5 dark:bg-indigo-900/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-dark-5 dark:text-dark-6">Net Pay (Take Home)</p>
+                    <p className="text-muted">Net Pay (Take Home)</p>
                     <p className="text-3xl font-bold text-dark dark:text-white mt-1">{fmt(active.netPay)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-dark-5 dark:text-dark-6">Pay Period</p>
-                    <p className="text-sm font-semibold text-dark dark:text-white">
+                    <p className="text-muted">Pay Period</p>
+                    <p className="text-body-medium">
                       {MONTH_NAMES[active.payrollRun.month]} {active.payrollRun.year}
                     </p>
-                    <p className="text-xs text-dark-5 dark:text-dark-6 mt-1">Mode: Bank Transfer</p>
+                    <p className="text-muted mt-1">Mode: Bank Transfer</p>
                   </div>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-3 border-t border-gray-3 pt-4 dark:border-dark-3">
+              <div className="flex flex-wrap gap-3 divider pt-4">
                 <button
                   onClick={() => setToast(`Downloading ${monthLabels[activeIdx]} payslip PDF...`)}
-                  className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 flex items-center gap-2"
+                  className="btn-primary flex items-center gap-2"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -263,7 +267,7 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
                 </button>
                 <button
                   onClick={() => typeof window !== "undefined" && window.print()}
-                  className="rounded-lg border border-gray-3 px-4 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6 flex items-center gap-2"
+                  className="btn-secondary flex items-center gap-2"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />

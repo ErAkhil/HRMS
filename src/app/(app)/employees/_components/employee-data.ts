@@ -35,7 +35,8 @@ export interface EmployeeWithDept {
   employeeCode: string;
   employmentType: string;
   avatarUrl: string | null;
-  startDate: Date;
+  isActive: boolean;
+  startDate: string;
   department: { name: string } | null;
 }
 

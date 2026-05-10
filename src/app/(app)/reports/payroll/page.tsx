@@ -80,15 +80,15 @@ export default function PayrollInsightsPage() {
   const { toast, setToast } = useToast();
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="page-container">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Payroll Insights</h1>
-          <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Cost analysis and payroll trends for Q2 2026</p>
+          <h1 className="page-title">Payroll Insights</h1>
+          <p className="mt-0.5 text-muted">Cost analysis and payroll trends for Q2 2026</p>
         </div>
         <button
           onClick={() => setToast("Payroll report exported successfully!")}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="btn-primary"
         >
           Export Report
         </button>
@@ -102,8 +102,8 @@ export default function PayrollInsightsPage() {
           { label: "Benefits Cost", value: fmt(totalBenefits), change: "20% of total" },
           { label: "Avg Salary", value: "$76,800", change: "+$1,200 YoY" },
         ].map((kpi) => (
-          <div key={kpi.label} className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-            <p className="text-xs text-dark-5 dark:text-dark-6">{kpi.label}</p>
+          <div key={kpi.label} className="card-p">
+            <p className="text-muted">{kpi.label}</p>
             <p className="mt-1 text-2xl font-bold text-dark dark:text-white">{kpi.value}</p>
             <p className="mt-1 text-xs text-emerald-dark dark:text-emerald">{kpi.change}</p>
           </div>
@@ -112,13 +112,13 @@ export default function PayrollInsightsPage() {
 
       {/* Chart + Budget */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-          <h2 className="text-sm font-semibold text-dark dark:text-white mb-4">Monthly Payroll Trend</h2>
+        <div className="lg:col-span-2 card-p">
+          <h2 className="section-title mb-4">Monthly Payroll Trend</h2>
           <PayrollChart />
         </div>
 
-        <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-          <h2 className="text-sm font-semibold text-dark dark:text-white mb-4">Budget Utilization</h2>
+        <div className="card-p">
+          <h2 className="section-title mb-4">Budget Utilization</h2>
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <svg width="120" height="120" viewBox="0 0 120 120">
@@ -133,20 +133,20 @@ export default function PayrollInsightsPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-bold text-dark dark:text-white">{budgetUsed}%</span>
-                <span className="text-xs text-dark-5 dark:text-dark-6">Used</span>
+                <span className="text-muted">Used</span>
               </div>
             </div>
             <div className="w-full space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-dark-5 dark:text-dark-6">Budget</span>
+                <span className="text-muted">Budget</span>
                 <span className="font-semibold text-dark dark:text-white">$2.26M</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-dark-5 dark:text-dark-6">Spent</span>
+                <span className="text-muted">Spent</span>
                 <span className="font-semibold text-dark dark:text-white">$1.90M</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-dark-5 dark:text-dark-6">Remaining</span>
+                <span className="text-muted">Remaining</span>
                 <span className="font-semibold text-emerald-dark dark:text-emerald">$360K</span>
               </div>
             </div>
@@ -155,29 +155,29 @@ export default function PayrollInsightsPage() {
       </div>
 
       {/* Department Cost Breakdown */}
-      <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+      <div className="card">
         <div className="border-b border-gray-3 dark:border-dark-3 px-5 py-4">
-          <h2 className="text-sm font-semibold text-dark dark:text-white">Department Cost Breakdown</h2>
+          <h2 className="section-title">Department Cost Breakdown</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-1 dark:bg-dark-3">
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Department</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-dark-5 dark:text-dark-6">Base Salaries</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-dark-5 dark:text-dark-6">Benefits</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-dark-5 dark:text-dark-6">Total</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Share</th>
+              <tr className="thead-row">
+                <th className="th">Department</th>
+                <th className="th text-right">Base Salaries</th>
+                <th className="th text-right">Benefits</th>
+                <th className="th text-right">Total</th>
+                <th className="th">Share</th>
               </tr>
             </thead>
             <tbody>
               {DEPT_COSTS.map((d) => (
-                <tr key={d.dept} className="border-b border-gray-3 dark:border-dark-3 hover:bg-gray-1 dark:hover:bg-dark-3">
-                  <td className="px-5 py-3.5 font-medium text-dark dark:text-white">{d.dept}</td>
-                  <td className="px-5 py-3.5 text-right text-dark dark:text-white">{fmt(d.base)}</td>
-                  <td className="px-5 py-3.5 text-right text-dark-5 dark:text-dark-6">{fmt(d.benefits)}</td>
-                  <td className="px-5 py-3.5 text-right font-semibold text-dark dark:text-white">{fmt(d.total)}</td>
-                  <td className="px-5 py-3.5">
+                <tr key={d.dept} className="tr-body">
+                  <td className="td font-medium text-dark dark:text-white">{d.dept}</td>
+                  <td className="td text-right text-dark dark:text-white">{fmt(d.base)}</td>
+                  <td className="td text-right text-muted">{fmt(d.benefits)}</td>
+                  <td className="td text-right font-semibold text-dark dark:text-white">{fmt(d.total)}</td>
+                  <td className="td">
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 overflow-hidden rounded-full bg-gray-2 dark:bg-dark-3">
                         <div
@@ -185,7 +185,7 @@ export default function PayrollInsightsPage() {
                           style={{ width: `${(d.total / DEPT_COSTS.reduce((s, r) => s + r.total, 0)) * 100}%` }}
                         />
                       </div>
-                      <span className="text-xs text-dark-5 dark:text-dark-6">
+                      <span className="text-muted">
                         {((d.total / DEPT_COSTS.reduce((s, r) => s + r.total, 0)) * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -198,12 +198,12 @@ export default function PayrollInsightsPage() {
       </div>
 
       {/* Benefits vs Base */}
-      <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-        <h2 className="text-sm font-semibold text-dark dark:text-white mb-4">Benefits vs Base Salary Comparison</h2>
+      <div className="card-p">
+        <h2 className="section-title mb-4">Benefits vs Base Salary Comparison</h2>
         <div className="space-y-3">
           {DEPT_COSTS.map((d) => (
             <div key={d.dept} className="flex items-center gap-3">
-              <span className="w-24 text-xs text-dark-5 dark:text-dark-6 shrink-0">{d.dept}</span>
+              <span className="w-24 text-muted shrink-0">{d.dept}</span>
               <div className="flex-1 flex h-5 overflow-hidden rounded-full bg-gray-2 dark:bg-dark-3 gap-0.5">
                 <div
                   className="h-full bg-indigo-500 rounded-l-full transition-all"
@@ -214,18 +214,18 @@ export default function PayrollInsightsPage() {
                   style={{ width: `${(d.benefits / d.total) * 100}%` }}
                 />
               </div>
-              <span className="text-xs text-dark-5 dark:text-dark-6 w-10 text-right shrink-0">{fmt(d.total)}</span>
+              <span className="text-muted w-10 text-right shrink-0">{fmt(d.total)}</span>
             </div>
           ))}
         </div>
         <div className="mt-4 flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="h-2.5 w-5 rounded-sm bg-indigo-500" />
-            <span className="text-xs text-dark-5 dark:text-dark-6">Base Salary</span>
+            <span className="text-muted">Base Salary</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="h-2.5 w-5 rounded-sm bg-emerald-500" />
-            <span className="text-xs text-dark-5 dark:text-dark-6">Benefits</span>
+            <span className="text-muted">Benefits</span>
           </div>
         </div>
       </div>

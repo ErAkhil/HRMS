@@ -68,7 +68,7 @@ export function GoalsList({ goals }: GoalsListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
       {goals.map((goal) => {
         const sc = getStatusConfig(goal.status);
         const categoryClass = goal.category ? (categoryColors[goal.category] ?? categoryColors.Business) : null;

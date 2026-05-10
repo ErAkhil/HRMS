@@ -4,73 +4,47 @@ import { useState } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
+import type { CelebrationItem } from "@/lib/actions/celebrations";
 
-const CELEBRATIONS = [
-  {
-    avatar: "/images/user/user-15.png",
-    name: "Sarah Mitchell",
-    type: "birthday",
-    label: "🎂 Birthday Today",
-    dept: "Engineering",
-  },
-  {
-    avatar: "/images/user/user-26.png",
-    name: "Priya Sharma",
-    type: "work-anniversary",
-    label: "🎉 3 Years at Acme",
-    dept: "Product",
-  },
-  {
-    avatar: "/images/user/user-28.png",
-    name: "James Williams",
-    type: "birthday",
-    label: "🎂 Birthday Tomorrow",
-    dept: "Sales",
-  },
-  {
-    avatar: "/images/user/user-23.png",
-    name: "Arjun Mehta",
-    type: "work-anniversary",
-    label: "🎉 1 Year at Acme",
-    dept: "HR",
-  },
-  {
-    avatar: "/images/user/user-27.png",
-    name: "Elena Torres",
-    type: "birthday",
-    label: "🎂 Birthday in 3 days",
-    dept: "Finance",
-  },
-];
+interface Props {
+  celebrations: CelebrationItem[];
+}
 
-export function BirthdayStrip() {
+export function BirthdayStrip({ celebrations }: Readonly<Props>) {
   const [wished, setWished] = useState<Set<string>>(new Set());
   const { toast, setToast } = useToast();
 
-  const handleWish = (name: string) => {
-    setWished((prev) => new Set(prev).add(name));
+  const handleWish = (id: string, name: string) => {
+    setWished((prev) => new Set(prev).add(id));
     setToast(`Wish sent to ${name}! 🎉`);
   };
 
+  if (celebrations.length === 0) {
+    return (
+      <div className="card-p">
+        <h3 className="section-title">Celebrations this week</h3>
+        <p className="mt-3 text-sm text-dark-5 dark:text-dark-6">No upcoming anniversaries this week.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+    <div className="card-p">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-dark dark:text-white">
-          Celebrations this week
-        </h3>
+        <h3 className="section-title">Celebrations this week</h3>
         <span className="rounded-full bg-amber-light px-2 py-0.5 text-[10px] font-bold text-amber-dark dark:bg-amber-dark/20 dark:text-amber">
-          {CELEBRATIONS.length} upcoming
+          {celebrations.length} upcoming
         </span>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
-        {CELEBRATIONS.map((person, i) => (
+        {celebrations.map((person) => (
           <div
-            key={i}
+            key={person.id}
             className="flex items-center gap-2.5 rounded-xl border border-gray-3 px-3 py-2.5 dark:border-dark-3"
           >
             <Image
-              src={person.avatar}
+              src={person.avatarUrl ?? "/images/user/user-03.png"}
               width={36}
               height={36}
               alt={person.name}
@@ -80,7 +54,7 @@ export function BirthdayStrip() {
               <p className="text-xs font-semibold text-dark dark:text-white">{person.name}</p>
               <p className="text-[10px] text-dark-5 dark:text-dark-6">{person.label}</p>
             </div>
-            {wished.has(person.name) ? (
+            {wished.has(person.id) ? (
               <button
                 disabled
                 className="ml-1 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-[10px] font-semibold text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300 cursor-default"
@@ -89,7 +63,7 @@ export function BirthdayStrip() {
               </button>
             ) : (
               <button
-                onClick={() => handleWish(person.name)}
+                onClick={() => handleWish(person.id, person.name)}
                 className="ml-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-semibold text-indigo-600 transition-colors hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/30"
               >
                 Wish

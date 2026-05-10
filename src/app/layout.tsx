@@ -38,7 +38,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       suppressHydrationWarning
       className={`${inter.variable} ${manrope.variable}`}
     >
-      <body>
+      <body suppressHydrationWarning>
         <Providers>
           <NextTopLoader color="#4F46E5" showSpinner={false} height={2} />
           {children}

@@ -11,12 +11,12 @@ interface KpiCardProps {
 
 function KpiCard({ title, value, sub, icon, iconBg, trend }: KpiCardProps) {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+    <div className="card-p">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs text-dark-5 dark:text-dark-6">{title}</p>
+          <p className="text-muted">{title}</p>
           <p className="mt-1 text-2xl font-bold text-dark dark:text-white">{value}</p>
-          <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">{sub}</p>
+          <p className="mt-1 text-muted">{sub}</p>
         </div>
         <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconBg}`}>
           {icon}

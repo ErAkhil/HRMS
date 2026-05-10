@@ -1,5 +1,6 @@
 import { getMyLeaveBalances } from "@/lib/actions/leave";
 import { getMyTodayStatus } from "@/lib/actions/attendance";
+import { getUpcomingCelebrations } from "@/lib/actions/celebrations";
 import { AIInsightsCard } from "./_components/ai-insights-card";
 import { AttendanceWidget } from "./_components/attendance-widget";
 import { BirthdayStrip } from "./_components/birthday-strip";
@@ -12,9 +13,10 @@ import { QuickActionsGrid } from "./_components/quick-actions-grid";
 import { TeamActivityFeed } from "./_components/team-activity-feed";
 
 export default async function EmployeeDashboard() {
-  const [leaveBalances, rawAttendance] = await Promise.all([
+  const [leaveBalances, rawAttendance, celebrations] = await Promise.all([
     getMyLeaveBalances().catch(() => []),
     getMyTodayStatus().catch(() => null),
+    getUpcomingCelebrations().catch(() => []),
   ]);
 
   const todayAttendance = rawAttendance
@@ -58,7 +60,7 @@ export default async function EmployeeDashboard() {
       </div>
 
       {/* ── Row 4: Celebrations ── */}
-      <BirthdayStrip />
+      <BirthdayStrip celebrations={celebrations} />
 
     </div>
   );

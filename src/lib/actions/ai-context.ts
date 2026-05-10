@@ -12,25 +12,25 @@ export async function getAIContext(): Promise<string> {
 
   const [employee, tasks, leaveBalances, attendance] = await Promise.all([
     user.employeeId
-      ? db.employee.findUnique({
-          where: { id: user.employeeId },
+      ? db.employee.findFirst({
+          where: { id: user.employeeId, orgId: user.orgId },
           include: { department: { select: { name: true } } },
         })
       : null,
     user.employeeId
       ? db.task.findMany({
-          where: { assigneeId: user.employeeId },
+          where: { orgId: user.orgId, assigneeId: user.employeeId },
           select: { status: true, dueDate: true },
         })
       : [],
     user.employeeId
       ? db.leaveBalance.findMany({
-          where: { employeeId: user.employeeId, year: today.getFullYear() },
+          where: { employeeId: user.employeeId, employee: { orgId: user.orgId }, year: today.getFullYear() },
         })
       : [],
     user.employeeId
       ? db.attendanceRecord.findFirst({
-          where: { employeeId: user.employeeId, date: { gte: today } },
+          where: { employeeId: user.employeeId, employee: { orgId: user.orgId }, date: { gte: today } },
         })
       : null,
   ]);
@@ -83,14 +83,14 @@ export async function getInsightsData() {
 
   const [tasks, leaveBalances, attendance] = await Promise.all([
     db.task.findMany({
-      where: { assigneeId: user.employeeId },
+      where: { orgId: user.orgId, assigneeId: user.employeeId },
       select: { status: true, dueDate: true },
     }),
     db.leaveBalance.findMany({
-      where: { employeeId: user.employeeId, year: today.getFullYear() },
+      where: { employeeId: user.employeeId, employee: { orgId: user.orgId }, year: today.getFullYear() },
     }),
     db.attendanceRecord.findFirst({
-      where: { employeeId: user.employeeId, date: { gte: today } },
+      where: { employeeId: user.employeeId, employee: { orgId: user.orgId }, date: { gte: today } },
     }),
   ]);
 

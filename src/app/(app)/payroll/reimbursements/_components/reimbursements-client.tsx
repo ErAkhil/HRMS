@@ -17,18 +17,18 @@ type ClaimItem = {
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  PENDING: "rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark",
-  APPROVED: "rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
-  REJECTED: "rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark",
+  PENDING: "badge-warning",
+  APPROVED: "badge-success",
+  REJECTED: "badge-error",
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
-  TRAVEL: "rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-dark dark:bg-sky-dark/10 dark:text-sky",
-  MEALS: "rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
-  EQUIPMENT: "rounded-full bg-violet-light px-2.5 py-0.5 text-xs font-medium text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
-  MEDICAL: "rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark",
-  TRAINING: "rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark",
-  OTHER: "rounded-full bg-gray-2 px-2.5 py-0.5 text-xs font-medium text-dark-5 dark:bg-dark-3 dark:text-dark-6",
+  TRAVEL: "badge-info",
+  MEALS: "badge-success",
+  EQUIPMENT: "badge-indigo",
+  MEDICAL: "badge-error",
+  TRAINING: "badge-warning",
+  OTHER: "badge-gray",
 };
 
 export function ReimbursementsClient({
@@ -88,16 +88,16 @@ export function ReimbursementsClient({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="page-container">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-xl font-bold text-dark dark:text-white">Reimbursements</h1>
-          <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Expense claims · Live data</p>
+          <h1 className="page-title">Reimbursements</h1>
+          <p className="mt-0.5 text-muted">Expense claims · Live data</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="btn-primary flex items-center gap-2"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -113,10 +113,10 @@ export function ReimbursementsClient({
           { label: "Approved", value: claims.filter((c) => c.status === "APPROVED").length, sub: `₹${approvedTotal.toLocaleString("en-IN")} approved`, color: "text-emerald-dark dark:text-emerald", bg: "bg-emerald-light dark:bg-emerald-dark/20", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
           { label: "Total Claims", value: claims.length, sub: "All time", color: "text-indigo-600 dark:text-indigo-300", bg: "bg-indigo-50 dark:bg-indigo-900/20", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+          <div key={s.label} className="card-p">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs text-dark-5 dark:text-dark-6">{s.label}</p>
+                <p className="text-muted">{s.label}</p>
                 <p className="mt-1 text-2xl font-bold text-dark dark:text-white">{s.value}</p>
                 <p className={`mt-0.5 text-xs ${s.color}`}>{s.sub}</p>
               </div>
@@ -131,14 +131,14 @@ export function ReimbursementsClient({
       </div>
 
       {/* Table */}
-      <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-3 p-5 dark:border-dark-3">
-          <h3 className="text-sm font-semibold text-dark dark:text-white">All Claims</h3>
+      <div className="card overflow-hidden">
+        <div className="page-header divider p-5">
+          <h3 className="section-title">All Claims</h3>
           <div className="flex items-center gap-2">
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="h-9 rounded-lg border border-gray-3 bg-gray-2 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white"
+              className="input-field h-9"
             >
               <option value="All">All Categories</option>
               <option value="TRAVEL">Travel</option>
@@ -150,7 +150,7 @@ export function ReimbursementsClient({
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="h-9 rounded-lg border border-gray-3 bg-gray-2 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white"
+              className="input-field h-9"
             >
               <option value="All">All Status</option>
               <option value="PENDING">Pending</option>
@@ -166,39 +166,39 @@ export function ReimbursementsClient({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-1 dark:bg-dark-3">
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Employee</th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Category</th>
-                  <th className="px-5 py-3 text-right text-xs font-semibold text-dark-5 dark:text-dark-6">Amount</th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Date</th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Description</th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Status</th>
-                  {isAdmin && <th className="px-5 py-3 text-left text-xs font-semibold text-dark-5 dark:text-dark-6">Action</th>}
+                <tr className="thead-row">
+                  <th className="th">Employee</th>
+                  <th className="th">Category</th>
+                  <th className="th text-right">Amount</th>
+                  <th className="th">Date</th>
+                  <th className="th">Description</th>
+                  <th className="th">Status</th>
+                  {isAdmin && <th className="th">Action</th>}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((claim) => (
-                  <tr key={claim.id} className="border-b border-gray-3 last:border-0 hover:bg-gray-1 dark:border-dark-3 dark:hover:bg-dark-3">
-                    <td className="px-5 py-3 font-medium text-dark dark:text-white">{claim.employeeName}</td>
-                    <td className="px-5 py-3">
+                  <tr key={claim.id} className="tr-body">
+                    <td className="td font-medium">{claim.employeeName}</td>
+                    <td className="td">
                       <span className={CATEGORY_COLOR[claim.category] ?? CATEGORY_COLOR.OTHER}>
                         {claim.category.charAt(0) + claim.category.slice(1).toLowerCase()}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-right font-semibold text-dark dark:text-white">
+                    <td className="td text-right font-semibold">
                       ₹{claim.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-5 py-3 text-dark-5 dark:text-dark-6">
+                    <td className="td text-dark-5 dark:text-dark-6">
                       {new Date(claim.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </td>
-                    <td className="px-5 py-3 max-w-[200px] truncate text-dark-5 dark:text-dark-6" title={claim.description}>
+                    <td className="td max-w-[200px] truncate text-dark-5 dark:text-dark-6" title={claim.description}>
                       {claim.description}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="td">
                       <span className={STATUS_BADGE[claim.status] ?? STATUS_BADGE.PENDING}>{claim.status}</span>
                     </td>
                     {isAdmin && (
-                      <td className="px-5 py-3">
+                      <td className="td">
                         {claim.status === "PENDING" && (
                           <button
                             onClick={() => handleApprove(claim.id)}
@@ -219,10 +219,10 @@ export function ReimbursementsClient({
 
       {/* Submit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-dark-2 dark:border dark:border-dark-3">
+        <div className="modal-overlay">
+          <div className="modal-panel max-w-md p-6">
             <div className="mb-5 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-dark dark:text-white">Submit Reimbursement Claim</h3>
+              <h3 className="section-title">Submit Reimbursement Claim</h3>
               <button onClick={() => setShowModal(false)} className="text-dark-5 hover:text-dark dark:text-dark-6">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -231,8 +231,8 @@ export function ReimbursementsClient({
             </div>
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Category</label>
-                <select value={form.category} onChange={(e) => update("category", e.target.value)} className="h-9 w-full rounded-lg border border-gray-3 bg-gray-2 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white">
+                <label className="label-field">Category</label>
+                <select value={form.category} onChange={(e) => update("category", e.target.value)} className="input-field h-9 w-full">
                   <option value="TRAVEL">Travel</option>
                   <option value="MEALS">Meals</option>
                   <option value="EQUIPMENT">Equipment</option>
@@ -242,20 +242,20 @@ export function ReimbursementsClient({
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Amount (₹)</label>
-                <input type="number" placeholder="Enter amount" value={form.amount} onChange={(e) => update("amount", e.target.value)} className="h-9 w-full rounded-lg border border-gray-3 bg-gray-2 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6" />
+                <label className="label-field">Amount (₹)</label>
+                <input type="number" placeholder="Enter amount" value={form.amount} onChange={(e) => update("amount", e.target.value)} className="input-field h-9 w-full" />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Date</label>
-                <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} className="h-9 w-full rounded-lg border border-gray-3 bg-gray-2 px-3 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white" />
+                <label className="label-field">Date</label>
+                <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} className="input-field h-9 w-full" />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">Description</label>
-                <textarea rows={3} placeholder="Describe the expense..." value={form.description} onChange={(e) => update("description", e.target.value)} className="w-full resize-none rounded-lg border border-gray-3 bg-gray-2 px-3 py-2 text-sm outline-none focus:border-primary-600 dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6" />
+                <label className="label-field">Description</label>
+                <textarea rows={3} placeholder="Describe the expense..." value={form.description} onChange={(e) => update("description", e.target.value)} className="input-field w-full resize-none py-2" />
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowModal(false)} className="flex-1 rounded-lg border border-gray-3 py-2 text-sm font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6">Cancel</button>
-                <button onClick={handleSubmit} disabled={submitting} className="flex-1 rounded-lg bg-primary-600 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60">
+                <button onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
+                <button onClick={handleSubmit} disabled={submitting} className="btn-primary flex-1 disabled:opacity-60">
                   {submitting ? "Submitting..." : "Submit Claim"}
                 </button>
               </div>

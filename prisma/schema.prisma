@@ -218,14 +218,17 @@ model VerificationToken {
 // ─── HR Core ──────────────────────────────────────────────────────────────────
 
 model Department {
-  id        String   @id @default(cuid())
-  name      String
-  orgId     String
-  headId    String?
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String   @default("#6366F1")
+  orgId       String
+  headId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 
-  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  employees Employee[]
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  employees   Employee[]
 
   @@unique([name, orgId])
   @@map("departments")

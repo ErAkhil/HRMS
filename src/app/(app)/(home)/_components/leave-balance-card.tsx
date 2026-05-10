@@ -40,7 +40,7 @@ export function LeaveBalanceCard({ balances }: Props) {
       ];
 
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+    <div className="flex h-full flex-col card-p">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -49,17 +49,17 @@ export function LeaveBalanceCard({ balances }: Props) {
               <path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <h3 className="text-sm font-semibold text-dark dark:text-white">Leave Balance</h3>
+          <h3 className="section-title">Leave Balance</h3>
         </div>
-        <span className="text-xs text-dark-5 dark:text-dark-6">FY {new Date().getFullYear()}–{String(new Date().getFullYear() + 1).slice(2)}</span>
+        <span className="text-muted">FY {new Date().getFullYear()}–{String(new Date().getFullYear() + 1).slice(2)}</span>
       </div>
 
       {/* Total highlight */}
-      <div className="mt-3 rounded-lg bg-gradient-ai-soft px-3 py-2.5 dark:bg-indigo-900/20">
-        <p className="text-xs text-dark-5 dark:text-dark-6">Total Available</p>
+      <div className="mt-3 rounded-lg bg-gradient-ai-soft px-3 py-2.5">
+        <p className="text-muted">Total Available</p>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-300">{totalRemaining}</span>
-          <span className="text-xs text-dark-5 dark:text-dark-6">days remaining</span>
+          <span className="text-muted">days remaining</span>
         </div>
       </div>
 
@@ -74,7 +74,7 @@ export function LeaveBalanceCard({ balances }: Props) {
             <div key={l.leaveType}>
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-xs font-medium text-dark dark:text-white">{label}</span>
-                <span className="text-xs text-dark-5 dark:text-dark-6">
+                <span className="text-muted">
                   <span className="font-semibold text-dark dark:text-white">{remaining}</span>
                   /{l.total}d
                 </span>
