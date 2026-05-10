@@ -260,3 +260,41 @@ export async function createEmployee(data: z.infer<typeof employeeSchema>) {
     throw toActionError(err);
   }
 }
+
+export async function getMyProfile() {
+  const user = await requireAuth();
+  if (!user.employeeId) return null;
+
+  try {
+    const [emp, goalsDone, tasksDone, coursesCount, certsCount] = await Promise.all([
+      db.employee.findUnique({
+        where: { id: user.employeeId },
+        include: { department: { select: { name: true } } },
+      }),
+      db.goal.count({ where: { employeeId: user.employeeId, status: "COMPLETED" } }),
+      db.task.count({ where: { assigneeId: user.employeeId, status: "DONE" } }),
+      db.courseEnrollment.count({ where: { employeeId: user.employeeId } }),
+      db.employeeCertification.count({ where: { employeeId: user.employeeId } }),
+    ]);
+
+    if (!emp) return null;
+
+    return {
+      id: emp.id,
+      firstName: emp.firstName,
+      lastName: emp.lastName,
+      email: emp.email,
+      title: emp.title,
+      department: emp.department?.name ?? null,
+      avatarUrl: emp.avatarUrl ?? null,
+      startDate: emp.startDate.toISOString(),
+      employmentType: emp.employmentType,
+      goalsDone,
+      tasksDone,
+      coursesCount,
+      certsCount,
+    };
+  } catch (err) {
+    throw toActionError(err);
+  }
+}

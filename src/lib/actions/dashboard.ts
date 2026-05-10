@@ -178,3 +178,123 @@ export async function getLeadershipDashboardData() {
     throw toActionError(err);
   }
 }
+
+export async function getHrDashboardData() {
+  const user = await requireAuth();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  try {
+    const [
+      attGroups,
+      headcount,
+      pendingLeaveCount,
+      pendingReviewsCount,
+      jobPostings,
+      deptData,
+      onboardingRecs,
+      pendingLeaveItems,
+      employeeFirst,
+    ] = await Promise.all([
+      db.attendanceRecord.groupBy({
+        by: ["status"],
+        where: { employee: { orgId: user.orgId }, date: today },
+        _count: true,
+      }),
+      db.employee.count({ where: { orgId: user.orgId, isActive: true } }),
+      db.leaveRequest.count({ where: { employee: { orgId: user.orgId }, status: "PENDING" } }),
+      db.performanceReview.count({ where: { reviewee: { orgId: user.orgId }, status: "PENDING" } }),
+      db.jobPosting.findMany({
+        where: { orgId: user.orgId, isActive: true },
+        include: { _count: { select: { candidates: true } } },
+        orderBy: { postedAt: "desc" },
+        take: 5,
+      }),
+      db.department.findMany({
+        where: { orgId: user.orgId },
+        include: { _count: { select: { employees: { where: { isActive: true } } } } },
+        orderBy: { name: "asc" },
+      }),
+      db.onboardingRecord.findMany({
+        where: {
+          employee: { orgId: user.orgId },
+          status: { in: ["IN_PROGRESS", "NOT_STARTED"] },
+        },
+        include: {
+          employee: {
+            select: {
+              firstName: true,
+              lastName: true,
+              startDate: true,
+              department: { select: { name: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      }),
+      db.leaveRequest.findMany({
+        where: { employee: { orgId: user.orgId }, status: "PENDING" },
+        include: { employee: { select: { firstName: true, lastName: true } } },
+        orderBy: { createdAt: "asc" },
+        take: 5,
+      }),
+      user.employeeId
+        ? db.employee.findUnique({ where: { id: user.employeeId }, select: { firstName: true } })
+        : Promise.resolve(null),
+    ]);
+
+    const sm = Object.fromEntries(attGroups.map((g) => [g.status, g._count]));
+
+    return {
+      userName: employeeFirst?.firstName ?? user.email?.split("@")[0] ?? "there",
+      headcount,
+      pendingLeaveCount,
+      pendingReviewsCount,
+      openJobsCount: jobPostings.length,
+      attendance: {
+        present: sm["PRESENT"] ?? 0,
+        late: sm["LATE"] ?? 0,
+        onLeave: sm["ON_LEAVE"] ?? 0,
+        remote: sm["REMOTE"] ?? 0,
+      },
+      jobPostings: jobPostings.map((j) => ({
+        id: j.id,
+        title: j.title,
+        department: j.department,
+        candidateCount: j._count.candidates,
+        type: j.type,
+      })),
+      deptHeadcount: deptData.map((d) => ({
+        dept: d.name,
+        count: d._count.employees,
+      })),
+      onboarding: onboardingRecs.map((r) => {
+        const tasks: { done: boolean }[] = Array.isArray(r.tasks)
+          ? (r.tasks as { done: boolean }[])
+          : [];
+        const done = tasks.filter((t) => t.done).length;
+        const progress = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
+        const daysSinceStart = Math.floor(
+          (today.getTime() - new Date(r.employee.startDate).getTime()) / 86_400_000,
+        );
+        return {
+          id: r.id,
+          name: `${r.employee.firstName} ${r.employee.lastName}`,
+          department: r.employee.department?.name ?? "—",
+          progress,
+          day: Math.max(1, Math.min(daysSinceStart, 30)),
+        };
+      }),
+      pendingLeaveItems: pendingLeaveItems.map((l) => ({
+        id: l.id,
+        employeeName: `${l.employee.firstName} ${l.employee.lastName}`,
+        leaveType: l.leaveType,
+        days: l.days,
+        startDate: l.startDate.toISOString(),
+      })),
+    };
+  } catch (err) {
+    throw toActionError(err);
+  }
+}

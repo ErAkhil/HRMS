@@ -10,13 +10,17 @@ import { TasksQuickLinks } from "./tasks-quick-links";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
 import { createTask } from "@/lib/actions/tasks";
-import type { SerializedTask } from "@/lib/actions/tasks";
+import type { SerializedTask, SerializedProject } from "@/lib/actions/tasks";
+
+type TeamMember = { name: string; avatarUrl: string | null; tasks: number; done: number };
 
 interface TasksPageClientProps {
   tasks: SerializedTask[];
+  projects: SerializedProject[];
+  teamWorkload: TeamMember[];
 }
 
-export function TasksPageClient({ tasks: initialTasks }: TasksPageClientProps) {
+export function TasksPageClient({ tasks: initialTasks, projects, teamWorkload }: TasksPageClientProps) {
   const router = useRouter();
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   const [tasks, setTasks] = useState(initialTasks);
@@ -168,7 +172,7 @@ export function TasksPageClient({ tasks: initialTasks }: TasksPageClientProps) {
       {/* Chart + Priority + Deadlines */}
       <div className="grid gap-4 md:grid-cols-12">
         <div className="md:col-span-8">
-          <TasksProgressChart />
+          <TasksProgressChart projects={projects} />
         </div>
         <div className="md:col-span-4 flex flex-col gap-4">
           <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
@@ -218,7 +222,7 @@ export function TasksPageClient({ tasks: initialTasks }: TasksPageClientProps) {
       {/* Team Workload + Quick Links */}
       <div className="grid gap-4 md:grid-cols-12">
         <div className="md:col-span-5">
-          <TasksTeamWorkload />
+          <TasksTeamWorkload teamWorkload={teamWorkload} />
         </div>
         <div className="md:col-span-7">
           <TasksQuickLinks />

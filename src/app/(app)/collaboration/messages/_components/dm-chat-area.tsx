@@ -1,32 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useRef } from "react";
-import { DM_MESSAGES } from "../_data/messages-data";
-import type { DMContact } from "../_data/messages-data";
-
-const STATUS_DOT: Record<DMContact["status"], string> = {
-  online: "bg-emerald-dark",
-  away: "bg-amber-dark",
-  offline: "bg-gray-4",
-};
-
-const STATUS_LABEL: Record<DMContact["status"], string> = {
-  online: "Online",
-  away: "Away",
-  offline: "Offline",
-};
-
-const STATUS_TEXT: Record<DMContact["status"], string> = {
-  online: "text-emerald-dark",
-  away: "text-amber-dark",
-  offline: "text-dark-5 dark:text-dark-6",
-};
+import Image from "next/image";
+import type { ChannelItem, ChannelMessage } from "@/lib/actions/messages";
 
 interface Props {
-  activeChat: DMContact;
+  channel: ChannelItem | null;
+  messages: ChannelMessage[];
   input: string;
   onInputChange: (v: string) => void;
+  onSend: () => void;
   onCall: () => void;
   onVideo: () => void;
   onSearch: () => void;
@@ -34,7 +17,15 @@ interface Props {
   onAttach: () => void;
 }
 
-export function DmChatArea({ activeChat, input, onInputChange, onCall, onVideo, onSearch, onEmoji, onAttach }: Readonly<Props>) {
+function formatMsgTime(iso: string) {
+  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function getInitials(name: string) {
+  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+}
+
+export function DmChatArea({ channel, messages, input, onInputChange, onSend, onCall, onVideo, onSearch, onEmoji, onAttach }: Readonly<Props>) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const headerButtons = [
@@ -43,18 +34,32 @@ export function DmChatArea({ activeChat, input, onInputChange, onCall, onVideo, 
     { label: "Search", path: "M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z", action: () => { inputRef.current?.focus(); onSearch(); } },
   ];
 
+  if (!channel) {
+    return (
+      <div className="flex flex-1 items-center justify-center bg-white dark:bg-dark-2">
+        <p className="text-sm text-dark-5 dark:text-dark-6">Select a channel to start messaging.</p>
+      </div>
+    );
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSend();
+    }
+  }
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-3 bg-white px-5 py-3 dark:border-dark-3 dark:bg-dark-2">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <Image src={activeChat.avatar} alt={activeChat.name} width={36} height={36} className="size-9 rounded-full" />
-            <span className={`absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-white dark:border-dark-2 ${STATUS_DOT[activeChat.status]}`} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+            #
           </div>
           <div>
-            <p className="text-body font-bold">{activeChat.name}</p>
-            <p className={`text-xs ${STATUS_TEXT[activeChat.status]}`}>{STATUS_LABEL[activeChat.status]}</p>
+            <p className="text-body font-bold">{channel.name}</p>
+            <p className="text-xs text-dark-5 dark:text-dark-6">{channel.isPrivate ? "Private channel" : "Public channel"}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -70,79 +75,45 @@ export function DmChatArea({ activeChat, input, onInputChange, onCall, onVideo, 
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto bg-white px-5 py-5 dark:bg-dark-2">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-gray-3 dark:bg-dark-3" />
-          <span className="rounded-full border border-gray-3 px-3 py-0.5 text-muted dark:border-dark-3">Today · May 7, 2026</span>
-          <div className="h-px flex-1 bg-gray-3 dark:bg-dark-3" />
-        </div>
-
-        <div className="space-y-4">
-          {DM_MESSAGES.map((msg) => (
-            <div key={msg.id} className={`flex gap-3 ${msg.from === "me" ? "flex-row-reverse" : ""}`}>
-              <Image
-                src={msg.from === "sarah" ? "/images/user/user-01.png" : "/images/user/user-12.png"}
-                alt={msg.from === "sarah" ? "Sarah Mitchell" : "You"}
-                width={32} height={32}
-                className="mt-0.5 size-8 flex-shrink-0 rounded-full"
-              />
-              <div className={`max-w-sm ${msg.from === "me" ? "items-end" : "items-start"} flex flex-col gap-1`}>
-                {msg.attachment ? (
-                  <div className={`rounded-xl border border-gray-3 px-3 py-2.5 dark:border-dark-3 ${msg.from === "me" ? "bg-primary-600 text-white" : "bg-gray-1 dark:bg-dark-3"}`}>
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-8 flex-shrink-0 items-center justify-center rounded-lg bg-rose-light dark:bg-rose-dark/20">
-                        <svg className="size-4 text-rose-dark" viewBox="0 0 24 24" fill="none">
-                          <path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className={`text-xs font-medium ${msg.from === "me" ? "text-white" : "text-dark dark:text-white"}`}>{msg.attachment.name}</p>
-                        <p className={`text-xs ${msg.from === "me" ? "text-white/70" : "text-dark-5 dark:text-dark-6"}`}>{msg.attachment.type} · {msg.attachment.size}</p>
-                      </div>
-                    </div>
-                    {msg.text && <p className={`mt-2 text-sm ${msg.from === "me" ? "text-white" : "text-dark-4 dark:text-dark-7"}`}>{msg.text}</p>}
-                  </div>
+        {messages.length === 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-sm text-dark-5 dark:text-dark-6">No messages in #{channel.name} yet. Start the conversation!</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex gap-3 ${msg.isMe ? "flex-row-reverse" : ""}`}>
+                {msg.senderAvatar ? (
+                  <Image src={msg.senderAvatar} alt={msg.senderName} width={32} height={32} className="mt-0.5 size-8 flex-shrink-0 rounded-full object-cover" />
                 ) : (
-                  <div className={`rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${msg.from === "me" ? "bg-primary-600 text-white" : "bg-gray-1 text-dark-4 dark:bg-dark-3 dark:text-dark-7"}`}>
-                    {msg.text}
+                  <div className="mt-0.5 flex size-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                    {getInitials(msg.senderName)}
                   </div>
                 )}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-muted">{msg.timestamp}</span>
-                  {msg.from === "me" && msg.read && (
-                    <svg className="size-3.5 text-primary-300" viewBox="0 0 24 24" fill="none">
-                      <path d="M4.5 12.75l6 6 9-13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
+                <div className={`max-w-sm flex flex-col gap-1 ${msg.isMe ? "items-end" : "items-start"}`}>
+                  <p className="text-xs text-dark-5 dark:text-dark-6">{msg.isMe ? "You" : msg.senderName}</p>
+                  <div className={`rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${msg.isMe ? "bg-primary-600 text-white" : "bg-gray-1 text-dark-4 dark:bg-dark-3 dark:text-dark-7"}`}>
+                    {msg.content}
+                  </div>
+                  <span className="text-muted">{formatMsgTime(msg.createdAt)}</span>
                 </div>
               </div>
-            </div>
-          ))}
-
-          <div className="flex items-end gap-3">
-            <Image src="/images/user/user-01.png" alt="Sarah Mitchell" width={32} height={32} className="size-8 flex-shrink-0 rounded-full" />
-            <div className="flex items-center gap-2 rounded-xl bg-gray-1 px-4 py-3 dark:bg-dark-3">
-              <div className="flex gap-1">
-                <span className="size-2 animate-bounce rounded-full bg-dark-5 [animation-delay:0ms] dark:bg-dark-6" />
-                <span className="size-2 animate-bounce rounded-full bg-dark-5 [animation-delay:150ms] dark:bg-dark-6" />
-                <span className="size-2 animate-bounce rounded-full bg-dark-5 [animation-delay:300ms] dark:bg-dark-6" />
-              </div>
-              <span className="text-muted">Sarah is typing...</span>
-            </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Compose */}
       <div className="border-t border-gray-3 bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
         <div className="overflow-hidden rounded-xl border border-gray-3 dark:border-dark-3">
           <div className="flex items-center gap-3 px-4 py-3">
-            <Image src="/images/user/user-12.png" alt="You" width={28} height={28} className="size-7 flex-shrink-0 rounded-full" />
             <input
               ref={inputRef}
               type="text"
-              placeholder={`Message ${activeChat.name}...`}
+              placeholder={`Message #${channel.name}...`}
               value={input}
               onChange={(e) => onInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="flex-1 bg-transparent text-sm text-dark outline-none placeholder-dark-5 dark:text-white dark:placeholder-dark-6"
             />
             <div className="flex items-center gap-1">
@@ -157,7 +128,8 @@ export function DmChatArea({ activeChat, input, onInputChange, onCall, onVideo, 
                 </svg>
               </button>
               <button
-                onClick={() => { if (input.trim()) onInputChange(""); }}
+                onClick={onSend}
+                disabled={!input.trim()}
                 className={`ml-1 flex size-8 items-center justify-center rounded-lg transition-colors ${input.trim() ? "bg-primary-600 text-white hover:bg-primary-700" : "bg-gray-3 text-dark-5 dark:bg-dark-3 dark:text-dark-6"}`}
               >
                 <svg className="size-4" viewBox="0 0 24 24" fill="none">

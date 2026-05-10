@@ -222,3 +222,63 @@ export async function runPayroll(month: number, year: number) {
     throw toActionError(err);
   }
 }
+
+export async function getPayrollInsights() {
+  const user = await requireRole("SUPER_ADMIN", "HR_ADMIN");
+
+  try {
+    const [payrollRuns, headcount] = await Promise.all([
+      db.payrollRun.findMany({
+        where: { orgId: user.orgId, status: "PROCESSED" },
+        orderBy: [{ year: "asc" }, { month: "asc" }],
+      }),
+      db.employee.count({ where: { orgId: user.orgId, isActive: true } }),
+    ]);
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const trend = payrollRuns.slice(-6).map((r) => ({
+      label: monthNames[r.month - 1] ?? `M${r.month}`,
+      total: Number(r.totalGross),
+    }));
+
+    const latestRun = payrollRuns[payrollRuns.length - 1] ?? null;
+    const latestTotal = latestRun ? Number(latestRun.totalGross) : 0;
+    const latestNet = latestRun ? Number(latestRun.totalNet) : 0;
+    const latestDeductions = latestRun ? Number(latestRun.totalDeductions) : 0;
+    const avgSalary = headcount > 0 && latestTotal > 0 ? Math.round(latestTotal / headcount) : 0;
+
+    let deptCosts: { dept: string; grossTotal: number; count: number }[] = [];
+    if (latestRun) {
+      const payslips = await db.payslip.findMany({
+        where: { payrollRunId: latestRun.id },
+        select: {
+          grossPay: true,
+          employee: { select: { department: { select: { name: true } } } },
+        },
+      });
+
+      const deptMap = new Map<string, { grossTotal: number; count: number }>();
+      for (const p of payslips) {
+        const deptName = p.employee.department?.name ?? "Other";
+        const existing = deptMap.get(deptName) ?? { grossTotal: 0, count: 0 };
+        deptMap.set(deptName, { grossTotal: existing.grossTotal + Number(p.grossPay), count: existing.count + 1 });
+      }
+      deptCosts = Array.from(deptMap.entries())
+        .map(([dept, d]) => ({ dept, ...d }))
+        .sort((a, b) => b.grossTotal - a.grossTotal);
+    }
+
+    return {
+      trend,
+      latestTotal,
+      latestNet,
+      latestDeductions,
+      avgSalary,
+      headcount,
+      deptCosts,
+      hasData: payrollRuns.length > 0,
+    };
+  } catch (err) {
+    throw toActionError(err);
+  }
+}

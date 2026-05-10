@@ -4,15 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-import { offboardings } from "./_data/offboarding-data";
+import type { OffboardingRecord } from "./_data/offboarding-data";
 import { OffboardingCard } from "./_components/offboarding-card";
 import { NewOffboardingModal } from "./_components/new-offboarding-modal";
 
+const offboardings: OffboardingRecord[] = [];
+
 const SUMMARY_STATS = [
-  { label: "Exiting This Month", value: "3", color: "text-rose-dark" },
-  { label: "Assets Pending", value: "2", color: "text-amber-dark" },
-  { label: "Exit Interviews", value: "1/4", color: "text-sky-dark" },
-  { label: "Completed", value: "7", color: "text-emerald-dark" },
+  { label: "Exiting This Month", value: "0", color: "text-rose-dark" },
+  { label: "Assets Pending", value: "0", color: "text-amber-dark" },
+  { label: "Exit Interviews", value: "0", color: "text-sky-dark" },
+  { label: "Completed", value: "0", color: "text-emerald-dark" },
 ];
 
 export default function OffboardingPage() {
@@ -35,7 +37,7 @@ export default function OffboardingPage() {
           </div>
           <div className="flex items-center gap-2">
             <h1 className="page-title">Offboarding</h1>
-            <span className="rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark">4 active</span>
+            <span className="rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark">{offboardings.length} active</span>
           </div>
           <p className="text-muted mt-0.5">Manage employee exit workflows</p>
         </div>
@@ -57,6 +59,11 @@ export default function OffboardingPage() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
+        {offboardings.length === 0 && (
+          <div className="card-p col-span-2 py-10 text-center">
+            <p className="text-sm text-dark-5 dark:text-dark-6">No active offboarding records. Initiate a process using "New Offboarding".</p>
+          </div>
+        )}
         {offboardings.map((ob) => (
           <OffboardingCard
             key={ob.id}

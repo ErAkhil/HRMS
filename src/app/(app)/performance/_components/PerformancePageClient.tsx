@@ -12,7 +12,7 @@ import { ReviewsTab } from "./tabs/reviews-tab";
 import { TeamTab } from "./tabs/team-tab";
 import { AnalyticsTab } from "./tabs/analytics-tab";
 import { ScheduleReviewModal } from "./schedule-review-modal";
-import type { SerializedGoal, SerializedReview } from "@/lib/actions/performance";
+import type { SerializedGoal, SerializedReview, TeamPerformanceSummary } from "@/lib/actions/performance";
 
 type Tab = "goals" | "reviews" | "team" | "analytics";
 
@@ -26,9 +26,10 @@ const TABS: { id: Tab; label: string }[] = [
 interface PerformancePageClientProps {
   goals: SerializedGoal[];
   reviews: SerializedReview[];
+  teamData: TeamPerformanceSummary | null;
 }
 
-export function PerformancePageClient({ goals: initialGoals, reviews }: PerformancePageClientProps) {
+export function PerformancePageClient({ goals: initialGoals, reviews, teamData }: PerformancePageClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("goals");
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -142,8 +143,8 @@ export function PerformancePageClient({ goals: initialGoals, reviews }: Performa
         </div>
       )}
       {activeTab === "reviews" && <ReviewsTab reviews={reviews} />}
-      {activeTab === "team" && <TeamTab />}
-      {activeTab === "analytics" && <AnalyticsTab />}
+      {activeTab === "team" && <TeamTab teamData={teamData} />}
+      {activeTab === "analytics" && <AnalyticsTab teamData={teamData} />}
 
       {showReviewModal && (
         <ScheduleReviewModal

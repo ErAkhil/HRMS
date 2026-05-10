@@ -1,40 +1,42 @@
-import { weekBars, maxDone, projectProgress } from "../_data/tasks-data";
+import type { SerializedProject } from "@/lib/actions/tasks";
 
-export function TasksProgressChart() {
+type TasksProgressChartProps = {
+  projects: SerializedProject[];
+};
+
+const PROJECT_BAR_COLORS = ["bg-primary-600", "bg-violet-500", "bg-emerald-500", "bg-amber-500", "bg-rose-500", "bg-sky-500"];
+
+export function TasksProgressChart({ projects }: TasksProgressChartProps) {
+  if (projects.length === 0) {
+    return (
+      <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
+        <h2 className="font-semibold text-dark dark:text-white mb-4">Project Progress</h2>
+        <p className="text-sm text-dark-5 dark:text-dark-6 py-4">No projects yet. Create a project to track progress.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
       <div className="mb-4 flex items-start justify-between">
         <div>
-          <h2 className="font-semibold text-dark dark:text-white">Task Progress This Week</h2>
-          <p className="text-xs text-dark-5 dark:text-dark-6">May 5–11, 2026</p>
+          <h2 className="font-semibold text-dark dark:text-white">Project Progress</h2>
+          <p className="text-xs text-dark-5 dark:text-dark-6">{projects.length} active project{projects.length !== 1 ? "s" : ""}</p>
         </div>
       </div>
 
-      <div className="flex items-end justify-around gap-1.5 h-32 mb-5">
-        {weekBars.map((bar, i) => {
-          const height = Math.round((bar.done / maxDone) * 96);
-          return (
-            <div key={i} className="flex flex-col items-center gap-1 flex-1">
-              <span className="text-[10px] font-bold text-dark-5 dark:text-dark-6">{bar.done}</span>
-              <div
-                className={`w-full rounded-t-sm ${bar.today ? "bg-primary-600" : "bg-primary-200 dark:bg-primary-900/40"}`}
-                style={{ height: `${height}px` }}
-              />
-              <span className="text-[10px] text-dark-5 dark:text-dark-6">{bar.day}</span>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="space-y-3 border-t border-gray-2 dark:border-dark-3 pt-4">
-        {projectProgress.map((proj) => (
-          <div key={proj.name}>
+      <div className="space-y-3">
+        {projects.slice(0, 5).map((proj, i) => (
+          <div key={proj.id}>
             <div className="mb-1 flex items-center justify-between text-sm">
-              <span className="font-medium text-dark dark:text-white">{proj.name}</span>
-              <span className="text-xs text-dark-5 dark:text-dark-6">{proj.done}/{proj.total} tasks · {proj.pct}%</span>
+              <span className="font-medium text-dark dark:text-white truncate mr-2">{proj.name}</span>
+              <span className="shrink-0 text-xs text-dark-5 dark:text-dark-6">{proj.doneTasks}/{proj.totalTasks} tasks · {proj.progress}%</span>
             </div>
             <div className="relative h-1.5 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
-              <div className={`absolute inset-y-0 left-0 rounded-full ${proj.bar}`} style={{ width: `${proj.pct}%` }} />
+              <div
+                className={`absolute inset-y-0 left-0 rounded-full ${PROJECT_BAR_COLORS[i % PROJECT_BAR_COLORS.length]}`}
+                style={{ width: `${proj.progress}%` }}
+              />
             </div>
           </div>
         ))}

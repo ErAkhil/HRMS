@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { deactivateEmployee, type EmployeeProfile } from "@/lib/actions/employees";
+import { type SerializedReview } from "@/lib/actions/performance";
 import { ProfileHeroCard } from "./profile-hero-card";
 import { EditProfileModal } from "./edit-profile-modal";
 import { OverviewTab } from "./tabs/overview-tab";
@@ -23,9 +24,10 @@ const TABS: { key: Tab; label: string }[] = [
 interface Props {
   employee: EmployeeProfile;
   departments: { id: string; name: string }[];
+  reviews: SerializedReview[];
 }
 
-export function ProfilePageClient({ employee, departments }: Readonly<Props>) {
+export function ProfilePageClient({ employee, departments, reviews }: Readonly<Props>) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [showEdit, setShowEdit] = useState(false);
@@ -99,7 +101,7 @@ export function ProfilePageClient({ employee, departments }: Readonly<Props>) {
           {activeTab === "overview" && (
             <OverviewTab employee={employee} onGoToPerformance={() => setActiveTab("performance")} onGoToLeave={() => setActiveTab("leave")} />
           )}
-          {activeTab === "performance" && <PerformanceTab />}
+          {activeTab === "performance" && <PerformanceTab reviews={reviews} />}
           {activeTab === "leave" && <LeaveTab leaveBalances={employee.leaveBalances} />}
           {activeTab === "documents" && <DocumentsTab />}
         </div>

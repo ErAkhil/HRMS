@@ -204,3 +204,36 @@ export async function getOrgTasks(): Promise<SerializedTask[]> {
     throw toActionError(err);
   }
 }
+
+export async function getTeamTaskWorkload() {
+  const user = await requireAuth();
+
+  try {
+    const employees = await db.employee.findMany({
+      where: { orgId: user.orgId, isActive: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+        tasks: {
+          where: { orgId: user.orgId },
+          select: { status: true },
+        },
+      },
+    });
+
+    return employees
+      .map((e) => ({
+        name: `${e.firstName} ${e.lastName}`,
+        avatarUrl: e.avatarUrl,
+        tasks: e.tasks.length,
+        done: e.tasks.filter((t) => t.status === "DONE").length,
+      }))
+      .filter((e) => e.tasks > 0)
+      .sort((a, b) => b.tasks - a.tasks)
+      .slice(0, 8);
+  } catch (err) {
+    throw toActionError(err);
+  }
+}

@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSidebarContext } from "../sidebar/sidebar-context";
 import { Notification } from "./notification";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
+import { GlobalSearch } from "./global-search";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Overview" },
@@ -38,9 +38,7 @@ function getPageMeta(pathname: string) {
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const pathname = usePathname();
-  const router = useRouter();
   const meta = getPageMeta(pathname);
-  const [query, setQuery] = useState("");
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center border-b border-gray-3 bg-white/95 backdrop-blur-sm dark:border-dark-3 dark:bg-dark-2/95">
@@ -83,33 +81,7 @@ export function Header() {
         </div>
 
         {/* ── Center: global search ── */}
-        <div className="mx-auto w-full max-w-md">
-          <label className="relative flex items-center">
-            <span className="sr-only">Search</span>
-            <svg
-              className="pointer-events-none absolute left-3 size-4 text-dark-5 dark:text-dark-6"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <input
-              type="search"
-              placeholder="Search employees, tasks, documents..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && query.trim()) {
-                  router.push(`/ai?q=${encodeURIComponent(query.trim())}`);
-                }
-              }}
-              className="h-9 w-full rounded-lg border border-gray-3 bg-gray-2 pl-9 pr-16 text-sm outline-none transition-colors placeholder:text-dark-5 focus:border-primary-600 focus:bg-white focus:ring-2 focus:ring-primary-100 dark:border-dark-3 dark:bg-dark-3 dark:placeholder:text-dark-6 dark:focus:border-primary-600 dark:focus:bg-dark-2 dark:focus:ring-primary-900/30"
-            />
-            <kbd className="pointer-events-none absolute right-3 hidden items-center gap-1 rounded border border-gray-3 bg-white px-1.5 py-0.5 text-[10px] font-medium text-dark-5 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6 sm:flex">
-              <span>⌘</span>K
-            </kbd>
-          </label>
-        </div>
+        <GlobalSearch />
 
         {/* ── Right: actions ── */}
         <div className="flex shrink-0 items-center gap-1">
