@@ -17,7 +17,7 @@ export function TasksProgressChart() {
             <div key={i} className="flex flex-col items-center gap-1 flex-1">
               <span className="text-[10px] font-bold text-dark-5 dark:text-dark-6">{bar.done}</span>
               <div
-                className={`w-full rounded-t-sm ${bar.today ? "bg-indigo-600" : "bg-indigo-200 dark:bg-indigo-900/40"}`}
+                className={`w-full rounded-t-sm ${bar.today ? "bg-primary-600" : "bg-primary-200 dark:bg-primary-900/40"}`}
                 style={{ height: `${height}px` }}
               />
               <span className="text-[10px] text-dark-5 dark:text-dark-6">{bar.day}</span>

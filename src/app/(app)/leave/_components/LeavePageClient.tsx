@@ -1,20 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import type { LeaveBalance, LeaveRequest, Employee } from "@prisma/client";
+import type { SerializedLeaveBalance, SerializedLeaveRequest } from "@/lib/actions/leave";
 import { LeaveBalanceCards } from "./LeaveBalanceCards";
 import { LeaveRequestsTable } from "./LeaveRequestsTable";
 import { ApplyLeaveModal } from "./ApplyLeaveModal";
 
 type Tab = "My Requests" | "Team Calendar" | "History";
 
-type LeaveRequestWithEmployee = LeaveRequest & {
-  employee: Pick<Employee, "firstName" | "lastName">;
-};
-
 interface LeavePageClientProps {
-  balances: LeaveBalance[];
-  requests: LeaveRequestWithEmployee[];
+  balances: SerializedLeaveBalance[];
+  requests: SerializedLeaveRequest[];
 }
 
 export function LeavePageClient({ balances, requests }: LeavePageClientProps) {

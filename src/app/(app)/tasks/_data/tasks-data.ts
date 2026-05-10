@@ -11,7 +11,7 @@ export const weekBars = [
 export const maxDone = 9;
 
 export const projectProgress = [
-  { name: "Platform Redesign", pct: 68, done: 32, total: 47, bar: "bg-indigo-600" },
+  { name: "Platform Redesign", pct: 68, done: 32, total: 47, bar: "bg-primary-600" },
   { name: "API v3 Migration", pct: 45, done: 18, total: 40, bar: "bg-violet-500" },
   { name: "Auth Module", pct: 89, done: 16, total: 18, bar: "bg-emerald-500" },
 ];

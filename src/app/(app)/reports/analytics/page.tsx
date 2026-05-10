@@ -48,7 +48,7 @@ export default function AdvancedAnalyticsPage() {
           <h2 className="text-sm font-semibold text-dark dark:text-white">Diversity Metrics — Gender by Department</h2>
           <div className="flex gap-4">
             <div className="flex items-center gap-1.5">
-              <div className="h-2.5 w-5 rounded-sm bg-indigo-500" />
+              <div className="h-2.5 w-5 rounded-sm bg-primary-500" />
               <span className="text-xs text-dark-5 dark:text-dark-6">Male ({totalMale} · {((totalMale / total) * 100).toFixed(0)}%)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -64,7 +64,7 @@ export default function AdvancedAnalyticsPage() {
               <div key={d.dept} className="flex items-center gap-3">
                 <span className="w-20 text-xs text-dark-5 dark:text-dark-6 shrink-0 text-right">{d.dept}</span>
                 <div className="flex-1 flex h-5 overflow-hidden rounded-full bg-gray-2 dark:bg-dark-3">
-                  <div className="h-full bg-indigo-500" style={{ width: `${(d.male / t) * 100}%` }} />
+                  <div className="h-full bg-primary-500" style={{ width: `${(d.male / t) * 100}%` }} />
                   <div className="h-full bg-pink-500" style={{ width: `${(d.female / t) * 100}%` }} />
                 </div>
                 <span className="text-xs text-dark-5 dark:text-dark-6 w-24 shrink-0">
@@ -84,7 +84,7 @@ export default function AdvancedAnalyticsPage() {
             <div key={item.month} className="flex-1 flex flex-col items-center gap-1">
               <div className="flex items-end gap-0.5 h-28">
                 <div
-                  className="w-5 rounded-t bg-indigo-500 transition-all"
+                  className="w-5 rounded-t bg-primary-500 transition-all"
                   style={{ height: `${(item.hires / maxBar) * 100}%` }}
                   title={`Hires: ${item.hires}`}
                 />
@@ -100,7 +100,7 @@ export default function AdvancedAnalyticsPage() {
         </div>
         <div className="flex gap-4 mt-3">
           <div className="flex items-center gap-1.5">
-            <div className="h-2.5 w-5 rounded-sm bg-indigo-500" />
+            <div className="h-2.5 w-5 rounded-sm bg-primary-500" />
             <span className="text-xs text-dark-5 dark:text-dark-6">Hires</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -152,8 +152,8 @@ export default function AdvancedAnalyticsPage() {
         <h2 className="text-sm font-semibold text-dark dark:text-white mb-3">Productivity vs Attendance Correlation</h2>
         <div className="rounded-lg bg-gray-1 dark:bg-dark-3 p-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20 shrink-0">
-              <svg className="h-4 w-4 text-indigo-600 dark:text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/20 shrink-0">
+              <svg className="h-4 w-4 text-primary-600 dark:text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>

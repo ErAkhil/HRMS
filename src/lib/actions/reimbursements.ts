@@ -5,6 +5,7 @@ import { requireAuth, requireRole } from "@/lib/session";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createAuditLog } from "./audit";
+import { toActionError } from "./utils";
 
 const claimSchema = z.object({
   category: z.enum(["TRAVEL", "MEALS", "EQUIPMENT", "MEDICAL", "TRAINING", "OTHER"]),
@@ -28,15 +29,19 @@ export async function getClaims(status?: string) {
     where.status = status;
   }
 
-  return db.claim.findMany({
-    where,
-    include: {
-      employee: {
-        select: { firstName: true, lastName: true, avatarUrl: true },
+  try {
+    return await db.claim.findMany({
+      where,
+      include: {
+        employee: {
+          select: { firstName: true, lastName: true, avatarUrl: true },
+        },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 export async function submitClaim(data: z.infer<typeof claimSchema>) {
@@ -46,34 +51,42 @@ export async function submitClaim(data: z.infer<typeof claimSchema>) {
   const parsed = claimSchema.safeParse(data);
   if (!parsed.success) throw new Error("Invalid data");
 
-  const claim = await db.claim.create({
-    data: {
-      employeeId: user.employeeId,
-      category: parsed.data.category,
-      amount: parsed.data.amount,
-      date: new Date(parsed.data.date),
-      description: parsed.data.description,
-    },
-  });
+  try {
+    const claim = await db.claim.create({
+      data: {
+        employeeId: user.employeeId,
+        category: parsed.data.category,
+        amount: parsed.data.amount,
+        date: new Date(parsed.data.date),
+        description: parsed.data.description,
+      },
+    });
 
-  revalidatePath("/payroll/reimbursements");
-  return claim;
+    revalidatePath("/payroll/reimbursements");
+    return claim;
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 export async function approveClaim(claimId: string) {
   const user = await requireRole("SUPER_ADMIN", "HR_ADMIN", "MANAGER");
 
-  const claim = await db.claim.update({
-    where: { id: claimId },
-    data: { status: "APPROVED", reviewedBy: user.id, reviewedAt: new Date() },
-  });
+  try {
+    const claim = await db.claim.update({
+      where: { id: claimId },
+      data: { status: "APPROVED", reviewedBy: user.id, reviewedAt: new Date() },
+    });
 
-  await createAuditLog({
-    action: "claim.approved",
-    resource: `Claim ${claimId}`,
-    details: `Approved ₹${claim.amount}`,
-  });
+    await createAuditLog({
+      action: "claim.approved",
+      resource: `Claim ${claimId}`,
+      details: `Approved ₹${claim.amount}`,
+    });
 
-  revalidatePath("/payroll/reimbursements");
-  return claim;
+    revalidatePath("/payroll/reimbursements");
+    return claim;
+  } catch (err) {
+    throw toActionError(err);
+  }
 }

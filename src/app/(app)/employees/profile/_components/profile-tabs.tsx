@@ -59,7 +59,7 @@ function OverviewTab() {
       </div>
 
       {/* AI Engagement Score */}
-      <div className="rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-indigo-700 p-5 text-white shadow-card">
+      <div className="rounded-xl bg-gradient-to-br from-violet-600 via-primary-600 to-primary-700 p-5 text-white shadow-card">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -165,7 +165,7 @@ function DocumentsTab() {
                 {doc.size} · {doc.date}
               </p>
             </div>
-            <button className="text-xs text-indigo-600 hover:underline dark:text-indigo-400">
+            <button className="text-xs text-primary-600 hover:underline dark:text-primary-400">
               Download
             </button>
           </li>

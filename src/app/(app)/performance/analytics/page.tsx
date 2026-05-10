@@ -10,7 +10,7 @@ const DEPARTMENTS = [
 ];
 
 const DISTRIBUTION = [
-  { label: "Exceptional", range: "91–100", count: 38, pct: 15, color: "bg-indigo-500" },
+  { label: "Exceptional", range: "91–100", count: 38, pct: 15, color: "bg-primary-500" },
   { label: "Above Average", range: "81–90", count: 87, pct: 35, color: "bg-emerald-500" },
   { label: "Average", range: "71–80", count: 75, pct: 30, color: "bg-amber-500" },
   { label: "Below Average", range: "61–70", count: 35, pct: 14, color: "bg-orange-400" },
@@ -83,7 +83,7 @@ export default function PerformanceAnalyticsPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-20 h-1.5 overflow-hidden rounded-full bg-gray-2 dark:bg-dark-3">
                           <div
-                            className="h-full rounded-full bg-indigo-500"
+                            className="h-full rounded-full bg-primary-500"
                             style={{ width: `${dept.avgScore}%` }}
                           />
                         </div>

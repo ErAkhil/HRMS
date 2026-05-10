@@ -20,6 +20,9 @@ function loadEnvLocal() {
 loadEnvLocal();
 
 export default defineConfig({
+  migrations: {
+    seed: "tsx ./prisma/seed.ts",
+  },
   datasource: {
     // DIRECT_URL (port 5432) required for Prisma CLI — pooler (6543) blocks DDL
     url: process.env.DIRECT_URL ?? process.env.DATABASE_URL!,

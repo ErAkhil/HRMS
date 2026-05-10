@@ -16,7 +16,7 @@ export function ProfileSidebar() {
       {/* ── Profile Card ── */}
       <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
         {/* Cover gradient */}
-        <div className="-mx-5 -mt-5 h-20 rounded-t-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-600" />
+        <div className="-mx-5 -mt-5 h-20 rounded-t-xl bg-gradient-to-r from-primary-500 via-violet-500 to-purple-600" />
 
         {/* Avatar */}
         <div className="-mt-10 flex flex-col items-center">
@@ -36,7 +36,7 @@ export function ProfileSidebar() {
           <p className="text-xs text-dark-5 dark:text-dark-6">
             Sr. Software Engineer
           </p>
-          <span className="mt-2 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">
+          <span className="mt-2 rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">
             Engineering
           </span>
         </div>

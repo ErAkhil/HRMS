@@ -65,7 +65,7 @@ export function toEmployeeDisplay(e: EmployeeWithDept): EmployeeDisplay {
 
 export const DEPARTMENT_COLORS: Record<DepartmentKey, string> = {
   Engineering:
-    "rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    "rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Product:
     "rounded-full bg-violet-light px-2.5 py-0.5 text-xs font-medium text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   Sales:

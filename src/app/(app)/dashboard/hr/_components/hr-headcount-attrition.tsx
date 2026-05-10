@@ -10,7 +10,7 @@ export function HrHeadcountAttrition() {
       <div className="md:col-span-7 rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-semibold text-dark dark:text-white">Headcount · Last 6 Months</h2>
-          <Link href="/reports" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">Export →</Link>
+          <Link href="/reports" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">Export →</Link>
         </div>
 
         <div className="flex items-end gap-2 h-32 mb-3">
@@ -18,7 +18,7 @@ export function HrHeadcountAttrition() {
             <div key={m.label} className="flex flex-1 flex-col items-center gap-1">
               <span className="text-[10px] font-semibold text-dark-5 dark:text-dark-6">{m.count}</span>
               <div
-                className={`w-full rounded-t-md ${i === headcountMonths.length - 1 ? "bg-indigo-600" : "bg-indigo-200 dark:bg-indigo-900/40"}`}
+                className={`w-full rounded-t-md ${i === headcountMonths.length - 1 ? "bg-primary-600" : "bg-primary-200 dark:bg-primary-900/40"}`}
                 style={{ height: `${m.height}px` }}
               />
               <span className="text-[10px] text-dark-5 dark:text-dark-6 whitespace-nowrap">{m.label}</span>
@@ -36,7 +36,7 @@ export function HrHeadcountAttrition() {
             <span className="text-xs text-dark-5 dark:text-dark-6">Exits (May)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">+12</span>
+            <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">+12</span>
             <span className="text-xs text-dark-5 dark:text-dark-6">Net Growth</span>
           </div>
         </div>
@@ -73,7 +73,7 @@ export function HrHeadcountAttrition() {
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${badgeClass[emp.riskColor]}`}>{emp.risk}</span>
                   </div>
                   <p className="text-[10px] text-dark-5 dark:text-dark-6 mt-0.5">{emp.dept} · {emp.reason}</p>
-                  <button className="mt-1.5 rounded px-2 py-0.5 text-[10px] font-semibold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 transition-colors">
+                  <button className="mt-1.5 rounded px-2 py-0.5 text-[10px] font-semibold bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-300 transition-colors">
                     Schedule 1:1
                   </button>
                 </div>

@@ -1,4 +1,4 @@
-import type { PayrollRun } from "@prisma/client";
+import type { SerializedPayrollRun } from "@/lib/actions/payroll";
 
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -9,15 +9,11 @@ const statusBadge: Record<string, string> = {
   CANCELLED: "rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
 };
 
-type RunWithCount = PayrollRun & { _count: { payslips: number } };
-
-function fmt(n: { toString(): string } | number | string) {
-  return "₹" + Math.round(Number(n.toString())).toLocaleString("en-IN");
+function fmt(n: number) {
+  return "₹" + Math.round(n).toLocaleString("en-IN");
 }
 
-export function RecentPayrollRuns({ runs = [] }: { runs?: RunWithCount[] }) {
-  const display = runs.length > 0 ? runs : [];
-
+export function RecentPayrollRuns({ runs = [] }: { runs?: SerializedPayrollRun[] }) {
   return (
     <div className="rounded-xl bg-white shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 overflow-hidden">
       <div className="flex items-center justify-between p-5 border-b border-gray-3 dark:border-dark-3">
@@ -35,14 +31,14 @@ export function RecentPayrollRuns({ runs = [] }: { runs?: RunWithCount[] }) {
             </tr>
           </thead>
           <tbody>
-            {display.length === 0 && (
+            {runs.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-5 py-8 text-center text-sm text-dark-5 dark:text-dark-6">
                   No payroll runs yet
                 </td>
               </tr>
             )}
-            {display.map((run) => (
+            {runs.map((run) => (
               <tr key={run.id} className="border-b border-gray-3 last:border-0 hover:bg-gray-1 dark:border-dark-3 dark:hover:bg-dark-3">
                 <td className="px-5 py-3 text-sm font-medium text-dark dark:text-white">
                   {MONTH_NAMES[run.month - 1]} {run.year}

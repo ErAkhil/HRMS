@@ -32,7 +32,7 @@ export const PAST_MEETINGS: Meeting[] = [
 ];
 
 export const TYPE_COLORS: Record<MeetingType, string> = {
-  "All-Hands": "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  "All-Hands": "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Team: "bg-sky-50 text-sky-dark dark:bg-sky-dark/10 dark:text-sky",
   "1:1": "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   Interview: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",

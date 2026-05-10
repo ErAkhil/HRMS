@@ -70,7 +70,7 @@ export function CollaborationPageClient({ channels, stats }: Readonly<{ channels
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <nav className="mb-1 flex items-center gap-1.5 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-indigo-600">Dashboard</Link>
+            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
             <span>/</span>
             <span className="text-dark dark:text-white">Collaboration</span>
           </nav>
@@ -108,7 +108,7 @@ export function CollaborationPageClient({ channels, stats }: Readonly<{ channels
           <p className="text-sm font-medium text-dark-5 dark:text-dark-6">Meetings Today</p>
           <p className="mt-2 text-3xl font-bold text-dark dark:text-white">—</p>
           <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">
-            <Link href="/collaboration/meetings" className="text-indigo-600 hover:underline">Schedule one →</Link>
+            <Link href="/collaboration/meetings" className="text-primary-600 hover:underline">Schedule one →</Link>
           </p>
         </div>
       </div>
@@ -117,7 +117,7 @@ export function CollaborationPageClient({ channels, stats }: Readonly<{ channels
       <div className={card}>
         <div className="flex items-center justify-between pb-4">
           <h2 className="text-base font-semibold text-dark dark:text-white">Channels ({channels.length})</h2>
-          <button onClick={() => setShowChannelModal(true)} className="text-sm font-medium text-indigo-600 hover:underline">
+          <button onClick={() => setShowChannelModal(true)} className="text-sm font-medium text-primary-600 hover:underline">
             + New Channel
           </button>
         </div>
@@ -158,7 +158,7 @@ export function CollaborationPageClient({ channels, stats }: Readonly<{ channels
         )}
 
         <div className="pt-4 border-t border-gray-2 dark:border-dark-3 mt-4">
-          <Link href="/collaboration/messages" className="text-sm font-medium text-indigo-600 hover:underline">
+          <Link href="/collaboration/messages" className="text-sm font-medium text-primary-600 hover:underline">
             Open Messages →
           </Link>
         </div>

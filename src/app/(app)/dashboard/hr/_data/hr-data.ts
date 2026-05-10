@@ -1,5 +1,5 @@
 export const badgeClass = {
-  indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  indigo: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   emerald: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   amber: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
   rose: "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
@@ -31,12 +31,12 @@ export const recruitmentRoles = [
 ];
 
 export const onboardingPeople = [
-  { name: "Marcus Chen", img: "/user-09.png", pct: 85, day: 14, dept: "Engineering", color: "indigo" as BadgeColor, barColor: "bg-indigo-500" },
+  { name: "Marcus Chen", img: "/user-09.png", pct: 85, day: 14, dept: "Engineering", color: "indigo" as BadgeColor, barColor: "bg-primary-500" },
   { name: "Nina Foster", img: "/user-06.png", pct: 60, day: 12, dept: "HR", color: "violet" as BadgeColor, barColor: "bg-violet-500" },
   { name: "Tom Bradley", img: "/user-08.png", pct: 40, day: 8, dept: "Sales", color: "amber" as BadgeColor, barColor: "bg-amber-500" },
   { name: "Lisa Wang", img: "/user-07.png", pct: 20, day: 4, dept: "Finance", color: "rose" as BadgeColor, barColor: "bg-rose-500" },
   { name: "Raj Kumar", img: "/user-10.png", pct: 95, day: 28, dept: "Engineering", color: "emerald" as BadgeColor, barColor: "bg-emerald-500" },
-  { name: "Anika Patel", img: "/user-11.png", pct: 10, day: 2, dept: "Product", color: "indigo" as BadgeColor, barColor: "bg-indigo-500" },
+  { name: "Anika Patel", img: "/user-11.png", pct: 10, day: 2, dept: "Product", color: "indigo" as BadgeColor, barColor: "bg-primary-500" },
 ];
 
 export const complianceItems = [
@@ -79,7 +79,7 @@ export const exitReasons = [
 
 export const leaveBars = [
   { label: "On Leave", count: 12, pct: (12 / 248) * 100, barColor: "bg-amber-500" },
-  { label: "WFH", count: 18, pct: (18 / 248) * 100, barColor: "bg-indigo-500" },
+  { label: "WFH", count: 18, pct: (18 / 248) * 100, barColor: "bg-primary-500" },
   { label: "Late", count: 4, pct: (4 / 248) * 100, barColor: "bg-rose-500" },
   { label: "Present", count: 214, pct: (214 / 248) * 100, barColor: "bg-emerald-500" },
 ];

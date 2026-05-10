@@ -12,11 +12,11 @@ export function EmployeesKpiRow({ totalEmployees, activeEmployees, deptCount }: 
       <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-dark-5 dark:text-dark-6">Total Employees</p>
-          <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">All</span>
+          <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">All</span>
         </div>
         <p className="mt-3 text-3xl font-bold text-dark dark:text-white">{totalEmployees}</p>
         <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">
-          <span className="font-semibold text-indigo-600">{deptCount}</span> departments
+          <span className="font-semibold text-primary-600">{deptCount}</span> departments
         </p>
       </div>
 

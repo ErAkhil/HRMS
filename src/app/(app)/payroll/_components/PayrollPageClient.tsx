@@ -5,13 +5,11 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
 import { runPayroll } from "@/lib/actions/payroll";
+import type { SerializedPayrollRun, PayslipRow } from "@/lib/actions/payroll";
 import { PayrollKpiCards } from "./PayrollKpiCards";
 import { PayrollTable } from "./PayrollTable";
 import { PayrollBreakdown } from "./PayrollBreakdown";
 import { RecentPayrollRuns } from "./RecentPayrollRuns";
-import type { PayrollRun } from "@prisma/client";
-
-type RunWithCount = PayrollRun & { _count: { payslips: number } };
 
 interface PayrollStats {
   totalGross: number;
@@ -22,14 +20,15 @@ interface PayrollStats {
 }
 
 interface Props {
-  payrollRuns: RunWithCount[];
+  payrollRuns: SerializedPayrollRun[];
+  payslipRows: PayslipRow[];
   latestStats?: PayrollStats;
   isAdmin: boolean;
 }
 
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-export function PayrollPageClient({ payrollRuns, latestStats, isAdmin }: Props) {
+export function PayrollPageClient({ payrollRuns, payslipRows, latestStats, isAdmin }: Props) {
   const router = useRouter();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -107,10 +106,10 @@ export function PayrollPageClient({ payrollRuns, latestStats, isAdmin }: Props) 
       {/* Table + Breakdown */}
       <div className="grid gap-5 lg:grid-cols-12">
         <div className="lg:col-span-8">
-          <PayrollTable />
+          <PayrollTable rows={payslipRows} />
         </div>
         <div className="lg:col-span-4">
-          <PayrollBreakdown />
+          <PayrollBreakdown stats={latestStats} />
         </div>
       </div>
 

@@ -1,38 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MyTasksView } from "./my-tasks-view";
 import { TasksProgressChart } from "./tasks-progress-chart";
 import { TasksTeamWorkload } from "./tasks-team-workload";
 import { TasksQuickLinks } from "./tasks-quick-links";
-import { NewTaskModal } from "./new-task-modal";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-
-type DbTask = {
-  id: string;
-  title: string;
-  description?: string | null;
-  status: string;
-  priority: string;
-  dueDate?: Date | null;
-  project?: { name: string } | null;
-  assignee?: { firstName: string; lastName: string; avatarUrl?: string | null } | null;
-};
+import { createTask } from "@/lib/actions/tasks";
+import type { SerializedTask } from "@/lib/actions/tasks";
 
 interface TasksPageClientProps {
-  tasks: DbTask[];
+  tasks: SerializedTask[];
 }
 
-export function TasksPageClient({ tasks }: TasksPageClientProps) {
+export function TasksPageClient({ tasks: initialTasks }: TasksPageClientProps) {
+  const router = useRouter();
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
+  const [tasks, setTasks] = useState(initialTasks);
+  const [isPending, startTransition] = useTransition();
   const { toast, setToast } = useToast();
 
-  function handleCreateTask(e: React.FormEvent) {
+  useEffect(() => { setTasks(initialTasks); }, [initialTasks]);
+
+  function handleCreateTask(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setShowNewTaskModal(false);
-    setToast("Task created successfully!");
+    const fd = new FormData(e.currentTarget);
+    startTransition(async () => {
+      try {
+        await createTask({
+          title: fd.get("title") as string,
+          description: (fd.get("description") as string) || undefined,
+          priority: (fd.get("priority") as "HIGH" | "MEDIUM" | "LOW") || "MEDIUM",
+          dueDate: (fd.get("dueDate") as string) || undefined,
+        });
+        setShowNewTaskModal(false);
+        setToast("Task created successfully!");
+        router.refresh();
+      } catch (err) {
+        setToast(err instanceof Error ? err.message : "Failed to create task");
+      }
+    });
   }
 
   const totalAssigned = tasks.length;
@@ -51,7 +61,7 @@ export function TasksPageClient({ tasks }: TasksPageClientProps) {
       label: "Total Assigned",
       value: String(totalAssigned),
       sub: `across ${new Set(tasks.map((t) => t.project?.name).filter(Boolean)).size || 0} projects`,
-      iconColor: "text-indigo-600 dark:text-indigo-300",
+      iconColor: "text-primary-600 dark:text-primary-300",
     },
     {
       label: "Completed",
@@ -81,7 +91,7 @@ export function TasksPageClient({ tasks }: TasksPageClientProps) {
   const priorities = [
     { label: "High Priority", count: highCount, pct: Math.round((highCount / totalForPriority) * 100), dot: "bg-rose-500" },
     { label: "Medium Priority", count: mediumCount, pct: Math.round((mediumCount / totalForPriority) * 100), dot: "bg-amber-500" },
-    { label: "Low Priority", count: lowCount, pct: Math.round((lowCount / totalForPriority) * 100), dot: "bg-indigo-500" },
+    { label: "Low Priority", count: lowCount, pct: Math.round((lowCount / totalForPriority) * 100), dot: "bg-primary-500" },
   ];
 
   const upcomingDeadlines = tasks
@@ -109,8 +119,8 @@ export function TasksPageClient({ tasks }: TasksPageClientProps) {
         dot = "bg-amber-500";
       } else {
         dueLabel = `Due ${due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
-        badgeClass = "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300";
-        dot = "bg-indigo-500";
+        badgeClass = "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300";
+        dot = "bg-primary-500";
       }
       return { task: t.title, project: t.project?.name ?? "General", due: dueLabel, badgeClass, dot };
     });
@@ -121,7 +131,7 @@ export function TasksPageClient({ tasks }: TasksPageClientProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="mb-1 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-indigo-600">Dashboard</Link>
+            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
             <span className="mx-1">/</span>
             <span>Tasks</span>
           </p>
@@ -222,7 +232,48 @@ export function TasksPageClient({ tasks }: TasksPageClientProps) {
       </div>
 
       {showNewTaskModal && (
-        <NewTaskModal onClose={() => setShowNewTaskModal(false)} onSubmit={handleCreateTask} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-modal dark:bg-dark-2">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-dark dark:text-white">New Task</h2>
+              <button onClick={() => setShowNewTaskModal(false)} className="flex size-8 items-center justify-center rounded-lg text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3">
+                <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleCreateTask} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Task Title <span className="text-rose-500">*</span></label>
+                <input name="title" type="text" required placeholder="Enter task title" className="input-field" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Description</label>
+                <textarea name="description" rows={3} placeholder="Describe the task..." className="input-field resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Priority</label>
+                  <select name="priority" className="input-field">
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM" defaultValue="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Due Date</label>
+                  <input name="dueDate" type="date" className="input-field" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setShowNewTaskModal(false)} className="btn-secondary">Cancel</button>
+                <button type="submit" disabled={isPending} className="btn-primary disabled:opacity-60">
+                  {isPending ? "Creating…" : "Create Task"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
       <Toast message={toast} />
     </div>

@@ -1,8 +1,11 @@
-import { getMyGoals } from "@/lib/actions/performance";
+import { getMyGoals, getMyReviews } from "@/lib/actions/performance";
 import { PerformancePageClient } from "./_components/PerformancePageClient";
 
 export default async function PerformancePage() {
-  const goals = await getMyGoals().catch(() => []);
+  const [goals, reviews] = await Promise.all([
+    getMyGoals().catch(() => []),
+    getMyReviews().catch(() => []),
+  ]);
 
-  return <PerformancePageClient goals={goals} />;
+  return <PerformancePageClient goals={goals} reviews={reviews} />;
 }

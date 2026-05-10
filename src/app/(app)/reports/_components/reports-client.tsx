@@ -54,7 +54,7 @@ export function ReportsClient({ data }: Readonly<{ data: ReportsData }>) {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
-          { label: "Total Headcount", value: data.totalEmployees.toString(), change: "Active employees", up: true, bg: "bg-indigo-50 dark:bg-indigo-900/20", color: "text-indigo-600 dark:text-indigo-300" },
+          { label: "Total Headcount", value: data.totalEmployees.toString(), change: "Active employees", up: true, bg: "bg-primary-50 dark:bg-primary-900/20", color: "text-primary-600 dark:text-primary-300" },
           { label: "Open Positions", value: data.openJobs.toString(), change: "Active job postings", up: data.openJobs === 0, bg: "bg-amber-light dark:bg-amber-dark/20", color: "text-amber-dark" },
           { label: "Task Completion", value: `${taskCompletionRate}%`, change: `${doneTasks} of ${totalTasks} tasks done`, up: taskCompletionRate > 50, bg: "bg-emerald-light dark:bg-emerald-dark/20", color: "text-emerald-dark dark:text-emerald" },
           { label: "Leaves (Approved)", value: approvedLeave.toString(), change: `${pendingLeave} pending review`, up: true, bg: "bg-violet-light dark:bg-violet-dark/20", color: "text-violet-dark dark:text-violet-300" },
@@ -75,7 +75,7 @@ export function ReportsClient({ data }: Readonly<{ data: ReportsData }>) {
         <div className="md:col-span-7 rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-dark dark:text-white">Headcount by Department</h2>
-            <Link href="/employees" className="text-xs text-indigo-600 hover:underline dark:text-indigo-400">View All →</Link>
+            <Link href="/employees" className="text-xs text-primary-600 hover:underline dark:text-primary-400">View All →</Link>
           </div>
           {data.deptData.length === 0 ? (
             <p className="text-sm text-dark-5 dark:text-dark-6">No department data yet.</p>
@@ -89,7 +89,7 @@ export function ReportsClient({ data }: Readonly<{ data: ReportsData }>) {
                   </div>
                   <div className="relative h-2 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
                     <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-indigo-500"
+                      className="absolute inset-y-0 left-0 rounded-full bg-primary-500"
                       style={{ width: `${Math.round((dept.count / maxCount) * 100)}%` }}
                     />
                   </div>
@@ -117,7 +117,7 @@ export function ReportsClient({ data }: Readonly<{ data: ReportsData }>) {
                 </div>
               ))}
             </div>
-            <Link href="/leave/approvals" className="mt-3 block text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <Link href="/leave/approvals" className="mt-3 block text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
               View all leave requests →
             </Link>
           </div>
@@ -138,7 +138,7 @@ export function ReportsClient({ data }: Readonly<{ data: ReportsData }>) {
                 </div>
               ))}
             </div>
-            <Link href="/tasks" className="mt-3 block text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <Link href="/tasks" className="mt-3 block text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
               View all tasks →
             </Link>
           </div>

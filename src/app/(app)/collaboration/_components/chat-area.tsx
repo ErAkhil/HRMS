@@ -34,7 +34,7 @@ export function ChatArea({ channel, messages }: ChatAreaProps) {
               <h2 className="text-sm font-bold text-dark dark:text-white">
                 {channel.name}
               </h2>
-              <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">
+              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">
                 {channel.members} members
               </span>
             </div>

@@ -57,8 +57,8 @@ export const COLUMNS: KanbanColumn[] = [
   {
     key: "inprogress",
     label: "In Progress",
-    headerColor: "border-indigo-600",
-    dotColor: "bg-indigo-600",
+    headerColor: "border-primary-600",
+    dotColor: "bg-primary-600",
     tasks: [
       {
         id: "ip1",

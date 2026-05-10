@@ -6,9 +6,9 @@ export function HrKpiRow() {
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Total Headcount</p>
             <p className="mt-1.5 text-3xl font-bold text-dark dark:text-white">248</p>
-            <p className="mt-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium">↑ 14 this month</p>
+            <p className="mt-1 text-xs text-primary-600 dark:text-primary-400 font-medium">↑ 14 this month</p>
           </div>
-          <span className="rounded-lg bg-indigo-50 p-2 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300 text-lg">👥</span>
+          <span className="rounded-lg bg-primary-50 p-2 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300 text-lg">👥</span>
         </div>
       </div>
       <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">

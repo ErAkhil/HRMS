@@ -23,9 +23,9 @@ export function MenuItem(props: ButtonProps | LinkProps) {
       ? "py-1.5 pl-9 text-dark-5 hover:text-dark dark:text-dark-6 dark:hover:text-white"
       : "py-2.5 text-dark-5 dark:text-dark-6",
     props.isActive && !props.isSubItem
-      ? "bg-indigo-50 text-indigo-600 dark:bg-[rgba(79,70,229,0.15)] dark:text-indigo-300"
+      ? "bg-primary-50 text-primary-600 dark:bg-[rgba(79,70,229,0.15)] dark:text-primary-300"
       : props.isActive && props.isSubItem
-        ? "text-indigo-600 dark:text-indigo-300"
+        ? "text-primary-600 dark:text-primary-300"
         : !props.isSubItem
           ? "hover:bg-gray-1 hover:text-dark dark:hover:bg-[rgba(255,255,255,0.06)] dark:hover:text-white"
           : "",

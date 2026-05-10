@@ -5,38 +5,43 @@ import { requireRole } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createAuditLog } from "./audit";
+import { toActionError } from "./utils";
 
 export async function getOrgUsers() {
   const admin = await requireRole("SUPER_ADMIN", "HR_ADMIN");
 
-  const users = await db.user.findMany({
-    where: { orgId: admin.orgId },
-    include: {
-      employee: {
-        select: {
-          firstName: true,
-          lastName: true,
-          avatarUrl: true,
-          department: { select: { name: true } },
-          title: true,
+  try {
+    const users = await db.user.findMany({
+      where: { orgId: admin.orgId },
+      include: {
+        employee: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+            department: { select: { name: true } },
+            title: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: "asc" },
-  });
+      orderBy: { createdAt: "asc" },
+    });
 
-  return users.map((u) => ({
-    id: u.id,
-    email: u.email,
-    role: u.role,
-    isActive: u.isActive,
-    createdAt: u.createdAt,
-    lastLoginAt: u.lastLoginAt,
-    name: u.employee ? `${u.employee.firstName} ${u.employee.lastName}` : u.email.split("@")[0],
-    avatarUrl: u.employee?.avatarUrl ?? null,
-    department: u.employee?.department?.name ?? "—",
-    title: u.employee?.title ?? "—",
-  }));
+    return users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      role: u.role,
+      isActive: u.isActive,
+      createdAt: u.createdAt,
+      lastLoginAt: u.lastLoginAt,
+      name: u.employee ? `${u.employee.firstName} ${u.employee.lastName}` : u.email.split("@")[0],
+      avatarUrl: u.employee?.avatarUrl ?? null,
+      department: u.employee?.department?.name ?? "—",
+      title: u.employee?.title ?? "—",
+    }));
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 const updateRoleSchema = z.object({
@@ -50,58 +55,70 @@ export async function updateUserRole(data: z.infer<typeof updateRoleSchema>) {
   const parsed = updateRoleSchema.safeParse(data);
   if (!parsed.success) throw new Error("Invalid data");
 
-  const target = await db.user.findUnique({
-    where: { id: parsed.data.userId },
-    select: { orgId: true, role: true },
-  });
+  try {
+    const target = await db.user.findUnique({
+      where: { id: parsed.data.userId },
+      select: { orgId: true, role: true },
+    });
 
-  if (!target || target.orgId !== admin.orgId) throw new Error("User not found");
+    if (!target || target.orgId !== admin.orgId) throw new Error("User not found");
 
-  await db.user.update({
-    where: { id: parsed.data.userId },
-    data: { role: parsed.data.role },
-  });
+    await db.user.update({
+      where: { id: parsed.data.userId },
+      data: { role: parsed.data.role },
+    });
 
-  await createAuditLog({
-    action: "user.role_changed",
-    resource: `User ${parsed.data.userId}`,
-    details: `Role changed to ${parsed.data.role}`,
-  });
+    await createAuditLog({
+      action: "user.role_changed",
+      resource: `User ${parsed.data.userId}`,
+      details: `Role changed to ${parsed.data.role}`,
+    });
 
-  revalidatePath("/admin/users");
+    revalidatePath("/admin/users");
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 export async function toggleUserActive(userId: string) {
   const admin = await requireRole("SUPER_ADMIN", "HR_ADMIN");
 
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: { orgId: true, isActive: true },
-  });
+  try {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { orgId: true, isActive: true },
+    });
 
-  if (!user || user.orgId !== admin.orgId) throw new Error("User not found");
+    if (!user || user.orgId !== admin.orgId) throw new Error("User not found");
 
-  await db.user.update({
-    where: { id: userId },
-    data: { isActive: !user.isActive },
-  });
+    await db.user.update({
+      where: { id: userId },
+      data: { isActive: !user.isActive },
+    });
 
-  await createAuditLog({
-    action: user.isActive ? "user.deactivated" : "user.activated",
-    resource: `User ${userId}`,
-    details: `User ${user.isActive ? "deactivated" : "activated"}`,
-  });
+    await createAuditLog({
+      action: user.isActive ? "user.deactivated" : "user.activated",
+      resource: `User ${userId}`,
+      details: `User ${user.isActive ? "deactivated" : "activated"}`,
+    });
 
-  revalidatePath("/admin/users");
+    revalidatePath("/admin/users");
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 export async function getWorkflows() {
   const admin = await requireRole("SUPER_ADMIN", "HR_ADMIN");
 
-  return db.workflow.findMany({
-    where: { orgId: admin.orgId },
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    return await db.workflow.findMany({
+      where: { orgId: admin.orgId },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 const createWorkflowSchema = z.object({
@@ -116,32 +133,40 @@ export async function createWorkflow(data: z.infer<typeof createWorkflowSchema>)
   const parsed = createWorkflowSchema.safeParse(data);
   if (!parsed.success) throw new Error("Invalid data");
 
-  await db.workflow.create({
-    data: {
-      orgId: admin.orgId,
-      name: parsed.data.name,
-      description: parsed.data.description,
-      trigger: parsed.data.trigger,
-    },
-  });
+  try {
+    await db.workflow.create({
+      data: {
+        orgId: admin.orgId,
+        name: parsed.data.name,
+        description: parsed.data.description,
+        trigger: parsed.data.trigger,
+      },
+    });
 
-  revalidatePath("/admin/workflows");
+    revalidatePath("/admin/workflows");
+  } catch (err) {
+    throw toActionError(err);
+  }
 }
 
 export async function toggleWorkflow(workflowId: string) {
   const admin = await requireRole("SUPER_ADMIN", "HR_ADMIN");
 
-  const wf = await db.workflow.findUnique({
-    where: { id: workflowId },
-    select: { orgId: true, isEnabled: true },
-  });
+  try {
+    const wf = await db.workflow.findUnique({
+      where: { id: workflowId },
+      select: { orgId: true, isEnabled: true },
+    });
 
-  if (!wf || wf.orgId !== admin.orgId) throw new Error("Not found");
+    if (!wf || wf.orgId !== admin.orgId) throw new Error("Not found");
 
-  await db.workflow.update({
-    where: { id: workflowId },
-    data: { isEnabled: !wf.isEnabled },
-  });
+    await db.workflow.update({
+      where: { id: workflowId },
+      data: { isEnabled: !wf.isEnabled },
+    });
 
-  revalidatePath("/admin/workflows");
+    revalidatePath("/admin/workflows");
+  } catch (err) {
+    throw toActionError(err);
+  }
 }

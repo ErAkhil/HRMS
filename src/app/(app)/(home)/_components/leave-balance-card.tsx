@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { LeaveBalance } from "@prisma/client";
 
 const LEAVE_COLORS: Record<string, string> = {
-  ANNUAL: "bg-indigo-500",
+  ANNUAL: "bg-primary-500",
   SICK: "bg-amber",
   CASUAL: "bg-emerald",
   MATERNITY: "bg-rose-400",
@@ -44,8 +44,8 @@ export function LeaveBalanceCard({ balances }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
-            <svg className="size-4 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/20">
+            <svg className="size-4 text-primary-600 dark:text-primary-400" viewBox="0 0 24 24" fill="none">
               <path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
@@ -58,7 +58,7 @@ export function LeaveBalanceCard({ balances }: Props) {
       <div className="mt-3 rounded-lg bg-gradient-ai-soft px-3 py-2.5">
         <p className="text-muted">Total Available</p>
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-300">{totalRemaining}</span>
+          <span className="text-2xl font-bold text-primary-600 dark:text-primary-300">{totalRemaining}</span>
           <span className="text-muted">days remaining</span>
         </div>
       </div>
@@ -93,7 +93,7 @@ export function LeaveBalanceCard({ balances }: Props) {
       {/* CTA */}
       <Link
         href="/leave"
-        className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-indigo-200 py-2 text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+        className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-primary-200 py-2 text-xs font-semibold text-primary-600 transition-colors hover:bg-primary-50 dark:border-primary-800 dark:text-primary-400 dark:hover:bg-primary-900/20"
       >
         <svg className="size-3.5" viewBox="0 0 24 24" fill="none">
           <path d="M12 4.5v15m7.5-7.5h-15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

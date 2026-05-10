@@ -27,7 +27,7 @@ const LEAVE_BADGE: Record<string, string> = {
   MATERNITY: "badge-ai",
   PATERNITY: "badge-ai",
   UNPAID: "badge-gray",
-  OTHER: "badge-indigo",
+  OTHER: "badge-ai",
 };
 
 export function ApprovalsClient({ requests }: Readonly<{ requests: LeaveRequest[] }>) {

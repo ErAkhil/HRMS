@@ -73,7 +73,7 @@ export function AttendanceWidget({ todayRecord }: Props) {
           isClockedIn
             ? "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald"
             : isCheckedOut
-            ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300"
+            ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300"
             : "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose"
         }`}>
           {isClockedIn ? "● Present" : isCheckedOut ? "● Done" : "● Not In"}

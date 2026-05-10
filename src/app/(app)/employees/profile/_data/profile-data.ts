@@ -13,7 +13,7 @@ export const ACTIVITY = [
   },
   {
     icon: "💬",
-    iconBg: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    iconBg: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
     text: "Commented on design review for v3.2 release",
     time: "Yesterday, 4:15 PM",
   },
@@ -79,6 +79,6 @@ export const TIMELINE = [
     date: "Mar 2022",
     event: "Joined Acme Corporation as Software Engineer",
     type: "join",
-    color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    color: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   },
 ];

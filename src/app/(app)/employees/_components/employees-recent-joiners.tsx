@@ -27,7 +27,7 @@ export function EmployeesRecentJoiners({ newJoiners, deptBadgeColor }: Readonly<
     <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 md:col-span-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-base font-semibold text-dark dark:text-white">Recent Joiners</h2>
-        <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">{newJoiners.length}</span>
+        <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">{newJoiners.length}</span>
       </div>
       {newJoiners.length === 0 ? (
         <p className="text-sm text-dark-5 dark:text-dark-6">No employees yet.</p>
@@ -37,7 +37,7 @@ export function EmployeesRecentJoiners({ newJoiners, deptBadgeColor }: Readonly<
             const fullName = `${emp.firstName} ${emp.lastName}`;
             const dept = emp.department?.name ?? "—";
             const da = daysAgo(emp.startDate);
-            const badgeColor = deptBadgeColor[dept] ?? "bg-indigo-50 text-indigo-600";
+            const badgeColor = deptBadgeColor[dept] ?? "bg-primary-50 text-primary-600";
             return (
               <div key={emp.id} className="flex items-center gap-3">
                 <Image src={emp.avatarUrl ?? "/images/user/user-03.png"} alt={fullName} width={36} height={36} className="h-9 w-9 rounded-full object-cover" />
@@ -51,7 +51,7 @@ export function EmployeesRecentJoiners({ newJoiners, deptBadgeColor }: Readonly<
                     <span className="text-xs text-dark-5 dark:text-dark-6">· {da}d ago</span>
                   </div>
                 </div>
-                <Link href="/employees/profile" className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">
+                <Link href="/employees/profile" className="shrink-0 text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400">
                   View
                 </Link>
               </div>
@@ -60,7 +60,7 @@ export function EmployeesRecentJoiners({ newJoiners, deptBadgeColor }: Readonly<
         </div>
       )}
       <div className="mt-4 border-t border-gray-100 pt-3 dark:border-dark-3">
-        <Link href="/employees?filter=new" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">
+        <Link href="/employees?filter=new" className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400">
           View all new joiners →
         </Link>
       </div>

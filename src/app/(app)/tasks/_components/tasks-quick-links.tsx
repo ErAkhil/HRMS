@@ -27,15 +27,15 @@ export function TasksQuickLinks() {
 
         <Link
           href="/tasks/projects"
-          className="group flex flex-col justify-between rounded-xl border border-gray-2 p-5 hover:border-indigo-400 dark:border-dark-3 dark:hover:border-indigo-500 transition-colors"
+          className="group flex flex-col justify-between rounded-xl border border-gray-2 p-5 hover:border-primary-400 dark:border-dark-3 dark:hover:border-primary-500 transition-colors"
         >
           <div className="flex items-center justify-between">
-            <span className="rounded-lg bg-indigo-50 p-2 dark:bg-indigo-900/20">
-              <svg className="h-5 w-5 text-indigo-600 dark:text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <span className="rounded-lg bg-primary-50 p-2 dark:bg-primary-900/20">
+              <svg className="h-5 w-5 text-primary-600 dark:text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h3.5L10 7H19a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
               </svg>
             </span>
-            <svg className="h-4 w-4 text-dark-5 group-hover:text-indigo-600 dark:text-dark-6 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-4 w-4 text-dark-5 group-hover:text-primary-600 dark:text-dark-6 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </div>

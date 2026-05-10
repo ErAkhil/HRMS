@@ -1,6 +1,6 @@
 const SCORE_BARS = [
   { label: "Goal Achievement", pct: 92, color: "bg-emerald" },
-  { label: "Collaboration", pct: 88, color: "bg-indigo-600" },
+  { label: "Collaboration", pct: 88, color: "bg-primary-600" },
   { label: "Delivery", pct: 85, color: "bg-violet-500" },
   { label: "Leadership", pct: 79, color: "bg-amber" },
 ];
@@ -23,7 +23,7 @@ const REVIEW_HISTORY = [
 
 const FEEDBACK_CARDS = [
   { title: "Exceptional Problem-Solving", body: "Sarah consistently delivers elegant solutions to complex technical challenges, often proposing approaches the team hadn't considered.", color: "border-l-emerald" },
-  { title: "Strong Collaboration", body: "Always available to help teammates, conducts thorough code reviews, and fosters a positive team environment.", color: "border-l-indigo-600" },
+  { title: "Strong Collaboration", body: "Always available to help teammates, conducts thorough code reviews, and fosters a positive team environment.", color: "border-l-primary-600" },
   { title: "Improve Documentation", body: "Encouraged to invest more time in writing clear inline documentation and architecture decision records for future maintainability.", color: "border-l-amber" },
 ];
 
@@ -37,7 +37,7 @@ export function PerformanceTab() {
 
         <div className="mb-6 flex flex-wrap items-center gap-8">
           <div className="text-center">
-            <p className="text-5xl font-bold text-indigo-600">87<span className="text-2xl font-normal text-dark-5 dark:text-dark-6">/100</span></p>
+            <p className="text-5xl font-bold text-primary-600">87<span className="text-2xl font-normal text-dark-5 dark:text-dark-6">/100</span></p>
             <p className="mt-1 text-sm text-dark-5 dark:text-dark-6">Overall Score</p>
             <span className="mt-1 inline-flex items-center rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-semibold text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald">Excellent</span>
           </div>
@@ -87,10 +87,10 @@ export function PerformanceTab() {
               {REVIEW_HISTORY.map(({ period, score, reviewer }) => (
                 <tr key={period}>
                   <td className="py-3 font-medium text-dark dark:text-white">{period}</td>
-                  <td className="py-3"><span className="font-semibold text-indigo-600 dark:text-indigo-400">{score}/100</span></td>
+                  <td className="py-3"><span className="font-semibold text-primary-600 dark:text-primary-400">{score}/100</span></td>
                   <td className="py-3 text-dark-5 dark:text-dark-6">{reviewer}</td>
                   <td className="py-3"><span className="inline-flex items-center rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-semibold text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald">Completed</span></td>
-                  <td className="py-3"><button className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View</button></td>
+                  <td className="py-3"><button className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">View</button></td>
                 </tr>
               ))}
             </tbody>

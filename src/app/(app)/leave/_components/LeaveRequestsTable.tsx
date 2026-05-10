@@ -1,11 +1,7 @@
-import type { LeaveRequest, Employee } from "@prisma/client";
-
-type LeaveRequestWithEmployee = LeaveRequest & {
-  employee: Pick<Employee, "firstName" | "lastName">;
-};
+import type { SerializedLeaveRequest } from "@/lib/actions/leave";
 
 interface LeaveRequestsTableProps {
-  requests: LeaveRequestWithEmployee[];
+  requests: SerializedLeaveRequest[];
 }
 
 type DisplayStatus = "Approved" | "Pending" | "Rejected";
@@ -42,7 +38,7 @@ function mapStatus(status: string): DisplayStatus {
   return "Pending";
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 

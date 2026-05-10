@@ -1,58 +1,90 @@
 import Image from "next/image";
+import type { EmployeeProfile } from "@/lib/actions/employees";
 
-export function ProfileHeroCard() {
+function tenure(startDate: string) {
+  const start = new Date(startDate);
+  const now = new Date();
+  const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
+  if (years === 0) return `${rem}mo`;
+  return rem === 0 ? `${years}yr` : `${years}yr ${rem}mo`;
+}
+
+interface Props {
+  employee: EmployeeProfile;
+}
+
+export function ProfileHeroCard({ employee }: Readonly<Props>) {
+  const totalLeave = employee.leaveBalances.reduce((s, b) => s + b.total, 0);
+  const activeGoals = employee.goals.length;
+
   return (
     <div className="rounded-xl bg-white p-6 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
       <div className="flex flex-wrap items-start gap-6">
         <div className="relative shrink-0">
-          <Image src="/images/user/user-15.png" alt="Sarah Mitchell" width={80} height={80} className="rounded-full object-cover" />
-          <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald dark:border-dark-2" />
+          <Image
+            src={employee.avatarUrl ?? "/images/user/user-01.png"}
+            alt={`${employee.firstName} ${employee.lastName}`}
+            width={80}
+            height={80}
+            className="rounded-full object-cover"
+          />
+          {employee.isActive && (
+            <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald dark:border-dark-2" />
+          )}
         </div>
 
         <div className="min-w-[160px]">
-          <h1 className="text-xl font-bold text-dark dark:text-white">Sarah Mitchell</h1>
-          <p className="mt-0.5 text-sm text-dark-5 dark:text-dark-6">Senior Software Engineer</p>
-          <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">Joined March 2022 &middot; 3 years 2 months</p>
+          <h1 className="text-xl font-bold text-dark dark:text-white">
+            {employee.firstName} {employee.lastName}
+          </h1>
+          <p className="mt-0.5 text-sm text-dark-5 dark:text-dark-6">{employee.title}</p>
+          <p className="mt-1 text-xs text-dark-5 dark:text-dark-6">
+            Joined {new Date(employee.startDate).toLocaleDateString("en-US", { month: "long", year: "numeric" })} &middot; {tenure(employee.startDate)}
+          </p>
         </div>
 
         <div className="min-w-[200px] flex-1 space-y-2.5">
-          <div>
-            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">Engineering</span>
-          </div>
-          <p className="flex items-center gap-1.5 text-sm text-dark-5 dark:text-dark-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            Remote &middot; Bengaluru, India
-          </p>
-          <div className="flex items-center gap-2">
-            <Image src="/images/user/user-28.png" alt="James Williams" width={24} height={24} className="rounded-full object-cover" />
-            <span className="text-sm text-dark-5 dark:text-dark-6">
-              Reports to <span className="font-medium text-dark dark:text-white">James Williams</span>, VP Engineering
-            </span>
-          </div>
+          {employee.department && (
+            <div>
+              <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-medium"
+                style={{ backgroundColor: employee.department.color + "20", color: employee.department.color }}>
+                {employee.department.name}
+              </span>
+            </div>
+          )}
           <p className="text-sm text-dark-5 dark:text-dark-6">
-            Employee ID: <span className="font-semibold text-dark dark:text-white">EMP-0042</span>
+            {employee.employmentType} · {employee.employeeCode}
           </p>
+          {employee.manager && (
+            <p className="text-sm text-dark-5 dark:text-dark-6">
+              Reports to{" "}
+              <span className="font-medium text-dark dark:text-white">
+                {employee.manager.firstName} {employee.manager.lastName}
+              </span>
+              , {employee.manager.title}
+            </p>
+          )}
+          {employee.email && (
+            <p className="truncate text-sm text-dark-5 dark:text-dark-6">{employee.email}</p>
+          )}
         </div>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-center sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-x-8 gap-y-3 text-center">
           <div>
-            <p className="text-2xl font-bold text-indigo-600">87<span className="text-base font-normal text-dark-5 dark:text-dark-6">/100</span></p>
-            <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Performance</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-dark dark:text-white">18</p>
+            <p className="text-2xl font-bold text-dark dark:text-white">{totalLeave}</p>
             <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Leave Days</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-dark dark:text-white">6</p>
-            <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Active Tasks</p>
+            <p className="text-2xl font-bold text-dark dark:text-white">{activeGoals}</p>
+            <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Active Goals</p>
           </div>
           <div>
-            <p className="text-sm font-semibold leading-tight text-dark dark:text-white">Platform<br />Team</p>
-            <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Team</p>
+            <p className={`text-sm font-semibold leading-tight ${employee.isActive ? "text-emerald-dark" : "text-rose-600"}`}>
+              {employee.isActive ? "Active" : "Inactive"}
+            </p>
+            <p className="mt-0.5 text-xs text-dark-5 dark:text-dark-6">Status</p>
           </div>
         </div>
       </div>

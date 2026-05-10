@@ -91,7 +91,7 @@ export function Notification() {
                     <span className="text-xs text-dark-5 dark:text-dark-6">{item.time}</span>
                   </div>
                   {!item.read && (
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-indigo-500" />
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary-500" />
                   )}
                 </Link>
               </li>

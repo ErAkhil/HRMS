@@ -3,7 +3,7 @@ import Link from "next/link";
 const NEWS = [
   {
     tag: "Policy",
-    tagColor: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    tagColor: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
     title: "Updated Remote Work Policy — Effective June 2026",
     excerpt: "The HR team has updated the hybrid work guidelines. All employees working remotely must adhere to the new check-in protocols.",
     time: "Today, 9:15 AM",
@@ -44,7 +44,7 @@ export function CompanyNews() {
     <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
         <h3 className="section-title">Company News</h3>
-        <Link href="/" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+        <Link href="/" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
           View all
         </Link>
       </div>
@@ -63,7 +63,7 @@ export function CompanyNews() {
                   </span>
                 )}
               </div>
-              <h4 className="mt-1.5 text-xs font-semibold leading-snug text-dark group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400 transition-colors">
+              <h4 className="mt-1.5 text-xs font-semibold leading-snug text-dark group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400 transition-colors">
                 {item.title}
               </h4>
               <p className="mt-1 text-[11px] leading-relaxed text-dark-5 dark:text-dark-6 line-clamp-2">

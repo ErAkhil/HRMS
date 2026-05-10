@@ -33,7 +33,7 @@ export interface PayslipData {
     year: number;
     status: string;
   };
-  createdAt: Date;
+  createdAt: string;
 }
 
 interface PayslipsClientProps {
@@ -238,7 +238,7 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
               </div>
 
               {/* Net Pay */}
-              <div className="rounded-xl border-2 border-primary-600 bg-indigo-50 p-5 dark:bg-indigo-900/10">
+              <div className="rounded-xl border-2 border-primary-600 bg-primary-50 p-5 dark:bg-primary-900/10">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted">Net Pay (Take Home)</p>

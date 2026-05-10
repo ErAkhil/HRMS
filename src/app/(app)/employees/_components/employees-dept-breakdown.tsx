@@ -13,7 +13,7 @@ export function EmployeesDeptBreakdown({ totalEmployees, deptBreakdown, etBreakd
       <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3 md:col-span-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-dark dark:text-white">Headcount by Department</h2>
-          <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">{totalEmployees}</span>
+          <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">{totalEmployees}</span>
         </div>
         {deptBreakdown.length === 0 ? (
           <p className="text-sm text-dark-5 dark:text-dark-6">No department data yet.</p>

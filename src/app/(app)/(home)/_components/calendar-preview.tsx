@@ -40,8 +40,8 @@ const EVENTS = [
 
 const TYPE_STYLE: Record<string, { bar: string; badge: string; label: string }> = {
   meeting: {
-    bar: "bg-indigo-500",
-    badge: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    bar: "bg-primary-500",
+    badge: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
     label: "Meeting",
   },
   review: {
@@ -71,7 +71,7 @@ export function CalendarPreview() {
     <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
         <h3 className="section-title">Today's Schedule</h3>
-        <Link href="/calendar" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+        <Link href="/calendar" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
           Calendar
         </Link>
       </div>
@@ -81,7 +81,7 @@ export function CalendarPreview() {
         {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
           <div
             key={i}
-            className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-[10px] font-medium ${i === 2 ? "bg-indigo-600 text-white" : "text-dark-5 dark:text-dark-6"}`}
+            className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-[10px] font-medium ${i === 2 ? "bg-primary-600 text-white" : "text-dark-5 dark:text-dark-6"}`}
           >
             <span>{d}</span>
             <span className={`mt-0.5 font-bold ${i === 2 ? "text-white" : "text-dark dark:text-white"}`}>

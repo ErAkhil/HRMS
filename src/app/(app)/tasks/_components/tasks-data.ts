@@ -234,7 +234,7 @@ export const OVERDUE_TASKS: Task[] = [
 ];
 
 export const PROJECT_COLORS: Record<string, string> = {
-  indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  indigo: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   emerald: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   violet: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   amber: "bg-amber-light text-amber-dark",

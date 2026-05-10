@@ -32,7 +32,7 @@ export function AnalyticsTab() {
                   <div key={d.bucket} className="flex flex-1 flex-col items-center gap-1">
                     <span className="text-xs font-semibold text-dark dark:text-white">{d.count}</span>
                     <div className="relative w-full flex-1 flex items-end">
-                      <div className="w-full rounded-t bg-indigo-500" style={{ height: `${heightPct}%` }} />
+                      <div className="w-full rounded-t bg-primary-500" style={{ height: `${heightPct}%` }} />
                     </div>
                     <span className="text-[10px] text-dark-5 dark:text-dark-6 text-center">{d.bucket}</span>
                   </div>
@@ -59,7 +59,7 @@ export function AnalyticsTab() {
               ))}
             </div>
             <div className="mt-4 border-t border-gray-3 pt-4 dark:border-dark-3">
-              <Link href="/performance/analytics" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+              <Link href="/performance/analytics" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
                 View full analytics report →
               </Link>
             </div>

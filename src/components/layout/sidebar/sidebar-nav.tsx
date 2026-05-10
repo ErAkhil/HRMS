@@ -67,7 +67,7 @@ export function SidebarNav({ userRole, userPlan, expandedItems, onToggleExpanded
                     <li key={item.title}>
                       <MenuItem as="link" href={"url" in item ? (item.url as string) : "/"} isActive={"url" in item ? pathname === item.url : false}>
                         <item.icon
-                          className={cn("size-[18px] shrink-0", "url" in item && pathname === item.url ? "text-indigo-600 dark:text-indigo-300" : "text-dark-5 dark:text-dark-6")}
+                          className={cn("size-[18px] shrink-0", "url" in item && pathname === item.url ? "text-primary-600 dark:text-primary-300" : "text-dark-5 dark:text-dark-6")}
                           aria-hidden="true"
                         />
                         <span className="flex-1">{item.title}</span>
@@ -89,7 +89,7 @@ export function SidebarNav({ userRole, userPlan, expandedItems, onToggleExpanded
                   <li key={item.title}>
                     <MenuItem isActive={isItemActive} onClick={() => onToggleExpanded(item.title)}>
                       <item.icon
-                        className={cn("size-[18px] shrink-0", isItemActive ? "text-indigo-600 dark:text-indigo-300" : "text-dark-5 dark:text-dark-6")}
+                        className={cn("size-[18px] shrink-0", isItemActive ? "text-primary-600 dark:text-primary-300" : "text-dark-5 dark:text-dark-6")}
                         aria-hidden="true"
                       />
                       <span className="flex-1">{item.title}</span>
@@ -100,7 +100,7 @@ export function SidebarNav({ userRole, userPlan, expandedItems, onToggleExpanded
                         {visibleSubItems.map((sub) => (
                           <li key={sub.title} role="none">
                             <MenuItem as="link" href={sub.url} isActive={pathname === sub.url} isSubItem>
-                              <span className={cn("h-1 w-1 rounded-full", pathname === sub.url ? "bg-indigo-600 dark:bg-indigo-300" : "bg-dark-5 dark:bg-dark-6")} />
+                              <span className={cn("h-1 w-1 rounded-full", pathname === sub.url ? "bg-primary-600 dark:bg-primary-300" : "bg-dark-5 dark:bg-dark-6")} />
                               {sub.title}
                             </MenuItem>
                           </li>

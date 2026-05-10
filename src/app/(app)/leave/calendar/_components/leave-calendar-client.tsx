@@ -25,7 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const LEAVE_TYPE_COLORS: Record<string, string> = {
-  ANNUAL: "bg-indigo-500",
+  ANNUAL: "bg-primary-500",
   SICK: "bg-rose-500",
   CASUAL: "bg-amber-400",
   MATERNITY: "bg-violet-500",
@@ -172,7 +172,7 @@ export function LeaveCalendarClient({ events: initialEvents, currentMonth, curre
                 {day !== null && (
                   <>
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold mb-1 ${
-                      isToday ? "bg-indigo-600 text-white" : "text-dark dark:text-white"
+                      isToday ? "bg-primary-600 text-white" : "text-dark dark:text-white"
                     }`}>
                       {day}
                     </div>

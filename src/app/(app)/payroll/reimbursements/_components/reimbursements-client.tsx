@@ -25,7 +25,7 @@ const STATUS_BADGE: Record<string, string> = {
 const CATEGORY_COLOR: Record<string, string> = {
   TRAVEL: "badge-info",
   MEALS: "badge-success",
-  EQUIPMENT: "badge-indigo",
+  EQUIPMENT: "badge-ai",
   MEDICAL: "badge-error",
   TRAINING: "badge-warning",
   OTHER: "badge-gray",
@@ -111,7 +111,7 @@ export function ReimbursementsClient({
         {[
           { label: "Pending Claims", value: claims.filter((c) => c.status === "PENDING").length, sub: `₹${pendingTotal.toLocaleString("en-IN")} awaiting review`, color: "text-amber-dark", bg: "bg-amber-light dark:bg-amber-dark/20", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
           { label: "Approved", value: claims.filter((c) => c.status === "APPROVED").length, sub: `₹${approvedTotal.toLocaleString("en-IN")} approved`, color: "text-emerald-dark dark:text-emerald", bg: "bg-emerald-light dark:bg-emerald-dark/20", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-          { label: "Total Claims", value: claims.length, sub: "All time", color: "text-indigo-600 dark:text-indigo-300", bg: "bg-indigo-50 dark:bg-indigo-900/20", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
+          { label: "Total Claims", value: claims.length, sub: "All time", color: "text-primary-600 dark:text-primary-300", bg: "bg-primary-50 dark:bg-primary-900/20", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
         ].map((s) => (
           <div key={s.label} className="card-p">
             <div className="flex items-start justify-between">

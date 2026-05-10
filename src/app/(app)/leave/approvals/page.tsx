@@ -11,12 +11,12 @@ export default async function ApprovalsPage() {
     employeeName: `${r.employee.firstName} ${r.employee.lastName}`,
     employeeDept: r.employee.department?.name ?? "—",
     leaveType: r.leaveType,
-    startDate: r.startDate.toISOString(),
-    endDate: r.endDate.toISOString(),
+    startDate: r.startDate,
+    endDate: r.endDate,
     days: r.days,
     reason: r.reason,
     status: r.status,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: r.createdAt,
   }));
 
   return <ApprovalsClient requests={requests} />;

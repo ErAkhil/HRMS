@@ -5,7 +5,7 @@ import { useState } from "react";
 type Tab = "Recommended" | "In Progress" | "Completed";
 
 const RECOMMENDED = [
-  { id: 1, title: "Advanced HR Analytics", category: "HR", duration: "4h 20m", rating: 4.8, gradient: "from-indigo-500 to-purple-600" },
+  { id: 1, title: "Advanced HR Analytics", category: "HR", duration: "4h 20m", rating: 4.8, gradient: "from-primary-500 to-purple-600" },
   { id: 2, title: "Strategic Leadership", category: "Leadership", duration: "6h 10m", rating: 4.7, gradient: "from-emerald-500 to-teal-600" },
   { id: 3, title: "Python for Data Analysis", category: "Tech", duration: "8h 30m", rating: 4.9, gradient: "from-orange-500 to-amber-600" },
   { id: 4, title: "Employment Law 2026", category: "Compliance", duration: "3h 15m", rating: 4.6, gradient: "from-rose-500 to-pink-600" },
@@ -27,7 +27,7 @@ const SESSIONS = [
 const STATS = [
   { label: "Courses Completed", value: "12", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", bg: "bg-emerald-light dark:bg-emerald-dark/20", color: "text-emerald-dark dark:text-emerald" },
   { label: "In Progress", value: "3", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z", bg: "bg-amber-light dark:bg-amber-dark/20", color: "text-amber-dark" },
-  { label: "Certificates Earned", value: "5", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z", bg: "bg-indigo-50 dark:bg-indigo-900/20", color: "text-indigo-600 dark:text-indigo-300" },
+  { label: "Certificates Earned", value: "5", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z", bg: "bg-primary-50 dark:bg-primary-900/20", color: "text-primary-600 dark:text-primary-300" },
   { label: "Learning Hours", value: "48h", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253", bg: "bg-violet-light dark:bg-violet-dark/20", color: "text-violet-dark dark:text-violet-300" },
 ];
 
@@ -119,7 +119,7 @@ export function LearningDashboard() {
                   </svg>
                 </div>
                 <div className="p-4">
-                  <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">
+                  <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">
                     {course.category}
                   </span>
                   <p className="mt-2 text-sm font-semibold text-dark dark:text-white line-clamp-2">{course.title}</p>

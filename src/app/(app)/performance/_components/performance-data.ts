@@ -17,22 +17,22 @@ export const SCORE_BARS = [
 ];
 
 export const FEEDBACK_HIGHLIGHTS = [
-  { text: "Exceptional problem-solving skills", category: "Technical", badge: "badge-indigo" },
+  { text: "Exceptional problem-solving skills", category: "Technical", badge: "badge-ai" },
   { text: "Strong team collaboration", category: "Soft Skills", badge: "badge-success" },
   { text: "Could improve documentation practices", category: "Growth Area", badge: "badge-warning" },
 ];
 
 export const TEAM_MEMBERS = [
-  { name: "Sarah Mitchell", avatar: "/images/user/user-15.png", score: 87, role: "Senior SE", barColor: "bg-indigo-500" },
-  { name: "Daniel Park", avatar: "/images/user/user-03.png", score: 82, role: "Frontend Eng", barColor: "bg-indigo-400" },
+  { name: "Sarah Mitchell", avatar: "/images/user/user-15.png", score: 87, role: "Senior SE", barColor: "bg-primary-500" },
+  { name: "Daniel Park", avatar: "/images/user/user-03.png", score: 82, role: "Frontend Eng", barColor: "bg-primary-400" },
   { name: "Priya Sharma", avatar: "/images/user/user-26.png", score: 91, role: "Product Designer", barColor: "bg-emerald-500" },
-  { name: "Arjun Mehta", avatar: "/images/user/user-23.png", score: 78, role: "Backend Eng", barColor: "bg-indigo-400" },
-  { name: "Elena Torres", avatar: "/images/user/user-27.png", score: 85, role: "QA Engineer", barColor: "bg-indigo-500" },
-  { name: "Marcus Chen", avatar: "/images/user/user-09.png", score: 88, role: "DevOps", barColor: "bg-indigo-500" },
+  { name: "Arjun Mehta", avatar: "/images/user/user-23.png", score: 78, role: "Backend Eng", barColor: "bg-primary-400" },
+  { name: "Elena Torres", avatar: "/images/user/user-27.png", score: 85, role: "QA Engineer", barColor: "bg-primary-500" },
+  { name: "Marcus Chen", avatar: "/images/user/user-09.png", score: 88, role: "DevOps", barColor: "bg-primary-500" },
 ];
 
 export const TEAM_GOALS = [
-  { title: "Ship Platform v2.0", dept: "Engineering", progress: 72, status: "In Progress", statusBadge: "badge-indigo", barColor: "bg-indigo-500" },
+  { title: "Ship Platform v2.0", dept: "Engineering", progress: 72, status: "In Progress", statusBadge: "badge-ai", barColor: "bg-primary-500" },
   { title: "Reduce API latency to < 100ms", dept: "Engineering", progress: 55, status: "In Progress", statusBadge: "badge-ai", barColor: "bg-violet-500" },
   { title: "Complete Q2 Design System", dept: "Product", progress: 88, status: "Near Complete", statusBadge: "badge-success", barColor: "bg-emerald-500" },
   { title: "Zero critical bugs in prod", dept: "QA", progress: 94, status: "Near Complete", statusBadge: "badge-success", barColor: "bg-emerald-500" },
@@ -45,7 +45,7 @@ export const TOP_PERFORMERS = [
 ];
 
 export const ANALYTICS_METRICS = [
-  { label: "Dept Avg Score", value: "83.4", sub: "↑ 4.2% QoQ", color: "text-indigo-600" },
+  { label: "Dept Avg Score", value: "83.4", sub: "↑ 4.2% QoQ", color: "text-primary-600" },
   { label: "On-Track Goals", value: "18/24", sub: "75% completion rate", color: "text-emerald-600" },
   { label: "Reviews Completed", value: "11/12", sub: "92% on time", color: "text-violet-600" },
   { label: "Improvement Plans", value: "2", sub: "active", color: "text-amber-600" },

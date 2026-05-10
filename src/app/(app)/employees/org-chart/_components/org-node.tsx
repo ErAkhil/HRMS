@@ -13,7 +13,7 @@ interface OrgNodeProps {
 
 const DEPT_COLORS: Record<string, string> = {
   Engineering:
-    "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Product:
     "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   Finance:
@@ -34,7 +34,7 @@ export function OrgNode({
     <Link
       href="/employees/profile"
       className={`group flex flex-col items-center rounded-xl bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg dark:bg-dark-2 dark:border dark:border-dark-3 ${
-        isRoot ? "min-w-48 border-2 border-indigo-200 dark:border-indigo-800" : isHead ? "min-w-40" : "min-w-36"
+        isRoot ? "min-w-48 border-2 border-primary-200 dark:border-primary-800" : isHead ? "min-w-40" : "min-w-36"
       }`}
     >
       <div className="relative">

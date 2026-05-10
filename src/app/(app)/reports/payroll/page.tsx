@@ -206,7 +206,7 @@ export default function PayrollInsightsPage() {
               <span className="w-24 text-muted shrink-0">{d.dept}</span>
               <div className="flex-1 flex h-5 overflow-hidden rounded-full bg-gray-2 dark:bg-dark-3 gap-0.5">
                 <div
-                  className="h-full bg-indigo-500 rounded-l-full transition-all"
+                  className="h-full bg-primary-500 rounded-l-full transition-all"
                   style={{ width: `${(d.base / d.total) * 100}%` }}
                 />
                 <div
@@ -220,7 +220,7 @@ export default function PayrollInsightsPage() {
         </div>
         <div className="mt-4 flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="h-2.5 w-5 rounded-sm bg-indigo-500" />
+            <div className="h-2.5 w-5 rounded-sm bg-primary-500" />
             <span className="text-muted">Base Salary</span>
           </div>
           <div className="flex items-center gap-1.5">

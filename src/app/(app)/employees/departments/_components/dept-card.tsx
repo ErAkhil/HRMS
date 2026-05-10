@@ -86,7 +86,7 @@ export function DeptCard({
           ) : (
             <span className="text-xs text-dark-5 dark:text-dark-6">No employees yet</span>
           )}
-          <Link href={`/employees?dept=${dept.id}`} className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+          <Link href={`/employees?dept=${dept.id}`} className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
             View →
           </Link>
         </div>

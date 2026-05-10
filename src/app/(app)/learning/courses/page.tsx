@@ -7,7 +7,7 @@ import { Toast } from "@/components/ui/toast";
 const CATEGORIES = ["All", "HR", "Leadership", "Tech", "Compliance", "Soft Skills"];
 
 const COURSES = [
-  { id: 1, title: "HR Fundamentals 2026", category: "HR", duration: "4h 20m", level: "Beginner", rating: 4.7, enrolled: 1240, gradient: "from-indigo-500 to-purple-600", enrolled2: true },
+  { id: 1, title: "HR Fundamentals 2026", category: "HR", duration: "4h 20m", level: "Beginner", rating: 4.7, enrolled: 1240, gradient: "from-primary-500 to-purple-600", enrolled2: true },
   { id: 2, title: "Strategic Leadership Program", category: "Leadership", duration: "8h 30m", level: "Advanced", rating: 4.9, enrolled: 856, gradient: "from-emerald-500 to-teal-600", enrolled2: false },
   { id: 3, title: "Python for HR Analytics", category: "Tech", duration: "10h 15m", level: "Intermediate", rating: 4.8, enrolled: 632, gradient: "from-orange-500 to-amber-600", enrolled2: false },
   { id: 4, title: "Employment Law Essentials", category: "Compliance", duration: "3h 45m", level: "Intermediate", rating: 4.6, enrolled: 2180, gradient: "from-rose-500 to-pink-600", enrolled2: true },
@@ -86,7 +86,7 @@ export default function CoursesPage() {
             onClick={() => setActiveCategory(cat)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               activeCategory === cat
-                ? "bg-indigo-600 text-white"
+                ? "bg-primary-600 text-white"
                 : "border border-gray-3 bg-white text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
             }`}
           >
@@ -111,7 +111,7 @@ export default function CoursesPage() {
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">
+                  <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">
                     {course.category}
                   </span>
                   <span className={levelColors[course.level]}>{course.level}</span>

@@ -1,35 +1,14 @@
-"use client";
-
-type GoalStatus = string;
-
-interface GoalItem {
-  id: string;
-  title: string;
-  description?: string | null;
-  status: GoalStatus;
-  progress: number;
-  dueDate?: Date | null;
-  category?: string | null;
-}
+import type { SerializedGoal } from "@/lib/actions/performance";
 
 interface GoalsListProps {
-  goals: GoalItem[];
+  goals: SerializedGoal[];
 }
 
-const categoryColors: Record<string, string> = {
-  Technical: "rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
-  Business: "rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
-  Personal: "rounded-full bg-violet-light px-2.5 py-0.5 text-xs font-medium text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
-  Team: "rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
-  Leadership: "rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
-  Learning: "rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-dark dark:bg-sky-dark/10 dark:text-sky",
-  Delivery: "rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
-};
 
 const statusConfig: Record<string, { badge: string; bar: string; label: string }> = {
   COMPLETED: {
-    badge: "rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
-    bar: "bg-indigo-500",
+    badge: "rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
+    bar: "bg-primary-500",
     label: "Completed",
   },
   IN_PROGRESS: {
@@ -53,11 +32,11 @@ function getStatusConfig(status: string) {
   return statusConfig[status] ?? statusConfig.IN_PROGRESS;
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export function GoalsList({ goals }: GoalsListProps) {
+export function GoalsList({ goals }: Readonly<GoalsListProps>) {
   if (goals.length === 0) {
     return (
       <div className="rounded-xl bg-white p-12 text-center shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
@@ -71,7 +50,6 @@ export function GoalsList({ goals }: GoalsListProps) {
     <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
       {goals.map((goal) => {
         const sc = getStatusConfig(goal.status);
-        const categoryClass = goal.category ? (categoryColors[goal.category] ?? categoryColors.Business) : null;
         return (
           <div
             key={goal.id}
@@ -83,9 +61,6 @@ export function GoalsList({ goals }: GoalsListProps) {
                   <h3 className="text-sm font-semibold text-dark dark:text-white">
                     {goal.title}
                   </h3>
-                  {categoryClass && goal.category && (
-                    <span className={categoryClass}>{goal.category}</span>
-                  )}
                   <span className={sc.badge}>{sc.label}</span>
                 </div>
                 <div className="flex items-center gap-3">

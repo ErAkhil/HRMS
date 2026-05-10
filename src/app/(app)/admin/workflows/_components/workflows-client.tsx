@@ -74,7 +74,7 @@ export function WorkflowsClient({ workflows }: Readonly<{ workflows: Workflow[] 
         {[
           { label: "Total Workflows", value: workflows.length, color: "text-dark dark:text-white" },
           { label: "Active", value: workflows.filter((w) => w.isEnabled).length, color: "text-emerald-dark dark:text-emerald" },
-          { label: "Total Runs", value: workflows.reduce((a, w) => a + w.runsCount, 0), color: "text-indigo-600 dark:text-indigo-300" },
+          { label: "Total Runs", value: workflows.reduce((a, w) => a + w.runsCount, 0), color: "text-primary-600 dark:text-primary-300" },
           { label: "Disabled", value: workflows.filter((w) => !w.isEnabled).length, color: "text-rose-dark dark:text-rose" },
         ].map((stat) => (
           <div key={stat.label} className="stat-card">

@@ -47,7 +47,7 @@ export function CollaborationPreview() {
     <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
         <h3 className="section-title">Collaboration</h3>
-        <Link href="/collaboration" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+        <Link href="/collaboration" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
           Open
         </Link>
       </div>
@@ -107,7 +107,7 @@ export function CollaborationPreview() {
               </div>
 
               {chat.unread > 0 && (
-                <span className="ml-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-bold text-white">
+                <span className="ml-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
                   {chat.unread}
                 </span>
               )}

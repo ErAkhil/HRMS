@@ -74,7 +74,7 @@ export function EmployeeDirectory({ employees, departments, totalCount }: Props)
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Total Employees" value={totalCount} iconBg="bg-indigo-50 dark:bg-indigo-900/20" icon={<svg className="size-5 text-indigo-600 dark:text-indigo-300" viewBox="0 0 24 24" fill="none"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>} trend="Active workforce" trendUp />
+        <StatCard label="Total Employees" value={totalCount} iconBg="bg-primary-50 dark:bg-primary-900/20" icon={<svg className="size-5 text-primary-600 dark:text-primary-300" viewBox="0 0 24 24" fill="none"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>} trend="Active workforce" trendUp />
         <StatCard label="Active" value={totalCount} iconBg="bg-emerald-light dark:bg-emerald-dark/20" icon={<svg className="size-5 text-emerald-dark dark:text-emerald" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>} trend="All active" trendUp />
         <StatCard label="On Leave" value={0} iconBg="bg-amber-light dark:bg-amber-dark/20" icon={<svg className="size-5 text-amber-dark dark:text-amber" viewBox="0 0 24 24" fill="none"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>} />
         <StatCard label="Departments" value={departments.length} iconBg="bg-violet-light dark:bg-violet-dark/20" icon={<svg className="size-5 text-violet-dark dark:text-violet-300" viewBox="0 0 24 24" fill="none"><path d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>} trend="Active depts" trendUp />
@@ -109,7 +109,7 @@ export function EmployeeDirectory({ employees, departments, totalCount }: Props)
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((employee) => (
-            <div key={employee.id} onClick={() => router.push("/employees/profile")} className="cursor-pointer hover:shadow-md transition-shadow">
+            <div key={employee.id} onClick={() => router.push(`/employees/profile?id=${employee.id}`)} className="cursor-pointer hover:shadow-md transition-shadow">
               <EmployeeCard employee={employee} />
             </div>
           ))}
@@ -117,7 +117,7 @@ export function EmployeeDirectory({ employees, departments, totalCount }: Props)
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((employee) => (
-            <div key={employee.id} onClick={() => router.push("/employees/profile")} className="cursor-pointer hover:shadow-md transition-shadow">
+            <div key={employee.id} onClick={() => router.push(`/employees/profile?id=${employee.id}`)} className="cursor-pointer hover:shadow-md transition-shadow">
               <EmployeeListRow employee={employee} />
             </div>
           ))}

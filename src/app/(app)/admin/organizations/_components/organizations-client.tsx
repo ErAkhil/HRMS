@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   createOrganization,
@@ -35,7 +35,7 @@ const PLAN_LABELS: Record<string, string> = {
 const PLAN_COLORS: Record<string, string> = {
   BASIC: "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6",
   PRO: "bg-sky-50 text-sky-dark dark:bg-sky-dark/10 dark:text-sky",
-  PRO_PLUS: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  PRO_PLUS: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   PRO_MAX: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
 };
 
@@ -43,6 +43,10 @@ export function OrganizationsClient({ orgs: initial }: Readonly<{ orgs: Org[] }>
   const router = useRouter();
   const [orgs, setOrgs] = useState(initial);
   const [showCreate, setShowCreate] = useState(false);
+
+  useEffect(() => {
+    setOrgs(initial);
+  }, [initial]);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 

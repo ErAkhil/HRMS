@@ -14,14 +14,14 @@ export default function OrgChartPage() {
           <nav className="mb-1 flex items-center gap-1.5 text-xs text-dark-5 dark:text-dark-6">
             <Link
               href="/"
-              className="hover:text-indigo-600 dark:hover:text-indigo-400"
+              className="hover:text-primary-600 dark:hover:text-primary-400"
             >
               Dashboard
             </Link>
             <span>/</span>
             <Link
               href="/employees"
-              className="hover:text-indigo-600 dark:hover:text-indigo-400"
+              className="hover:text-primary-600 dark:hover:text-primary-400"
             >
               Employees
             </Link>
@@ -76,7 +76,7 @@ export default function OrgChartPage() {
           {
             name: "Engineering",
             color:
-              "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+              "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
           },
           {
             name: "Product",
@@ -117,7 +117,7 @@ export default function OrgChartPage() {
       {/* ── Quick Stats ── */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { dept: "Engineering", count: 45, color: "text-indigo-600 dark:text-indigo-300" },
+          { dept: "Engineering", count: 45, color: "text-primary-600 dark:text-primary-300" },
           { dept: "Product", count: 18, color: "text-violet-dark dark:text-violet-300" },
           { dept: "Finance", count: 12, color: "text-sky-dark dark:text-sky" },
           { dept: "HR", count: 8, color: "text-amber-dark dark:text-amber" },

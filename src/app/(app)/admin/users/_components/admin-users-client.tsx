@@ -30,7 +30,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 const ROLE_COLORS: Record<UserRole, string> = {
   SUPER_ADMIN: "badge-error",
-  HR_ADMIN: "badge-indigo",
+  HR_ADMIN: "badge-ai",
   MANAGER: "badge-warning",
   EMPLOYEE: "badge-success",
 };
@@ -146,7 +146,7 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
                       {u.avatarUrl ? (
                         <img src={u.avatarUrl} alt={u.name} className="h-8 w-8 rounded-full object-cover" />
                       ) : (
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
                           {getInitials(u.name)}
                         </span>
                       )}

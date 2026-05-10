@@ -210,7 +210,7 @@ export function ChannelSidebar({
                   }}
                   className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors ${
                     isActive
-                      ? "bg-indigo-50 dark:bg-indigo-900/20"
+                      ? "bg-primary-50 dark:bg-primary-900/20"
                       : "text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3"
                   }`}
                 >
@@ -235,7 +235,7 @@ export function ChannelSidebar({
                     </div>
                     <span
                       className={`text-sm font-medium ${
-                        isActive ? "text-indigo-600 dark:text-indigo-300" : ""
+                        isActive ? "text-primary-600 dark:text-primary-300" : ""
                       }`}
                     >
                       {user.name}

@@ -55,7 +55,7 @@ const FEED = [
 const TYPE_COLORS: Record<string, string> = {
   approval: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   task: "bg-sky-50 text-sky-dark dark:bg-sky-dark/10 dark:text-sky",
-  join: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  join: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   complete: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   payroll: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
   mention: "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
@@ -75,7 +75,7 @@ export function TeamActivityFeed() {
     <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
         <h3 className="section-title">Team Activity</h3>
-        <Link href="/collaboration" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+        <Link href="/collaboration" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
           View all
         </Link>
       </div>

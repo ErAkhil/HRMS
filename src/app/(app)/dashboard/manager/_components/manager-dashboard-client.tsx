@@ -31,7 +31,7 @@ type DashboardData = {
 const statusBadgeClass: Record<string, string> = {
   emerald: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   amber: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
-  indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  indigo: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   rose: "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
 };
 
@@ -59,7 +59,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
   return (
     <div className="page-container">
       {/* Section 1: Greeting Header */}
-      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl p-5">
+      <div className="bg-gradient-to-r from-primary-600 to-violet-600 text-white rounded-xl p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-3">
             <div>
@@ -107,7 +107,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
               <p className="mt-1.5 text-3xl font-bold text-dark dark:text-white">{data.teamSize}</p>
               <p className="text-muted mt-1">{data.onLeaveCount} on leave today</p>
             </div>
-            <span className="rounded-lg bg-indigo-50 p-2 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300 text-lg">👥</span>
+            <span className="rounded-lg bg-primary-50 p-2 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300 text-lg">👥</span>
           </div>
         </div>
 
@@ -161,7 +161,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
                 {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               </p>
             </div>
-            <Link href="/employees" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View All</Link>
+            <Link href="/employees" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">View All</Link>
           </div>
           <div className="overflow-x-auto">
             {data.teamMembers.length === 0 ? (
@@ -185,7 +185,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
                           {member.avatarUrl ? (
                             <img src={member.avatarUrl} alt={member.name} width={28} height={28} className="rounded-full object-cover w-7 h-7" />
                           ) : (
-                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
                               {getInitials(member.name)}
                             </span>
                           )}
@@ -203,7 +203,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
                         <span className="block truncate text-muted">{member.department}</span>
                       </td>
                       <td className="td text-right">
-                        <Link href="/employees" className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">View</Link>
+                        <Link href="/employees" className="text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400">View</Link>
                       </td>
                     </tr>
                   ))}
@@ -218,11 +218,11 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
           <div className="card-p">
             <div className="flex items-center justify-between mb-4">
               <h2 className="section-title">Sprint Tasks</h2>
-              <Link href="/tasks/kanban" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View Kanban →</Link>
+              <Link href="/tasks/kanban" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">View Kanban →</Link>
             </div>
             <div className="space-y-3">
               {[
-                { label: "To Do", count: todo, color: "bg-indigo-500", max: Math.max(todo, 1) },
+                { label: "To Do", count: todo, color: "bg-primary-500", max: Math.max(todo, 1) },
                 { label: "In Progress", count: inProgress, color: "bg-violet-500", max: Math.max(inProgress, 1) },
                 { label: "In Review", count: inReview, color: "bg-amber-500", max: Math.max(inReview, 1) },
                 { label: "Completed", count: done, color: "bg-emerald-500", max: Math.max(done, 1) },
@@ -244,7 +244,7 @@ export function ManagerDashboardClient({ data, userName }: Readonly<{ data: Dash
             {data.overdueTasks > 0 && (
               <div className="mt-4 flex items-center justify-between border-t border-gray-3 pt-3 dark:border-dark-3">
                 <span className="text-xs font-semibold text-rose-dark dark:text-rose">Overdue: {data.overdueTasks}</span>
-                <Link href="/tasks" className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">View →</Link>
+                <Link href="/tasks" className="text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400">View →</Link>
               </div>
             )}
           </div>

@@ -81,9 +81,9 @@ export default function HRDashboardPage() {
                 <p className="text-lg font-bold text-amber-dark dark:text-amber">12</p>
                 <p className="text-[10px] font-semibold text-amber-dark/80 dark:text-amber/80">On Leave</p>
               </div>
-              <div className="rounded-lg bg-indigo-50 dark:bg-indigo-900/20 px-3 py-2 text-center">
-                <p className="text-lg font-bold text-indigo-600 dark:text-indigo-300">18</p>
-                <p className="text-[10px] font-semibold text-indigo-600/80 dark:text-indigo-300/80">WFH</p>
+              <div className="rounded-lg bg-primary-50 dark:bg-primary-900/20 px-3 py-2 text-center">
+                <p className="text-lg font-bold text-primary-600 dark:text-primary-300">18</p>
+                <p className="text-[10px] font-semibold text-primary-600/80 dark:text-primary-300/80">WFH</p>
               </div>
               <div className="rounded-lg bg-rose-light dark:bg-rose-dark/20 px-3 py-2 text-center">
                 <p className="text-lg font-bold text-rose-dark dark:text-rose">4</p>
@@ -106,7 +106,7 @@ export default function HRDashboardPage() {
               ))}
             </div>
             <div className="flex items-center justify-between border-t border-gray-3 dark:border-dark-3 pt-3">
-              <Link href="/leave/calendar" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+              <Link href="/leave/calendar" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
                 View Leave Calendar →
               </Link>
               <Link href="/leave/approvals" className="rounded-lg bg-primary-600 px-3 py-1 text-xs font-semibold text-white hover:bg-primary-700">

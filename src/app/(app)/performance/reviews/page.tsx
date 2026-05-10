@@ -4,9 +4,9 @@ import { ReviewsClient } from "./_components/reviews-client";
 export const metadata = { title: "Performance Reviews" };
 
 export default async function ReviewsPage() {
-  const raw = await getOrgReviews().catch(() => []);
+  const reviews = await getOrgReviews().catch(() => []);
 
-  const reviews = raw.map((r) => ({
+  const rows = reviews.map((r) => ({
     id: r.id,
     revieweeName: `${r.reviewee.firstName} ${r.reviewee.lastName}`,
     revieweeTitle: r.reviewee.title,
@@ -16,8 +16,8 @@ export default async function ReviewsPage() {
     type: r.type,
     score: r.score,
     status: r.status,
-    completedAt: r.completedAt?.toISOString() ?? null,
+    completedAt: r.completedAt,
   }));
 
-  return <ReviewsClient reviews={reviews} />;
+  return <ReviewsClient reviews={rows} />;
 }

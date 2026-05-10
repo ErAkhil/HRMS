@@ -42,13 +42,13 @@ type Stats = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Engineering: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  Engineering: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Cloud: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
   Leadership: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   Data: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   DevOps: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   Sales: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
-  HR: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  HR: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
 };
 
 function getCategoryColor(cat: string) {
@@ -91,7 +91,7 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="mb-1 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-indigo-600">Dashboard</Link>
+            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
             <span className="mx-1">/</span>
             <span>Learning &amp; Development</span>
           </p>
@@ -111,7 +111,7 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
       {/* KPI Row */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
-          { label: "Enrolled Courses", value: `${enrollments.length}`, sub: `${inProgress.length} in progress`, color: "text-indigo-600 dark:text-indigo-300" },
+          { label: "Enrolled Courses", value: `${enrollments.length}`, sub: `${inProgress.length} in progress`, color: "text-primary-600 dark:text-primary-300" },
           { label: "Completed", value: `${completed.length}`, sub: `${stats.completionRate}% completion rate`, color: "text-emerald-dark dark:text-emerald" },
           { label: "Certifications", value: `${certifications.length}`, sub: "earned certificates", color: "text-violet-dark dark:text-violet-300" },
           { label: "Org Completion", value: `${stats.completionRate}%`, sub: `${stats.totalEnrollments} total enrollments`, color: "text-amber-dark dark:text-amber" },
@@ -129,7 +129,7 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
         <div className="md:col-span-8 rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold text-dark dark:text-white">Learning Progress</h2>
-            <Link href="/learning/courses" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-300">
+            <Link href="/learning/courses" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-300">
               View all →
             </Link>
           </div>
@@ -137,7 +137,7 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
           {inProgress.length === 0 && completed.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-sm text-dark-5 dark:text-dark-6 mb-3">No courses enrolled yet.</p>
-              <Link href="/learning/courses" className="text-sm font-medium text-indigo-600 hover:underline">
+              <Link href="/learning/courses" className="text-sm font-medium text-primary-600 hover:underline">
                 Browse available courses →
               </Link>
             </div>
@@ -159,7 +159,7 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="relative h-1.5 flex-1 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
-                            <div className="absolute inset-y-0 left-0 rounded-full bg-indigo-500" style={{ width: `${enrollment.progress}%` }} />
+                            <div className="absolute inset-y-0 left-0 rounded-full bg-primary-500" style={{ width: `${enrollment.progress}%` }} />
                           </div>
                           <span className="shrink-0 text-xs font-semibold text-dark-5 dark:text-dark-6">{enrollment.progress}%</span>
                         </div>

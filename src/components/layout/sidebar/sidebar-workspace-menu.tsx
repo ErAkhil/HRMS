@@ -26,7 +26,7 @@ export function SidebarWorkspaceMenu({ orgName, userPlan, userRole, planLabel, r
           onClick={() => setShowMenu((v) => !v)}
           className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-gray-2 dark:hover:bg-dark-3"
         >
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-indigo-100 dark:bg-indigo-900/30">
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-primary-100 dark:bg-primary-900/30">
             <Image src="/images/logo/logo-icon.svg" width={14} height={14} alt="" role="presentation" />
           </div>
           <div className="flex-1 text-left">
@@ -44,7 +44,7 @@ export function SidebarWorkspaceMenu({ orgName, userPlan, userRole, planLabel, r
                 <span className={cn(
                   "rounded-full px-2 py-0.5 text-[10px] font-semibold",
                   userPlan === "PRO_MAX" ? "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300" :
-                  userPlan === "PRO_PLUS" ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300" :
+                  userPlan === "PRO_PLUS" ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300" :
                   userPlan === "PRO" ? "bg-sky-50 text-sky-dark dark:bg-sky-dark/10 dark:text-sky" :
                   "bg-gray-2 text-dark-5 dark:bg-dark-3 dark:text-dark-6"
                 )}>
@@ -64,7 +64,7 @@ export function SidebarWorkspaceMenu({ orgName, userPlan, userRole, planLabel, r
               </Link>
             )}
             {userPlan !== "PRO_MAX" && (
-              <Link href="/upgrade" onClick={() => setShowMenu(false)} className="block p-3 text-xs font-semibold text-primary-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/20">
+              <Link href="/upgrade" onClick={() => setShowMenu(false)} className="block p-3 text-xs font-semibold text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/20">
                 Upgrade Plan →
               </Link>
             )}

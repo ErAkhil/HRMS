@@ -3,7 +3,7 @@ import { getCandidates, getJobPostings } from "@/lib/actions/recruitment";
 import { KanbanColumn, type CandidateCard } from "./_components/KanbanColumn";
 
 const STAGE_CONFIG = {
-  APPLIED:   { title: "Applied",   headerColor: "bg-indigo-50 dark:bg-indigo-900/20", dotColor: "bg-indigo-500" },
+  APPLIED:   { title: "Applied",   headerColor: "bg-primary-50 dark:bg-primary-900/20", dotColor: "bg-primary-500" },
   SCREENING: { title: "Screening", headerColor: "bg-amber-light dark:bg-amber-dark/10", dotColor: "bg-amber-500" },
   INTERVIEW: { title: "Interview", headerColor: "bg-sky-50 dark:bg-sky-dark/10",    dotColor: "bg-sky-500" },
   OFFER:     { title: "Offer",     headerColor: "bg-violet-light dark:bg-violet-dark/10", dotColor: "bg-violet-500" },

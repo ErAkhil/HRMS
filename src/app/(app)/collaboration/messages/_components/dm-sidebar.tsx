@@ -56,7 +56,7 @@ export function DmSidebar({ activeDm, search, onSelect, onSearch, onNewDm }: Rea
             <button
               key={dm.name}
               onClick={() => onSelect(originalIndex)}
-              className={`flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors ${isActive ? "bg-indigo-50 dark:bg-indigo-900/20" : "hover:bg-gray-2 dark:hover:bg-dark-3"}`}
+              className={`flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors ${isActive ? "bg-primary-50 dark:bg-primary-900/20" : "hover:bg-gray-2 dark:hover:bg-dark-3"}`}
             >
               <div className="relative flex-shrink-0">
                 <Image src={dm.avatar} alt={dm.name} width={36} height={36} className="size-9 rounded-full" />

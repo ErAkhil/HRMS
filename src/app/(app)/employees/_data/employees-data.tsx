@@ -1,15 +1,15 @@
 export const DEPT_COLORS = [
-  "bg-indigo-600", "bg-violet-500", "bg-emerald-500", "bg-amber-500",
+  "bg-primary-600", "bg-violet-500", "bg-emerald-500", "bg-amber-500",
   "bg-rose-500", "bg-sky-500", "bg-teal-500", "bg-orange-500",
 ];
 
 export const deptBadgeColor: Record<string, string> = {
-  Engineering: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  Engineering: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Product: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   Sales: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   Finance: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
   HR: "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
-  Operations: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  Operations: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
 };
 
 export const actionItems = [
@@ -48,13 +48,13 @@ export const actionItems = [
   },
   {
     icon: (
-      <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <svg className="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
     description: "1 Promotion approval awaiting",
     badge: "Review",
-    badgeClass: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+    badgeClass: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
     action: "Approve",
   },
   {
@@ -71,7 +71,7 @@ export const actionItems = [
 ];
 
 export const employmentTypes = [
-  { label: "Full-time", dot: "bg-indigo-600" },
+  { label: "Full-time", dot: "bg-primary-600" },
   { label: "Part-time", dot: "bg-violet-500" },
   { label: "Contract", dot: "bg-amber-500" },
 ];

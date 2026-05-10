@@ -10,7 +10,7 @@ export function HrThreeColumns() {
       <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-dark dark:text-white">Open Roles · 17</h2>
-          <Link href="/recruitment" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View All →</Link>
+          <Link href="/recruitment" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">View All →</Link>
         </div>
         <div className="space-y-3">
           {recruitmentRoles.map((role) => (
@@ -35,7 +35,7 @@ export function HrThreeColumns() {
       <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-dark dark:text-white">Active Onboarding · 6</h2>
-          <Link href="/onboarding" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View →</Link>
+          <Link href="/onboarding" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">View →</Link>
         </div>
         <div className="space-y-3">
           {onboardingPeople.map((person) => (
@@ -83,7 +83,7 @@ export function HrThreeColumns() {
           ))}
         </div>
         <div className="mt-4 border-t border-gray-3 dark:border-dark-3 pt-3">
-          <Link href="/reports" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+          <Link href="/reports" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
             View All Compliance →
           </Link>
         </div>

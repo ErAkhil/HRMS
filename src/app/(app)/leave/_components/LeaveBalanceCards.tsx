@@ -1,6 +1,6 @@
-import type { LeaveBalance } from "@prisma/client";
+import type { SerializedLeaveBalance } from "@/lib/actions/leave";
 
-type LeaveTypeEnum = LeaveBalance["leaveType"];
+type LeaveTypeEnum = SerializedLeaveBalance["leaveType"];
 
 const LEAVE_TYPE_DISPLAY: Record<LeaveTypeEnum, string> = {
   ANNUAL: "Annual Leave",
@@ -83,7 +83,7 @@ function LeaveTypeIcon({ type, colorClass }: { type: LeaveTypeEnum; colorClass: 
 }
 
 interface LeaveBalanceCardsProps {
-  balances: LeaveBalance[];
+  balances: SerializedLeaveBalance[];
 }
 
 export function LeaveBalanceCards({ balances }: LeaveBalanceCardsProps) {

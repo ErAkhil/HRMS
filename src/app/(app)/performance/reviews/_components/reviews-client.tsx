@@ -60,7 +60,7 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: "Total Reviews", value: reviews.length, color: "text-indigo-600 dark:text-indigo-300" },
+          { label: "Total Reviews", value: reviews.length, color: "text-primary-600 dark:text-primary-300" },
           { label: "Pending", value: pending, color: "text-amber-dark" },
           { label: "Completed", value: completed, color: "text-emerald-dark dark:text-emerald" },
           { label: "Avg Score", value: avgScore > 0 ? `${avgScore}/100` : "—", color: "text-violet-dark dark:text-violet-300" },

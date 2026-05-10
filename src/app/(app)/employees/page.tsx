@@ -49,7 +49,7 @@ export default async function EmployeesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <nav className="mb-1 flex items-center gap-1.5 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-indigo-600">Dashboard</Link>
+            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
             <span>/</span>
             <span className="text-dark dark:text-white">Employees</span>
           </nav>

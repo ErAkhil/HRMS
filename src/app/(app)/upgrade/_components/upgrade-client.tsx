@@ -31,7 +31,7 @@ const PLANS: {
     name: "Pro+",
     price: "$24",
     description: "Recruitment, learning, and deep analytics",
-    color: "border-indigo-400 dark:border-indigo-600",
+    color: "border-primary-400 dark:border-primary-600",
     badge: "Popular",
   },
   {
@@ -124,7 +124,7 @@ export function UpgradeClient({ currentPlan }: Readonly<{ currentPlan: Plan }>) 
               )}
             >
               {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary-600 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                   {plan.badge}
                 </div>
               )}

@@ -166,9 +166,9 @@ export function AIChat({ context, userName }: Props) {
               <p className="text-sm text-dark-5 dark:text-dark-6 mb-8">What can I help you with today?</p>
               <div className="grid grid-cols-2 gap-3 w-full max-w-lg">
                 {SUGGESTIONS.map((s) => (
-                  <button key={s.label} onClick={() => send(s.label)} className="rounded-xl bg-white dark:bg-dark-2 p-4 text-left border border-gray-3 dark:border-dark-3 hover:border-primary-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-all">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20 mb-2">
-                      <svg className="h-4 w-4 text-indigo-600 dark:text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <button key={s.label} onClick={() => send(s.label)} className="rounded-xl bg-white dark:bg-dark-2 p-4 text-left border border-gray-3 dark:border-dark-3 hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-all">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary-900/20 mb-2">
+                      <svg className="h-4 w-4 text-primary-600 dark:text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon} />
                       </svg>
                     </div>
@@ -191,7 +191,7 @@ export function AIChat({ context, userName }: Props) {
               <div className={`max-w-[72%] rounded-xl px-4 py-3 ${
                 msg.role === "user"
                   ? "bg-primary-600 text-white rounded-tr-sm"
-                  : "bg-white dark:bg-dark-2 border-l-4 border-indigo-500 rounded-tl-sm shadow-sm"
+                  : "bg-white dark:bg-dark-2 border-l-4 border-primary-500 rounded-tl-sm shadow-sm"
               }`}>
                 {msg.role === "user" ? (
                   <p className="text-sm text-white">{msg.content}</p>
@@ -201,9 +201,9 @@ export function AIChat({ context, userName }: Props) {
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 py-1">
-                    <span className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <span className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <span className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 )}
               </div>

@@ -17,7 +17,7 @@ type LeadershipData = {
 
 const DEPT_COLORS = [
   "bg-emerald-50 text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
-  "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
   "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
   "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
@@ -37,7 +37,7 @@ export function LeadershipDashboardClient({ data, orgName }: Readonly<{ data: Le
   return (
     <div className="page-container">
       {/* Section 1: Executive Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-indigo-900 text-white rounded-xl p-6">
+      <div className="bg-gradient-to-r from-slate-800 to-primary-900 text-white rounded-xl p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex-1">
             <h1 className="page-title text-white">{orgName} · Executive Overview</h1>
@@ -77,9 +77,9 @@ export function LeadershipDashboardClient({ data, orgName }: Readonly<{ data: Le
 
       {/* Section 2: KPI Row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
-        <div className="card p-5 border-t-4 border-indigo-500">
+        <div className="card p-5 border-t-4 border-primary-500">
           <p className="text-xs font-semibold uppercase tracking-wide text-dark-5 dark:text-dark-6">Total Employees</p>
-          <p className="mt-2 text-3xl font-bold text-indigo-600">{data.totalEmployees}</p>
+          <p className="mt-2 text-3xl font-bold text-primary-600">{data.totalEmployees}</p>
           <p className="text-muted mt-1">Active headcount</p>
         </div>
 
@@ -108,7 +108,7 @@ export function LeadershipDashboardClient({ data, orgName }: Readonly<{ data: Le
         <div className="md:col-span-7 card-p">
           <div className="flex items-center justify-between mb-4">
             <h2 className="section-title">Department Headcount</h2>
-            <Link href="/employees" className="text-xs text-indigo-600 hover:underline dark:text-indigo-400">View All →</Link>
+            <Link href="/employees" className="text-xs text-primary-600 hover:underline dark:text-primary-400">View All →</Link>
           </div>
 
           {data.deptHealth.length === 0 ? (
@@ -123,7 +123,7 @@ export function LeadershipDashboardClient({ data, orgName }: Readonly<{ data: Le
                   </div>
                   <div className="relative h-2 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
                     <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-indigo-500"
+                      className="absolute inset-y-0 left-0 rounded-full bg-primary-500"
                       style={{ width: data.totalEmployees > 0 ? `${Math.round((dept.headcount / data.totalEmployees) * 100)}%` : "0%" }}
                     />
                   </div>

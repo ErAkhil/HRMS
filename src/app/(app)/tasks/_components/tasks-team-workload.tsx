@@ -6,7 +6,7 @@ export function TasksTeamWorkload() {
     <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-semibold text-dark dark:text-white">Team Workload</h2>
-        <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300">
+        <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs text-primary-600 dark:bg-primary-900/20 dark:text-primary-300">
           5 members
         </span>
       </div>
@@ -37,7 +37,7 @@ export function TasksTeamWorkload() {
                   <td className="py-2.5 text-center text-xs text-dark-5 dark:text-dark-6">{m.done}</td>
                   <td className="py-2.5 pl-2">
                     <div className="relative h-1 w-20 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
-                      <div className="absolute inset-y-0 left-0 rounded-full bg-indigo-500" style={{ width: `${pct}%` }} />
+                      <div className="absolute inset-y-0 left-0 rounded-full bg-primary-500" style={{ width: `${pct}%` }} />
                     </div>
                   </td>
                 </tr>

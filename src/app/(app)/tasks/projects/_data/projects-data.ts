@@ -17,7 +17,7 @@ export const PROJECTS: Project[] = [
     description: "Deep-dive headcount analysis, attrition modeling, and reporting.",
     status: "Active", progress: 68, dueDate: "Jun 30, 2026",
     members: ["/images/user/user-01.png", "/images/user/user-05.png", "/images/user/user-09.png"],
-    totalTasks: 24, completedTasks: 16, accentColor: "bg-indigo-600",
+    totalTasks: 24, completedTasks: 16, accentColor: "bg-primary-600",
   },
   {
     id: "p2", name: "HRMS Migration",
@@ -71,7 +71,7 @@ export const PROJECTS: Project[] = [
 ];
 
 export const STATUS_COLORS: Record<Project["status"], string> = {
-  Active: "rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  Active: "rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Completed: "rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   Overdue: "rounded-full bg-rose-light px-2.5 py-0.5 text-xs font-medium text-rose-dark",
   "At Risk": "rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark",

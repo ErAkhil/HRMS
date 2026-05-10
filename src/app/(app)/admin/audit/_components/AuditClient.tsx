@@ -4,19 +4,19 @@ import { useState, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-import type { AuditLog } from "@prisma/client";
+import type { SerializedAuditLog } from "@/lib/actions/audit";
 
 const EVENT_TYPES = ["All", "employee", "leave", "payroll", "auth", "system"] as const;
 
 const severityColors: Record<string, string> = {
-  Info: "badge-indigo",
+  Info: "badge-ai",
   Warning: "badge-warning",
   Error: "badge-error",
   Critical: "badge-error bg-rose-600 text-white dark:bg-rose-600 dark:text-white",
 };
 
 interface Props {
-  logs: AuditLog[];
+  logs: SerializedAuditLog[];
   from: string;
   to: string;
   type: string;

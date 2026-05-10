@@ -64,7 +64,7 @@ export function BirthdayStrip({ celebrations }: Readonly<Props>) {
             ) : (
               <button
                 onClick={() => handleWish(person.id, person.name)}
-                className="ml-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-semibold text-indigo-600 transition-colors hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/30"
+                className="ml-1 rounded-lg bg-primary-50 px-2.5 py-1.5 text-[10px] font-semibold text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-300 dark:hover:bg-primary-900/30"
               >
                 Wish
               </button>

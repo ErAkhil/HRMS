@@ -32,7 +32,7 @@ function getInitials(name: string) {
 }
 
 const DEPT_COLORS: Record<string, string> = {
-  Engineering: "rounded-full bg-indigo-50 px-2.5 py-0.5 font-medium text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300",
+  Engineering: "rounded-full bg-primary-50 px-2.5 py-0.5 font-medium text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
   Marketing: "rounded-full bg-rose-light px-2.5 py-0.5 font-medium text-rose-dark",
   Sales: "rounded-full bg-emerald-light px-2.5 py-0.5 font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
   HR: "rounded-full bg-amber-light px-2.5 py-0.5 font-medium text-amber-dark",
@@ -46,7 +46,7 @@ function getDeptColor(dept: string) {
 
 function getProgressColor(pct: number) {
   if (pct >= 80) return "bg-emerald-500";
-  if (pct >= 50) return "bg-indigo-500";
+  if (pct >= 50) return "bg-primary-500";
   if (pct >= 25) return "bg-amber-500";
   return "bg-rose-500";
 }
@@ -175,7 +175,7 @@ export function OnboardingPageClient({ records, stats }: Readonly<{ records: Onb
                 {ob.avatarUrl ? (
                   <img src={ob.avatarUrl} alt={ob.name} className="h-10 w-10 rounded-full object-cover" />
                 ) : (
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
                     {getInitials(ob.name)}
                   </span>
                 )}

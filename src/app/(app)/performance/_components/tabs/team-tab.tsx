@@ -34,7 +34,7 @@ export function TeamTab() {
           </div>
           <div className="mt-5 flex items-center justify-between border-t border-gray-3 pt-4 dark:border-dark-3">
             <span className="text-sm font-semibold text-dark dark:text-white">Team Average: 85.2 / 100</span>
-            <Link href="/performance/analytics" className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">View Full Analytics →</Link>
+            <Link href="/performance/analytics" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">View Full Analytics →</Link>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@ export function TeamTab() {
                 <div className="mb-1.5 flex items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2 min-w-0">
                     <span className="text-sm font-medium text-dark dark:text-white truncate">{goal.title}</span>
-                    <span className="badge-indigo flex-shrink-0">{goal.dept}</span>
+                    <span className="badge-ai flex-shrink-0">{goal.dept}</span>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-xs font-semibold text-dark dark:text-white">{goal.progress}%</span>
@@ -73,7 +73,7 @@ export function TeamTab() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-semibold text-dark dark:text-white">{p.name}</span>
-                    <span className="badge-indigo">{p.dept}</span>
+                    <span className="badge-ai">{p.dept}</span>
                   </div>
                   <div className="mt-0.5 flex items-center gap-2">
                     <span className="text-muted">{p.score}/100</span>

@@ -26,7 +26,7 @@ export default async function PayslipsPage() {
       year: p.payrollRun.year,
       status: p.payrollRun.status,
     },
-    createdAt: p.createdAt,
+    createdAt: p.createdAt.toISOString(),
   }));
 
   return <PayslipsClient payslips={payslips} />;
