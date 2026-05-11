@@ -42,6 +42,67 @@ export class ReportsService {
     };
   }
 
+  async getAnalytics(user: JwtPayload) {
+    const today = new Date();
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(today.getFullYear(), today.getMonth() - (5 - i), 1);
+      return {
+        label: d.toLocaleString('en-US', { month: 'short' }),
+        start: new Date(d.getFullYear(), d.getMonth(), 1),
+        end: new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59),
+      };
+    });
+
+    const [hiresPerMonth, attritionPerMonth, depts, jobCounts] = await Promise.all([
+      Promise.all(
+        months.map((m) =>
+          this.prisma.employee.count({
+            where: { orgId: user.orgId, startDate: { gte: m.start, lte: m.end } },
+          }),
+        ),
+      ),
+      Promise.all(
+        months.map((m) =>
+          this.prisma.employee.count({
+            where: {
+              orgId: user.orgId,
+              isActive: false,
+              endDate: { gte: m.start, lte: m.end },
+            },
+          }),
+        ),
+      ),
+      this.prisma.department.findMany({
+        where: { orgId: user.orgId },
+        select: {
+          name: true,
+          _count: { select: { employees: { where: { isActive: true } } } },
+        },
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.jobPosting.groupBy({
+        by: ['department'],
+        where: { orgId: user.orgId, isActive: true },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const openRolesMap = new Map(jobCounts.map((r) => [r.department, r._count._all]));
+
+    return {
+      hireAttrition: months.map((m, i) => ({
+        month: m.label,
+        hires: hiresPerMonth[i],
+        attrition: attritionPerMonth[i],
+      })),
+      deptStats: depts.map((d) => ({
+        dept: d.name,
+        headcount: d._count.employees,
+        openRoles: openRolesMap.get(d.name) ?? 0,
+      })),
+    };
+  }
+
   async getLeaveCalendar(month: number, year: number, user: JwtPayload) {
     const startDate = new Date(Date.UTC(year, month, 1));
     const endDate = new Date(Date.UTC(year, month + 1, 0));

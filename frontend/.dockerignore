@@ -1,0 +1,37 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (reinstalled inside Docker)
+node_modules
+backend/node_modules
+
+# Build artefacts
+.next
+backend/dist
+
+# Dev / local env files (injected at runtime via --env-file)
+.env
+.env.local
+.env.development
+.env.development.local
+backend/.env.development
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+coverage
+
+# Prisma migrations (runtime only needs schema + client)
+# prisma/migrations  ← keep commented out; migrations needed for deploy

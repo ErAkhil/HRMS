@@ -11,6 +11,13 @@ const DEFAULT_TASKS = [
   { id: 5, title: 'Complete Onboarding Courses', done: false },
 ];
 
+const EXIT_TASKS = [
+  { label: 'Assets Return', done: false },
+  { label: 'Knowledge Transfer', done: false },
+  { label: 'Exit Interview', done: false },
+  { label: 'Final Settlement', done: false },
+];
+
 @Injectable()
 export class OnboardingService {
   constructor(private prisma: PrismaService) {}
@@ -96,6 +103,62 @@ export class OnboardingService {
     ]);
 
     return { inProgress, completedThisMonth, completingThisWeek };
+  }
+
+  async getOffboardingRecords(user: JwtPayload) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+
+    const employees = await this.prisma.employee.findMany({
+      where: {
+        orgId: user.orgId,
+        isActive: false,
+        endDate: { not: null, gte: cutoff },
+      },
+      include: { department: { select: { name: true } } },
+      orderBy: { endDate: 'desc' },
+    });
+
+    return employees.map((emp) => ({
+      id: emp.id,
+      name: `${emp.firstName} ${emp.lastName}`,
+      avatarUrl: emp.avatarUrl,
+      role: emp.title,
+      department: emp.department?.name ?? '—',
+      lastDay: emp.endDate!.toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+      }),
+      reason: 'Resignation',
+      tasks: EXIT_TASKS,
+    }));
+  }
+
+  async getOffboardingStats(user: JwtPayload) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    monthEnd.setHours(23, 59, 59, 999);
+
+    const [exitingThisMonth, totalDeparted] = await Promise.all([
+      this.prisma.employee.count({
+        where: {
+          orgId: user.orgId,
+          isActive: false,
+          endDate: { gte: monthStart, lte: monthEnd },
+        },
+      }),
+      this.prisma.employee.count({
+        where: { orgId: user.orgId, isActive: false, endDate: { not: null } },
+      }),
+    ]);
+
+    return {
+      exitingThisMonth,
+      assetsPending: exitingThisMonth,
+      exitInterviews: exitingThisMonth,
+      completed: totalDeparted,
+    };
   }
 
   async createOrUpdate(dto: CreateOnboardingDto, user: JwtPayload) {

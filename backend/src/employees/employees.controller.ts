@@ -31,6 +31,11 @@ export class EmployeesController {
     return this.employees.getDepartments(user);
   }
 
+  @Get('org-chart')
+  getOrgChart(@CurrentUser() user: JwtPayload) {
+    return this.employees.getOrgChart(user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.employees.findOne(id, user);

@@ -12,6 +12,18 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 export class OnboardingController {
   constructor(private onboarding: OnboardingService) {}
 
+  @Get('offboarding/stats')
+  @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
+  getOffboardingStats(@CurrentUser() user: JwtPayload) {
+    return this.onboarding.getOffboardingStats(user);
+  }
+
+  @Get('offboarding')
+  @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
+  getOffboarding(@CurrentUser() user: JwtPayload) {
+    return this.onboarding.getOffboardingRecords(user);
+  }
+
   @Get()
   @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
   getRecords(@CurrentUser() user: JwtPayload) {

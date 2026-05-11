@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeesModule } from './employees/employees.module';
@@ -25,10 +27,24 @@ import { CollaborationModule } from './collaboration/collaboration.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { ReimbursementsModule } from './reimbursements/reimbursements.module';
 import { AiContextModule } from './ai-context/ai-context.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60_000,  // 1 minute window
+        limit: 120,   // 120 requests per minute per IP (general)
+      },
+    ]),
     PrismaModule,
     EventsModule,
     AuditModule,
@@ -54,6 +70,7 @@ import { AiContextModule } from './ai-context/ai-context.module';
     OnboardingModule,
     ReimbursementsModule,
     AiContextModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

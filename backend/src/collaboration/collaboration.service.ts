@@ -54,7 +54,8 @@ export class CollaborationService {
             select: { userId: true, firstName: true, lastName: true, avatarUrl: true },
           })
         : [];
-    const empMap = new Map(employees.map((e) => [e.userId!, e]));
+    type EmpRow = { userId: string | null; firstName: string; lastName: string; avatarUrl: string | null };
+    const empMap = new Map<string, EmpRow>(employees.map((e) => [e.userId!, e]));
 
     return messages.map((m) => {
       const emp = m.senderId ? empMap.get(m.senderId) : null;

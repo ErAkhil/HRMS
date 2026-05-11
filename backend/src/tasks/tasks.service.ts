@@ -117,6 +117,32 @@ export class TasksService {
     return { success: true };
   }
 
+  async updateTask(
+    taskId: string,
+    dto: { title?: string; priority?: string; dueDate?: string | null },
+    user: JwtPayload,
+  ) {
+    await this.prisma.task.updateMany({
+      where: { id: taskId, orgId: user.orgId },
+      data: {
+        ...(dto.title !== undefined && { title: dto.title }),
+        ...(dto.priority !== undefined && { priority: dto.priority }),
+        ...(dto.dueDate !== undefined && {
+          dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
+        }),
+        updatedAt: new Date(),
+      },
+    });
+    return { success: true };
+  }
+
+  async deleteTask(taskId: string, user: JwtPayload) {
+    await this.prisma.task.deleteMany({
+      where: { id: taskId, orgId: user.orgId },
+    });
+    return { success: true };
+  }
+
   async createProject(dto: CreateProjectDto, user: JwtPayload) {
     return this.prisma.project.create({
       data: {

@@ -111,6 +111,23 @@ export class EmployeesService {
     };
   }
 
+  async getOrgChart(user: JwtPayload) {
+    const rows = await this.prisma.employee.findMany({
+      where: { orgId: user.orgId, isActive: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        title: true,
+        avatarUrl: true,
+        managerId: true,
+        department: { select: { name: true } },
+      },
+      orderBy: [{ managerId: 'asc' }, { firstName: 'asc' }],
+    });
+    return rows;
+  }
+
   async getDepartments(user: JwtPayload) {
     return this.prisma.department.findMany({
       where: { orgId: user.orgId },

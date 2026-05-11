@@ -16,6 +16,11 @@ export class ReportsController {
     return this.reports.getReportsData(user);
   }
 
+  @Get('analytics')
+  getAnalytics(@CurrentUser() user: JwtPayload) {
+    return this.reports.getAnalytics(user);
+  }
+
   @Get('leave-calendar')
   getLeaveCalendar(@Query() dto: CalendarQueryDto, @CurrentUser() user: JwtPayload) {
     return this.reports.getLeaveCalendar(dto.month, dto.year, user);
