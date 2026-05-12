@@ -66,7 +66,31 @@ export function LeadershipDashboardClient({ data, orgName }: Readonly<{ data: Le
               Last updated: {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} IST
             </p>
             <button
-              onClick={() => setToast("Generating executive report... You'll receive it by email.")}
+              onClick={() => {
+                const lines = [
+                  `Executive Report — ${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}`,
+                  `Organization: ${orgName}`,
+                  "",
+                  "KPIs",
+                  `Total Employees,${data.totalEmployees}`,
+                  `Open Positions,${data.openJobs}`,
+                  `Pending Leave Approvals,${data.pendingLeave}`,
+                  `Task Completion Rate,${completionRate}%`,
+                  `Monthly Payroll,${formattedPayroll}`,
+                  "",
+                  "Department Headcount",
+                  "Department,Headcount",
+                  ...data.deptHealth.map((d) => `${d.name},${d.headcount}`),
+                ];
+                const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `executive-report-${new Date().toISOString().slice(0, 7)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                setToast("Executive report downloaded!");
+              }}
               className="rounded-lg border border-white/40 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors"
             >
               Generate Report

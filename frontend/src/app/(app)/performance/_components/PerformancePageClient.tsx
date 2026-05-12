@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
 import Link from "next/link";
-import { createGoal } from "@/lib/actions/performance";
+import { createGoal, scheduleReview } from "@/lib/actions/performance";
 import { ScoreCard } from "./score-card";
 import { GoalsList } from "./goals-list";
 import { ReviewsTab } from "./tabs/reviews-tab";
@@ -68,7 +68,7 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
   return (
     <div className="page-container">
       <nav className="flex items-center gap-1.5 text-xs text-dark-5 dark:text-dark-6">
-        <Link href="/" className="hover:text-dark dark:hover:text-white transition-colors">Dashboard</Link>
+        <Link href="/dashboard" className="hover:text-dark dark:hover:text-white transition-colors">Dashboard</Link>
         <span>/</span>
         <span className="text-dark dark:text-white font-medium">Performance</span>
       </nav>
@@ -139,7 +139,7 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
       {activeTab === "goals" && (
         <div className="space-y-5">
           <ScoreCard score={latestScore} reviews={reviews} />
-          <GoalsList goals={goals} />
+          <GoalsList goals={goals} setToast={setToast} />
         </div>
       )}
       {activeTab === "reviews" && <ReviewsTab reviews={reviews} />}
@@ -149,7 +149,25 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
       {showReviewModal && (
         <ScheduleReviewModal
           onClose={() => setShowReviewModal(false)}
-          onSubmit={(e) => { e.preventDefault(); setShowReviewModal(false); setToast("Review scheduled!"); }}
+          isPending={isPending}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            startTransition(async () => {
+              try {
+                await scheduleReview({
+                  type: fd.get("type") as string,
+                  period: fd.get("period") as string,
+                  notes: (fd.get("notes") as string) || undefined,
+                });
+                setShowReviewModal(false);
+                setToast("Review scheduled successfully!");
+                router.refresh();
+              } catch (err) {
+                setToast(err instanceof Error ? err.message : "Failed to schedule review");
+              }
+            });
+          }}
         />
       )}
 

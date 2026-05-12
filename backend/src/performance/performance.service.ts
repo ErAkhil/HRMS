@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import type { CreateGoalDto } from './dto/create-goal.dto';
+import type { CreateReviewCycleDto } from './dto/create-review-cycle.dto';
 
 @Injectable()
 export class PerformanceService {
@@ -42,6 +43,48 @@ export class PerformanceService {
       },
     });
     return { success: true };
+  }
+
+  async createReviewCycle(dto: CreateReviewCycleDto, user: JwtPayload) {
+    if (!user.employeeId) throw new BadRequestException('No employee profile');
+
+    const employees = await this.prisma.employee.findMany({
+      where: { orgId: user.orgId, isActive: true },
+      select: { id: true, managerId: true },
+    });
+
+    if (employees.length === 0) throw new BadRequestException('No active employees found');
+
+    const data = employees.map((emp) => ({
+      revieweeId: emp.id,
+      reviewerId: emp.managerId ?? user.employeeId!,
+      period: dto.period,
+      type: dto.type,
+    }));
+
+    const { count } = await this.prisma.performanceReview.createMany({ data, skipDuplicates: false });
+    return { created: count };
+  }
+
+  async scheduleSelfReview(dto: { type: string; period: string; notes?: string }, user: JwtPayload) {
+    if (!user.employeeId) throw new BadRequestException('No employee profile');
+
+    const employee = await this.prisma.employee.findUnique({
+      where: { id: user.employeeId },
+      select: { managerId: true },
+    });
+
+    const reviewerId = employee?.managerId ?? user.employeeId;
+
+    return this.prisma.performanceReview.create({
+      data: {
+        revieweeId: user.employeeId,
+        reviewerId,
+        period: dto.period,
+        type: dto.type,
+        comments: dto.notes,
+      },
+    });
   }
 
   async getMyReviews(user: JwtPayload) {

@@ -82,7 +82,25 @@ export function PayrollInsightsClient({ data }: Readonly<{ data: InsightsData }>
               : "No payroll runs processed yet"}
           </p>
         </div>
-        <button onClick={() => setToast("Payroll report exported successfully!")} className="btn-primary">
+        <button
+          onClick={() => {
+            if (!data?.hasData) { setToast("No payroll data to export"); return; }
+            const header = "Period,Gross Total,Net Pay,Deductions";
+            const rows = data.trend.map((t) => `${t.label},${t.total.toFixed(2)},,`);
+            const deptHeader = "\n\nDepartment,Employees,Gross Total";
+            const deptRows = data.deptCosts.map((d) => `${d.dept},${d.count},${d.grossTotal.toFixed(2)}`);
+            const csv = [header, ...rows, deptHeader, ...deptRows].join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "payroll-report.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+            setToast("Payroll report exported successfully!");
+          }}
+          className="btn-primary"
+        >
           Export Report
         </button>
       </div>

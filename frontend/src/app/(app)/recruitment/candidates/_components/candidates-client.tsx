@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-import { addCandidate } from "@/lib/actions/recruitment";
+import { addCandidate, updateCandidateStage } from "@/lib/actions/recruitment";
 import type { SerializedCandidate, SerializedJobPosting } from "@/lib/actions/recruitment";
 
 const STAGE_BADGE: Record<string, string> = {
@@ -30,7 +30,19 @@ export function CandidatesClient({ candidates, jobs }: Readonly<Props>) {
   const [isPending, startTransition] = useTransition();
 
   const stages = ["All", "APPLIED", "SCREENING", "INTERVIEW", "OFFER", "HIRED", "REJECTED"];
+  const STAGE_VALUES = ["APPLIED", "SCREENING", "INTERVIEW", "OFFER", "HIRED", "REJECTED"] as const;
   const filtered = stageFilter === "All" ? candidates : candidates.filter((c) => c.stage === stageFilter);
+
+  function handleStageChange(candidateId: string, newStage: typeof STAGE_VALUES[number]) {
+    startTransition(async () => {
+      try {
+        await updateCandidateStage(candidateId, newStage);
+        router.refresh();
+      } catch {
+        setToast("Failed to update stage");
+      }
+    });
+  }
 
   function handleAdd(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -118,9 +130,16 @@ export function CandidatesClient({ candidates, jobs }: Readonly<Props>) {
                     <td className="td text-muted">{c.jobTitle}</td>
                     <td className="td text-muted">{c.source ?? "—"}</td>
                     <td className="td">
-                      <span className={STAGE_BADGE[c.stage] ?? STAGE_BADGE.APPLIED}>
-                        {c.stage.charAt(0) + c.stage.slice(1).toLowerCase()}
-                      </span>
+                      <select
+                        value={c.stage}
+                        onChange={(e) => handleStageChange(c.id, e.target.value as typeof STAGE_VALUES[number])}
+                        className={`cursor-pointer border-0 bg-transparent p-0 text-xs font-medium focus:outline-none ${STAGE_BADGE[c.stage] ?? STAGE_BADGE.APPLIED}`}
+                        disabled={isPending}
+                      >
+                        {STAGE_VALUES.map((s) => (
+                          <option key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</option>
+                        ))}
+                      </select>
                     </td>
                     <td className="td text-muted">
                       {new Date(c.appliedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}

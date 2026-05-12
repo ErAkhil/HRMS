@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
+import { initiateOffboarding, sendOffboardingReminder } from "@/lib/actions/onboarding";
 import { OffboardingCard, type OffboardingRecord } from "./offboarding-card";
 import { NewOffboardingModal } from "./new-offboarding-modal";
+import type { ActiveEmployee } from "@/lib/actions/onboarding";
 
 interface OffboardingStats {
   exitingThisMonth: number;
@@ -17,10 +20,14 @@ interface OffboardingStats {
 interface Props {
   records: OffboardingRecord[];
   stats: OffboardingStats;
+  activeEmployees: ActiveEmployee[];
 }
 
-export function OffboardingClient({ records, stats }: Readonly<Props>) {
+export function OffboardingClient({ records, stats, activeEmployees }: Readonly<Props>) {
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [detailRecord, setDetailRecord] = useState<OffboardingRecord | null>(null);
+  const [isPending, startTransition] = useTransition();
   const { toast, setToast } = useToast();
 
   const summaryStats = [
@@ -29,6 +36,36 @@ export function OffboardingClient({ records, stats }: Readonly<Props>) {
     { label: "Exit Interviews", value: String(stats.exitInterviews), color: "text-sky-dark" },
     { label: "Completed", value: String(stats.completed), color: "text-emerald-dark" },
   ];
+
+  function handleInitiate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    startTransition(async () => {
+      try {
+        await initiateOffboarding({
+          employeeId: fd.get("employeeId") as string,
+          lastWorkingDay: fd.get("lastWorkingDay") as string,
+          reason: (fd.get("reason") as string) || undefined,
+        });
+        setShowModal(false);
+        setToast("Offboarding process initiated successfully!");
+        router.refresh();
+      } catch (err) {
+        setToast(err instanceof Error ? err.message : "Failed to initiate offboarding");
+      }
+    });
+  }
+
+  function handleSendReminder(employeeId: string) {
+    startTransition(async () => {
+      try {
+        const result = await sendOffboardingReminder(employeeId);
+        setToast(result.success ? `Reminder sent to ${result.name}` : "Could not send reminder");
+      } catch {
+        setToast("Failed to send reminder");
+      }
+    });
+  }
 
   return (
     <div className="page-container">
@@ -76,17 +113,76 @@ export function OffboardingClient({ records, stats }: Readonly<Props>) {
           <OffboardingCard
             key={ob.id}
             ob={ob}
-            onViewDetails={() => setToast("Opening offboarding details...")}
-            onSendReminder={() => setToast("Reminder sent to employee!")}
+            onViewDetails={() => setDetailRecord(ob)}
+            onSendReminder={() => handleSendReminder(ob.id)}
           />
         ))}
       </div>
 
       {showModal && (
         <NewOffboardingModal
+          employees={activeEmployees}
           onClose={() => setShowModal(false)}
-          onSubmit={() => { setShowModal(false); setToast("Offboarding process initiated!"); }}
+          onSubmit={handleInitiate}
+          isPending={isPending}
         />
+      )}
+
+      {detailRecord && (
+        <div className="modal-overlay">
+          <div className="modal-panel max-w-md p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-dark dark:text-white">Exit Details</h2>
+              <button
+                onClick={() => setDetailRecord(null)}
+                className="flex size-8 items-center justify-center rounded-lg text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3"
+              >
+                <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted">Employee</span>
+                <span className="font-medium text-dark dark:text-white">{detailRecord.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Role</span>
+                <span className="text-dark dark:text-white">{detailRecord.role}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Department</span>
+                <span className="text-dark dark:text-white">{detailRecord.department}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Last Day</span>
+                <span className="font-medium text-rose-dark">{detailRecord.lastDay}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Exit Reason</span>
+                <span className="text-dark dark:text-white">{detailRecord.reason}</span>
+              </div>
+              <div className="mt-4 border-t border-gray-3 pt-4 dark:border-dark-3">
+                <p className="mb-2 text-xs font-semibold text-dark-5 dark:text-dark-6 uppercase tracking-wide">Exit Checklist</p>
+                <div className="space-y-2">
+                  {detailRecord.tasks.map((t) => (
+                    <div key={t.label} className="flex items-center gap-2">
+                      <span className={t.done ? "text-emerald-dark" : "text-dark-5"}>
+                        {t.done ? "?" : "?"}
+                      </span>
+                      <span className={`text-sm ${t.done ? "line-through text-dark-5" : "text-dark dark:text-white"}`}>{t.label}</span>
+                      {!t.done && <span className="ml-auto text-xs text-amber-dark">Pending</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <button onClick={() => setDetailRecord(null)} className="btn-secondary">Close</button>
+            </div>
+          </div>
+        </div>
       )}
 
       <Toast message={toast} />

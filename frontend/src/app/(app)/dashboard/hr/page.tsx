@@ -4,7 +4,7 @@ import { HrKpiRow } from "./_components/hr-kpi-row";
 import { HrThreeColumns } from "./_components/hr-three-columns";
 import { HrHeadcountAttrition } from "./_components/hr-headcount-attrition";
 
-export const metadata = { title: "HR Dashboard | Unikove" };
+export const metadata = { title: "HR Dashboard | Monja" };
 
 const badge = {
   rose: "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",

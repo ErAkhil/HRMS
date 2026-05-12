@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-import { enrollInCourse } from "@/lib/actions/learning";
+import { enrollInCourse, updateCourseProgress } from "@/lib/actions/learning";
 import { useRouter } from "next/navigation";
 
 type Enrollment = {
@@ -91,7 +91,7 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="mb-1 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-primary-600">Dashboard</Link>
             <span className="mx-1">/</span>
             <span>Learning &amp; Development</span>
           </p>
@@ -165,10 +165,19 @@ export function LearningPageClient({ enrollments, certifications, allCourses, st
                         </div>
                       </div>
                       <button
-                        onClick={() => setToast("Resuming course...")}
+                        onClick={async () => {
+                          try {
+                            if (enrollment.progress < 100) {
+                              await updateCourseProgress(enrollment.id, Math.min(100, enrollment.progress + 10));
+                            }
+                            router.push("/learning/courses");
+                          } catch {
+                            setToast("Failed to update progress");
+                          }
+                        }}
                         className="shrink-0 rounded-lg bg-primary-600 px-3 py-1 text-xs font-semibold text-white hover:bg-primary-700"
                       >
-                        {enrollment.progress > 90 ? "Finish" : "Resume"}
+                        {enrollment.progress >= 90 ? "Finish" : "Resume"}
                       </button>
                     </div>
                   ))}

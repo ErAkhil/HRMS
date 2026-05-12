@@ -43,7 +43,7 @@ export default async function OrgChartPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <nav className="mb-1 flex items-center gap-1.5 text-xs text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-primary-600 dark:hover:text-primary-400">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-primary-600 dark:hover:text-primary-400">Dashboard</Link>
             <span>/</span>
             <Link href="/employees" className="hover:text-primary-600 dark:hover:text-primary-400">Employees</Link>
             <span>/</span>

@@ -6,6 +6,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalProgressDto } from './dto/update-goal-progress.dto';
+import { CreateReviewCycleDto } from './dto/create-review-cycle.dto';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
 @Controller('performance')
@@ -30,6 +31,20 @@ export class PerformanceController {
     @CurrentUser() user: JwtPayload,
   ) {
     return this.performance.updateGoalProgress(id, dto.progress, user);
+  }
+
+  @Post('reviews/self')
+  scheduleSelfReview(
+    @Body() dto: { type: string; period: string; notes?: string },
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.performance.scheduleSelfReview(dto, user);
+  }
+
+  @Post('reviews')
+  @Roles('HR_ADMIN', 'SUPER_ADMIN', 'MANAGER')
+  createReviewCycle(@Body() dto: CreateReviewCycleDto, @CurrentUser() user: JwtPayload) {
+    return this.performance.createReviewCycle(dto, user);
   }
 
   @Get('reviews/me')

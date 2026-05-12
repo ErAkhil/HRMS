@@ -11,7 +11,7 @@ export const NAV_DATA = [
         title: "Dashboard",
         icon: Icons.HomeIcon,
         items: [
-          { title: "My Dashboard",       url: "/",                       roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER","EMPLOYEE"] },
+          { title: "My Dashboard",       url: "/dashboard",              roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER","EMPLOYEE"] },
           { title: "Manager View",        url: "/dashboard/manager",      roles: ["SUPER_ADMIN","HR_ADMIN","MANAGER"] },
           { title: "Leadership View",     url: "/dashboard/leadership",   roles: ["SUPER_ADMIN","HR_ADMIN"] },
         ],

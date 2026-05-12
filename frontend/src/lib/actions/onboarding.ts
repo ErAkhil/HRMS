@@ -61,6 +61,25 @@ export async function getOffboardingStats(): Promise<OffboardingStats> {
   return api.get<OffboardingStats>("/onboarding/offboarding/stats");
 }
 
+export type ActiveEmployee = { id: string; firstName: string; lastName: string; title: string };
+
+export async function getActiveEmployees(): Promise<ActiveEmployee[]> {
+  await requireRole("SUPER_ADMIN", "HR_ADMIN", "MANAGER");
+  return api.get<ActiveEmployee[]>("/onboarding/offboarding/active-employees");
+}
+
+export async function initiateOffboarding(data: { employeeId: string; lastWorkingDay: string; reason?: string }) {
+  await requireRole("SUPER_ADMIN", "HR_ADMIN", "MANAGER");
+  if (!data.employeeId || !data.lastWorkingDay) throw new Error("Employee and last working day are required");
+  await api.post<unknown>("/onboarding/offboarding", data);
+  revalidatePath("/onboarding/offboarding");
+}
+
+export async function sendOffboardingReminder(employeeId: string) {
+  await requireRole("SUPER_ADMIN", "HR_ADMIN", "MANAGER");
+  return api.post<{ success: boolean; name: string }>(`/onboarding/offboarding/${employeeId}/remind`, {});
+}
+
 const createOnboardingSchema = z.object({
   employeeId: z.string(),
   startDate: z.string(),

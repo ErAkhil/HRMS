@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { type Task, type TaskGroup } from "./tasks-data";
 import { TaskRow } from "./task-row";
 import { TasksFilterBar, type FilterTab, type PriorityFilter } from "./tasks-filter-bar";
+import { updateTaskStatus, deleteTask } from "@/lib/actions/tasks";
 import type { SerializedTask } from "@/lib/actions/tasks";
 
 interface MyTasksViewProps {
   tasks: SerializedTask[];
+  setToast: (msg: string) => void;
 }
 
 const today = new Date();
@@ -45,36 +48,66 @@ function mapDbTaskToTask(t: SerializedTask): Task {
   };
 }
 
-export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
-  const [completed, setCompleted] = useState<Set<string>>(new Set());
+export function MyTasksView({ tasks: dbTasks, setToast }: MyTasksViewProps) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+  const [optimisticDone, setOptimisticDone] = useState<Set<string>>(
+    () => new Set(dbTasks.filter((t) => t.status === "DONE").map((t) => t.id))
+  );
   const [filterTab, setFilterTab] = useState<FilterTab>("All");
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("All");
 
-  function toggleComplete(id: string) {
-    setCompleted((prev) => {
+  function handleToggle(id: string) {
+    const isNowDone = !optimisticDone.has(id);
+    setOptimisticDone((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      isNowDone ? next.add(id) : next.delete(id);
       return next;
+    });
+    startTransition(async () => {
+      try {
+        await updateTaskStatus(id, isNowDone ? "DONE" : "TODO");
+        router.refresh();
+      } catch {
+        setOptimisticDone((prev) => {
+          const next = new Set(prev);
+          isNowDone ? next.delete(id) : next.add(id);
+          return next;
+        });
+        setToast("Failed to update task status");
+      }
     });
   }
 
-  const allTasks = useMemo<Task[]>(() => {
-    return dbTasks.filter((t) => t.status !== "DONE").map(mapDbTaskToTask);
-  }, [dbTasks]);
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      try {
+        await deleteTask(id);
+        setToast("Task deleted.");
+        router.refresh();
+      } catch {
+        setToast("Failed to delete task");
+      }
+    });
+  }
 
-  const overdueTasksList = useMemo<Task[]>(() => {
-    return dbTasks
-      .filter((t) => {
-        if (!t.dueDate || t.status === "DONE") return false;
-        const due = new Date(t.dueDate);
-        due.setHours(0, 0, 0, 0);
-        return due < today;
-      })
-      .map(mapDbTaskToTask);
-  }, [dbTasks]);
+  const allTasks = useMemo<Task[]>(
+    () => dbTasks.filter((t) => t.status !== "DONE").map(mapDbTaskToTask),
+    [dbTasks],
+  );
 
-  const totalCount = allTasks.length + overdueTasksList.length;
+  const overdueTasksList = useMemo<Task[]>(
+    () =>
+      dbTasks
+        .filter((t) => {
+          if (!t.dueDate || t.status === "DONE") return false;
+          const due = new Date(t.dueDate);
+          due.setHours(0, 0, 0, 0);
+          return due < today;
+        })
+        .map(mapDbTaskToTask),
+    [dbTasks],
+  );
 
   const filtered = allTasks.filter((t) => {
     const matchTab =
@@ -82,8 +115,7 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
       (filterTab === "Today" && t.group === "Today") ||
       (filterTab === "This Week" && t.group === "This Week") ||
       filterTab === "Overdue";
-    const matchPriority =
-      priorityFilter === "All" || t.priority === priorityFilter;
+    const matchPriority = priorityFilter === "All" || t.priority === priorityFilter;
     return matchTab && matchPriority;
   });
 
@@ -92,16 +124,11 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
   );
 
   const groups: TaskGroup[] = ["Today", "This Week", "Later"];
-
-  const tasksForGroup = (group: TaskGroup) =>
-    filtered.filter((t) => t.group === group);
-
   const showOverdue = filterTab === "All" || filterTab === "Overdue";
   const showGroups = filterTab !== "Overdue";
 
   return (
     <div className="space-y-4">
-      {/* Filter bar */}
       <TasksFilterBar
         filterTab={filterTab}
         setFilterTab={setFilterTab}
@@ -109,22 +136,20 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
         setPriorityFilter={setPriorityFilter}
       />
 
-      {/* Overdue section */}
       {showOverdue && overdueFiltered.length > 0 && (
         <div className="card">
           <div className="flex items-center gap-2 border-b border-gray-3 px-5 py-3 dark:border-dark-3">
             <span className="size-2 rounded-full bg-rose-dark" />
-            <h2 className="section-title text-rose-dark">
-              Overdue ({overdueFiltered.length})
-            </h2>
+            <h2 className="section-title text-rose-dark">Overdue ({overdueFiltered.length})</h2>
           </div>
           <div className="p-3">
             {overdueFiltered.map((task) => (
               <TaskRow
                 key={task.id}
                 task={task}
-                completed={completed.has(task.id)}
-                onToggle={toggleComplete}
+                completed={optimisticDone.has(task.id)}
+                onToggle={handleToggle}
+                onDelete={handleDelete}
                 overdue
               />
             ))}
@@ -132,31 +157,24 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
         </div>
       )}
 
-      {/* Grouped task lists */}
       {showGroups &&
         groups.map((group) => {
-          const groupTasks = tasksForGroup(group);
+          const groupTasks = filtered.filter((t) => t.group === group);
           if (groupTasks.length === 0) return null;
           return (
-            <div
-              key={group}
-              className="card"
-            >
+            <div key={group} className="card">
               <div className="flex items-center justify-between border-b border-gray-3 px-5 py-3 dark:border-dark-3">
-                <h2 className="section-title">
-                  {group}
-                </h2>
-                <span className="text-muted">
-                  {groupTasks.length} tasks
-                </span>
+                <h2 className="section-title">{group}</h2>
+                <span className="text-muted">{groupTasks.length} tasks</span>
               </div>
               <div className="p-3">
                 {groupTasks.map((task) => (
                   <TaskRow
                     key={task.id}
                     task={task}
-                    completed={completed.has(task.id)}
-                    onToggle={toggleComplete}
+                    completed={optimisticDone.has(task.id)}
+                    onToggle={handleToggle}
+                    onDelete={handleDelete}
                   />
                 ))}
               </div>
@@ -164,7 +182,6 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
           );
         })}
 
-      {/* Empty state */}
       {showGroups && filtered.length === 0 && overdueFiltered.length === 0 && (
         <div className="card empty-state">
           <p className="text-body-medium">No tasks found</p>
@@ -174,14 +191,11 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
         </div>
       )}
 
-      {/* Overdue-only view */}
       {!showGroups && (
         <div className="card">
           <div className="flex items-center gap-2 border-b border-gray-3 px-5 py-3 dark:border-dark-3">
             <span className="size-2 rounded-full bg-rose-dark" />
-            <h2 className="section-title text-rose-dark">
-              Overdue ({overdueFiltered.length})
-            </h2>
+            <h2 className="section-title text-rose-dark">Overdue ({overdueFiltered.length})</h2>
           </div>
           <div className="p-3">
             {overdueFiltered.length > 0 ? (
@@ -189,20 +203,18 @@ export function MyTasksView({ tasks: dbTasks }: MyTasksViewProps) {
                 <TaskRow
                   key={task.id}
                   task={task}
-                  completed={completed.has(task.id)}
-                  onToggle={toggleComplete}
+                  completed={optimisticDone.has(task.id)}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
                   overdue
                 />
               ))
             ) : (
-              <p className="py-6 text-center text-sm text-dark-5 dark:text-dark-6">
-                No overdue tasks!
-              </p>
+              <p className="py-6 text-center text-sm text-dark-5 dark:text-dark-6">No overdue tasks!</p>
             )}
           </div>
         </div>
       )}
-
     </div>
   );
 }

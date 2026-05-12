@@ -40,7 +40,27 @@ export function ReportsClient({ data }: Readonly<{ data: ReportsData }>) {
             Schedule
           </button>
           <button
-            onClick={() => setToast("Workforce report exported successfully!")}
+            onClick={() => {
+              const lines = [
+                "Workforce Report",
+                `Total Employees,${data.totalEmployees}`,
+                `Open Positions,${data.openJobs}`,
+                `Task Completion Rate,${taskCompletionRate}%`,
+                `Approved Leaves,${approvedLeave}`,
+                `Pending Leaves,${pendingLeave}`,
+                "",
+                "Department,Headcount",
+                ...data.deptData.map((d) => `${d.name},${d.count}`),
+              ];
+              const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "workforce-report.csv";
+              a.click();
+              URL.revokeObjectURL(url);
+              setToast("Workforce report exported successfully!");
+            }}
             className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 flex items-center gap-1.5"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

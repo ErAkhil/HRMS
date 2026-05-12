@@ -56,7 +56,7 @@ export function GreetingHeader() {
   const { data: session } = useSession();
   const name = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "there";
   const role = session?.user?.role?.replace(/_/g, " ").toLowerCase() ?? "employee";
-  const org = session?.user?.orgName ?? "Unikove";
+  const org = session?.user?.orgName ?? "Monja";
 
   return (
     <div className="card-p md:p-6">

@@ -257,7 +257,26 @@ export function PayslipsClient({ payslips }: PayslipsClientProps) {
               {/* Actions */}
               <div className="flex flex-wrap gap-3 divider pt-4">
                 <button
-                  onClick={() => setToast(`Downloading ${monthLabels[activeIdx]} payslip PDF...`)}
+                  onClick={() => {
+                    const period = `${MONTH_NAMES[active.payrollRun.month]} ${active.payrollRun.year}`;
+                    const html = `<!DOCTYPE html><html><head><title>Payslip – ${period}</title>
+<style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{font-size:20px;margin:0}p{margin:4px 0;color:#555;font-size:13px}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th{text-align:left;background:#f3f4f6;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.05em}td{padding:8px 10px;border-bottom:1px solid #e5e7eb}.tr{font-weight:700;background:#f9fafb}.net{background:#eff6ff;padding:16px;border-radius:8px;border:2px solid #4f46e5;margin-top:16px;display:flex;justify-content:space-between}.amt{font-size:24px;font-weight:700}@media print{body{padding:16px}}</style></head><body>
+<h1>Payslip</h1><p>${period}</p><p>Status: ${active.payrollRun.status}</p>
+<table><tr><th>Earnings</th><th style="text-align:right">Amount</th></tr>
+<tr><td>Basic Salary</td><td style="text-align:right">${fmt(active.basicSalary)}</td></tr>
+<tr><td>HRA</td><td style="text-align:right">${fmt(active.hra)}</td></tr>
+<tr><td>Allowances</td><td style="text-align:right">${fmt(active.allowances)}</td></tr>
+<tr class="tr"><td>Gross Earnings</td><td style="text-align:right">${fmt(active.grossPay)}</td></tr></table>
+<table style="margin-top:16px"><tr><th>Deductions</th><th style="text-align:right">Amount</th></tr>
+<tr><td>Provident Fund</td><td style="text-align:right">${fmt(active.pfDeduction)}</td></tr>
+<tr><td>Income Tax (TDS)</td><td style="text-align:right">${fmt(active.taxDeduction)}</td></tr>
+${active.otherDeductions > 0 ? `<tr><td>Other Deductions</td><td style="text-align:right">${fmt(active.otherDeductions)}</td></tr>` : ""}
+<tr class="tr"><td>Total Deductions</td><td style="text-align:right">${fmt(active.taxDeduction + active.pfDeduction + active.otherDeductions)}</td></tr></table>
+<div class="net"><div><p>Net Pay (Take Home)</p><div class="amt">${fmt(active.netPay)}</div></div><div style="text-align:right"><p>Pay Period</p><p>${period}</p></div></div>
+<script>window.onload=()=>{window.print()}</script></body></html>`;
+                    const w = window.open("", "_blank");
+                    if (w) { w.document.write(html); w.document.close(); }
+                  }}
                   className="btn-primary flex items-center gap-2"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

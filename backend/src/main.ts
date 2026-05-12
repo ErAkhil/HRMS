@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+﻿import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -40,11 +40,11 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  // Swagger — available only outside production
+  // Swagger â€” available only outside production
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Unikove HRMS API')
-      .setDescription('REST API for the Unikove HRMS platform')
+      .setTitle('Monja HRMS API')
+      .setDescription('REST API for the Monja HRMS platform')
       .setVersion('1.0')
       .addBearerAuth()
       .build();

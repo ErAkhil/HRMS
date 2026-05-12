@@ -1,10 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+﻿import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/auth";
 import { NextRequest } from "next/server";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const BASE_SYSTEM = `You are Unikove AI, an intelligent HR assistant embedded inside the Unikove HRMS platform. You help employees and managers with:
+const BASE_SYSTEM = `You are Monja AI, an intelligent HR assistant embedded inside the Monja HRMS platform. You help employees and managers with:
 - HR policies, leave, attendance, and payroll queries
 - Performance reviews and goal tracking
 - Recruitment and onboarding processes

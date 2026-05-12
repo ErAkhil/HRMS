@@ -86,7 +86,17 @@ export function MeetingsPageClient({ meetings, employees }: Readonly<Props>) {
             </div>
             <div className="flex gap-2">
               {liveMeetings.map((m) => (
-                <button key={m.id} onClick={() => setToast("Launching meeting...")} className="rounded-lg bg-white/20 px-3 py-1.5 text-sm font-semibold text-white hover:bg-white/30">
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    if (m.meetingUrl) {
+                      window.open(m.meetingUrl, "_blank", "noopener,noreferrer");
+                    } else {
+                      setToast("No meeting link available — ask the organizer to add one");
+                    }
+                  }}
+                  className="rounded-lg bg-white/20 px-3 py-1.5 text-sm font-semibold text-white hover:bg-white/30"
+                >
                   Join {m.title.split(" ")[0]}
                 </button>
               ))}
@@ -131,7 +141,13 @@ export function MeetingsPageClient({ meetings, employees }: Readonly<Props>) {
                 dateLabel={dateLabel}
                 timeLabel={timeLabel}
                 durationLabel={durationLabel(meeting.durationMins)}
-                onJoin={() => setToast("Launching meeting...")}
+                onJoin={() => {
+                  if (meeting.meetingUrl) {
+                    window.open(meeting.meetingUrl, "_blank", "noopener,noreferrer");
+                  } else {
+                    setToast("No meeting link — add one when scheduling");
+                  }
+                }}
                 onDetails={() => setToast("Opening meeting details...")}
               />
             );

@@ -127,7 +127,7 @@ export function AIChat({ context, userName }: Props) {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-dark dark:text-white">Unikove AI</p>
+            <p className="text-sm font-semibold text-dark dark:text-white">Monja AI</p>
             <p className="text-xs text-dark-5 dark:text-dark-6">Powered by Claude · Always learning</p>
           </div>
           <div className="ml-auto flex items-center gap-1.5">
@@ -225,7 +225,7 @@ export function AIChat({ context, userName }: Props) {
             </button>
           </div>
           <p className="mt-2 text-center text-xs text-dark-5 dark:text-dark-6">
-            Unikove AI may make mistakes. Verify important decisions with HR.
+            Monja AI may make mistakes. Verify important decisions with HR.
           </p>
         </div>
       </div>

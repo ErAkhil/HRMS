@@ -1,23 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import type { ActiveEmployee } from "@/lib/actions/onboarding";
 
 interface Props {
+  employees: ActiveEmployee[];
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isPending?: boolean;
 }
 
-export function NewOffboardingModal({ onClose, onSubmit }: Readonly<Props>) {
-  const [form, setForm] = useState({
-    employeeName: "", employeeId: "", lastWorkingDay: "",
-    reason: "", exitInterviewDate: "", hrContact: "",
-  });
+const EXIT_REASONS = ["Resignation", "Termination", "Retirement", "Contract End", "Relocation"];
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    onSubmit();
-  }
-
+export function NewOffboardingModal({ employees, onClose, onSubmit, isPending }: Readonly<Props>) {
   return (
     <div className="modal-overlay">
       <div className="modal-panel w-full max-w-lg p-6">
@@ -32,51 +26,38 @@ export function NewOffboardingModal({ onClose, onSubmit }: Readonly<Props>) {
             </svg>
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="label-field">Employee Name <span className="text-rose-500">*</span></label>
-              <input type="text" required placeholder="e.g. Kevin Lee" value={form.employeeName} onChange={(e) => setForm((p) => ({ ...p, employeeName: e.target.value }))} className="input-field" />
-            </div>
-            <div>
-              <label className="label-field">Employee ID</label>
-              <input type="text" placeholder="e.g. EMP-1042" value={form.employeeId} onChange={(e) => setForm((p) => ({ ...p, employeeId: e.target.value }))} className="input-field" />
-            </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label className="label-field">Employee <span className="text-rose-500">*</span></label>
+            <select name="employeeId" required className="input-field">
+              <option value="">Select employee</option>
+              {employees.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.firstName} {e.lastName} — {e.title}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label-field">Last Working Day <span className="text-rose-500">*</span></label>
-              <input type="date" required value={form.lastWorkingDay} onChange={(e) => setForm((p) => ({ ...p, lastWorkingDay: e.target.value }))} className="input-field" />
+              <input name="lastWorkingDay" type="date" required className="input-field" />
             </div>
             <div>
               <label className="label-field">Reason</label>
-              <select value={form.reason} onChange={(e) => setForm((p) => ({ ...p, reason: e.target.value }))} className="input-field">
+              <select name="reason" className="input-field">
                 <option value="">Select reason</option>
-                <option>Resignation</option>
-                <option>Termination</option>
-                <option>Retirement</option>
-                <option>Contract End</option>
-                <option>Relocation</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="label-field">Exit Interview Date</label>
-              <input type="date" value={form.exitInterviewDate} onChange={(e) => setForm((p) => ({ ...p, exitInterviewDate: e.target.value }))} className="input-field" />
-            </div>
-            <div>
-              <label className="label-field">HR Contact</label>
-              <select value={form.hrContact} onChange={(e) => setForm((p) => ({ ...p, hrContact: e.target.value }))} className="input-field">
-                <option value="">Select HR contact</option>
-                <option>Meera Nair</option>
-                <option>Priya Sharma</option>
+                {EXIT_REASONS.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
               </select>
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-            <button type="submit" className="btn-primary">Initiate</button>
+            <button type="button" onClick={onClose} disabled={isPending} className="btn-secondary">Cancel</button>
+            <button type="submit" disabled={isPending} className="btn-primary disabled:opacity-60">
+              {isPending ? "Initiating…" : "Initiate"}
+            </button>
           </div>
         </form>
       </div>

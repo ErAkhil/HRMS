@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import { z } from "zod";
 import { authConfig } from "./auth.config";
 import type { UserRole, Plan } from "@/types/domain";
@@ -38,6 +39,37 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        try {
+          const res = await fetch(`${API}/auth/google-signin`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: user.email }),
+          });
+          if (!res.ok) return "/login?error=GoogleAccountNotFound";
+          const data = await res.json() as {
+            accessToken: string;
+            refreshToken: string;
+            user: { id: string; email: string; role: UserRole; orgId: string; orgName: string; plan: Plan; employeeId: string | null };
+          };
+          // Attach backend data to the user object so jwt callback can read it
+          Object.assign(user, {
+            id: data.user.id,
+            role: data.user.role,
+            orgId: data.user.orgId,
+            orgName: data.user.orgName,
+            plan: data.user.plan,
+            employeeId: data.user.employeeId,
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+          });
+        } catch {
+          return "/login?error=GoogleSignInFailed";
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         const u = user as {
@@ -83,6 +115,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   providers: [
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
     Credentials({
       async authorize(credentials) {
         const parsed = signInSchema.safeParse(credentials);

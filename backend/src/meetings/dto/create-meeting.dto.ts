@@ -24,6 +24,10 @@ export class CreateMeetingDto {
 
   @IsOptional()
   @IsString()
+  meetingUrl?: string;
+
+  @IsOptional()
+  @IsString()
   agenda?: string;
 
   @IsArray()

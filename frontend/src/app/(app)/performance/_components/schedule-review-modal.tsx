@@ -1,9 +1,10 @@
 interface Props {
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isPending?: boolean;
 }
 
-export function ScheduleReviewModal({ onClose, onSubmit }: Readonly<Props>) {
+export function ScheduleReviewModal({ onClose, onSubmit, isPending }: Readonly<Props>) {
   return (
     <div className="modal-overlay">
       <div className="modal-panel max-w-lg p-6">
@@ -19,43 +20,32 @@ export function ScheduleReviewModal({ onClose, onSubmit }: Readonly<Props>) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label-field">Review Type</label>
-              <select className="input-field">
-                <option>Annual Review</option>
-                <option>Mid-year Review</option>
-                <option>Quarterly Check-in</option>
-                <option>360° Feedback</option>
+              <select name="type" className="input-field">
+                <option value="Annual Review">Annual Review</option>
+                <option value="Mid-year Review">Mid-year Review</option>
+                <option value="Quarterly Check-in">Quarterly Check-in</option>
+                <option value="360� Feedback">360� Feedback</option>
               </select>
             </div>
             <div>
               <label className="label-field">Review Period</label>
-              <select className="input-field">
-                <option>Q2 2026</option>
-                <option>Q3 2026</option>
-                <option>Q4 2026</option>
+              <select name="period" className="input-field">
+                <option value="Q2 2026">Q2 2026</option>
+                <option value="Q3 2026">Q3 2026</option>
+                <option value="Q4 2026">Q4 2026</option>
               </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="label-field">Reviewer</label>
-              <select className="input-field">
-                <option>James Williams</option>
-                <option>Sarah Mitchell</option>
-                <option>Priya Sharma</option>
-              </select>
-            </div>
-            <div>
-              <label className="label-field">Review Date</label>
-              <input type="date" className="input-field" />
             </div>
           </div>
           <div>
             <label className="label-field">Notes <span className="text-muted">(optional)</span></label>
-            <textarea rows={2} placeholder="Any notes for the reviewer..." className="input-field resize-none" />
+            <textarea name="notes" rows={2} placeholder="Any notes for the reviewer..." className="input-field resize-none" />
           </div>
+          <p className="text-xs text-dark-5 dark:text-dark-6">Your manager will be assigned as the reviewer automatically.</p>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-            <button type="submit" className="btn-primary">Schedule Review</button>
+            <button type="button" onClick={onClose} disabled={isPending} className="btn-secondary">Cancel</button>
+            <button type="submit" disabled={isPending} className="btn-primary disabled:opacity-60">
+              {isPending ? "Scheduling�" : "Schedule Review"}
+            </button>
           </div>
         </form>
       </div>

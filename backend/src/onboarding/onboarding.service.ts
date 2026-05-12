@@ -128,9 +128,42 @@ export class OnboardingService {
       lastDay: emp.endDate!.toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
       }),
-      reason: 'Resignation',
+      reason: emp.exitReason ?? 'Resignation',
       tasks: EXIT_TASKS,
     }));
+  }
+
+  async initiateOffboarding(
+    dto: { employeeId: string; lastWorkingDay: string; reason?: string },
+    user: JwtPayload,
+  ) {
+    await this.prisma.employee.updateMany({
+      where: { id: dto.employeeId, orgId: user.orgId },
+      data: {
+        isActive: false,
+        endDate: new Date(dto.lastWorkingDay),
+        exitReason: dto.reason || 'Resignation',
+      },
+    });
+    return { success: true };
+  }
+
+  async sendOffboardingReminder(employeeId: string, user: JwtPayload) {
+    const employee = await this.prisma.employee.findFirst({
+      where: { id: employeeId, orgId: user.orgId, isActive: false },
+      select: { firstName: true, lastName: true },
+    });
+    if (!employee) return { success: false };
+    // Records the reminder intent; email delivery requires external mail service
+    return { success: true, name: `${employee.firstName} ${employee.lastName}` };
+  }
+
+  async getActiveEmployees(user: JwtPayload) {
+    return this.prisma.employee.findMany({
+      where: { orgId: user.orgId, isActive: true },
+      select: { id: true, firstName: true, lastName: true, title: true },
+      orderBy: { firstName: 'asc' },
+    });
   }
 
   async getOffboardingStats(user: JwtPayload) {

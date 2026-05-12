@@ -70,7 +70,7 @@ export function CollaborationPageClient({ channels, stats }: Readonly<{ channels
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <nav className="mb-1 flex items-center gap-1.5 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-primary-600">Dashboard</Link>
             <span>/</span>
             <span className="text-dark dark:text-white">Collaboration</span>
           </nav>

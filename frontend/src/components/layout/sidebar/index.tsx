@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export function Sidebar() {
   const userName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "User";
   const userRole = (session?.user?.role ?? "EMPLOYEE") as NavItemRole;
   const userPlan = (session?.user?.plan ?? "BASIC") as NavItemPlan;
-  const orgName = session?.user?.orgName ?? "Unikove";
+  const orgName = session?.user?.orgName ?? "Monja";
   const userImage = session?.user?.image ?? "/images/user/user-03.png";
 
   const planLabel = userPlan.replace("_", " ").replace("PRO PLUS", "Pro+").replace("PRO MAX", "Pro Max").replace("PRO", "Pro").replace("BASIC", "Basic");
@@ -67,11 +67,11 @@ export function Sidebar() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-5">
-          <Link href="/" onClick={() => isMobile && toggleSidebar()} className="flex items-center gap-2.5">
+          <Link href="/dashboard" onClick={() => isMobile && toggleSidebar()} className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-ai shadow-indigo-glow">
               <AIAssistantIcon className="h-4 w-4 text-white" />
             </div>
-            <span className="text-sm font-semibold text-dark dark:text-white">Unikove</span>
+            <span className="text-sm font-semibold text-dark dark:text-white">Monja</span>
           </Link>
           {isMobile && (
             <button onClick={toggleSidebar} className="rounded-lg p-1.5 text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3">

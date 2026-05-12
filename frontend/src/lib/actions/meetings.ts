@@ -20,6 +20,7 @@ export type SerializedMeeting = {
   scheduledAt: string;
   durationMins: number;
   platform: string;
+  meetingUrl: string | null;
   agenda: string | null;
   participants: { id: string; name: string; avatarUrl: string | null }[];
   isLive: boolean;
@@ -33,6 +34,7 @@ const createMeetingSchema = z.object({
   time: z.string().min(1, "Time required"),
   durationMins: z.coerce.number().int().positive(),
   platform: z.string().min(1),
+  meetingUrl: z.string().url().optional().or(z.literal("")),
   agenda: z.string().optional(),
   participantIds: z.array(z.string()).min(1, "Add at least one participant"),
 });
@@ -54,6 +56,7 @@ export async function createMeeting(data: {
   time: string;
   durationMins: number;
   platform: string;
+  meetingUrl?: string;
   agenda?: string;
   participantIds: string[];
 }) {

@@ -135,7 +135,7 @@ export function TasksPageClient({ tasks: initialTasks, projects, teamWorkload }:
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="mb-1 text-sm text-dark-5 dark:text-dark-6">
-            <Link href="/" className="hover:text-primary-600">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-primary-600">Dashboard</Link>
             <span className="mx-1">/</span>
             <span>Tasks</span>
           </p>
@@ -232,7 +232,7 @@ export function TasksPageClient({ tasks: initialTasks, projects, teamWorkload }:
       {/* All My Tasks */}
       <div>
         <h2 className="mb-4 text-lg font-semibold text-dark dark:text-white">All My Tasks</h2>
-        <MyTasksView tasks={tasks} />
+        <MyTasksView tasks={tasks} setToast={setToast} />
       </div>
 
       {showNewTaskModal && (

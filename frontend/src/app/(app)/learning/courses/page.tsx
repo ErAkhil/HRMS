@@ -9,7 +9,7 @@ export default async function CoursesPage() {
     getOrgLearningStats().catch(() => ({ totalEnrollments: 0, completedEnrollments: 0, certCount: 0, completionRate: 0 })),
   ]);
 
-  const enrolledMap = new Map(enrollments.map((e) => [e.courseId, { progress: e.progress }]));
+  const enrolledMap = new Map(enrollments.map((e) => [e.courseId, { progress: e.progress, enrollmentId: e.id }]));
 
   const courses = allCourses.map((c) => ({
     id: c.id,
@@ -20,6 +20,7 @@ export default async function CoursesPage() {
     enrolledCount: c._count.enrollments,
     isEnrolled: enrolledMap.has(c.id),
     progress: enrolledMap.get(c.id)?.progress ?? 0,
+    enrollmentId: enrolledMap.get(c.id)?.enrollmentId ?? null,
   }));
 
   return <CoursesClient courses={courses} stats={stats} />;

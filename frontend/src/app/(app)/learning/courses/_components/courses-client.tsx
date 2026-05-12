@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-import { enrollInCourse } from "@/lib/actions/learning";
+import { enrollInCourse, updateCourseProgress } from "@/lib/actions/learning";
 
 type Course = {
   id: string;
@@ -15,6 +15,7 @@ type Course = {
   enrolledCount: number;
   isEnrolled: boolean;
   progress: number;
+  enrollmentId: string | null;
 };
 
 type Stats = {
@@ -73,6 +74,20 @@ export function CoursesClient({ courses, stats }: Readonly<{ courses: Course[]; 
         router.refresh();
       } catch {
         setToast("Failed to enroll. Please try again.");
+      }
+    });
+  }
+
+  function handleContinue(course: Course) {
+    if (!course.enrollmentId) return;
+    startTransition(async () => {
+      try {
+        const newProgress = Math.min(100, course.progress + 10);
+        await updateCourseProgress(course.enrollmentId!, newProgress);
+        setToast(newProgress >= 100 ? `"${course.title}" marked as complete!` : `Progress updated to ${newProgress}%`);
+        router.refresh();
+      } catch {
+        setToast("Failed to update progress");
       }
     });
   }
@@ -166,8 +181,9 @@ export function CoursesClient({ courses, stats }: Readonly<{ courses: Course[]; 
                   </div>
                 )}
                 <button
-                  onClick={() => course.isEnrolled ? setToast("Resuming course...") : handleEnroll(course.id, course.title)}
-                  className={`w-full py-1.5 ${course.isEnrolled ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => course.isEnrolled ? handleContinue(course) : handleEnroll(course.id, course.title)}
+                  disabled={course.progress >= 100}
+                  className={`w-full py-1.5 ${course.isEnrolled ? "btn-primary disabled:opacity-60" : "btn-secondary"}`}
                 >
                   {course.isEnrolled ? (course.progress >= 100 ? "Completed ✓" : "Continue") : "Enroll"}
                 </button>

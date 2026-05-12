@@ -78,7 +78,29 @@ export function AuditClient({ logs, from, to, type }: Props) {
             className="input-field h-9"
           />
           <button
-            onClick={() => setToast("Audit log exported!")}
+            onClick={() => {
+              const header = "Date,User,Action,Resource,Details,IP,Severity";
+              const rows = logs.map((l) =>
+                [
+                  new Date(l.createdAt).toISOString(),
+                  l.userEmail,
+                  l.action,
+                  l.resource,
+                  (l.details ?? "").replace(/,/g, ";"),
+                  l.ipAddress ?? "",
+                  l.severity,
+                ].join(",")
+              );
+              const csv = [header, ...rows].join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `audit-log-${fromDate}-to-${toDate}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+              setToast("Audit log exported!");
+            }}
             className="btn-primary flex items-center gap-1.5"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

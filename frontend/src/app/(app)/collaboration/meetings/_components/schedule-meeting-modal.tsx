@@ -34,6 +34,7 @@ export function ScheduleMeetingModal({ employees, onClose, onSchedule }: Readonl
   const [time, setTime] = useState("");
   const [durationMins, setDurationMins] = useState(30);
   const [platform, setPlatform] = useState("Zoom");
+  const [meetingUrl, setMeetingUrl] = useState("");
   const [agenda, setAgenda] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
@@ -73,6 +74,7 @@ export function ScheduleMeetingModal({ employees, onClose, onSchedule }: Readonl
           time,
           durationMins,
           platform,
+          meetingUrl: meetingUrl.trim() || undefined,
           agenda: agenda.trim() || undefined,
           participantIds: Array.from(selectedIds),
         });
@@ -139,8 +141,13 @@ export function ScheduleMeetingModal({ employees, onClose, onSchedule }: Readonl
             </div>
 
             <div>
+              <label className="label-field">Meeting Link <span className="font-normal text-muted">(optional)</span></label>
+              <input type="url" placeholder="https://zoom.us/j/..." value={meetingUrl} onChange={(e) => setMeetingUrl(e.target.value)} className="input-field" />
+            </div>
+
+            <div>
               <label className="label-field">Agenda <span className="font-normal text-muted">(optional)</span></label>
-              <textarea rows={3} placeholder="What will be discussed?" value={agenda} onChange={(e) => setAgenda(e.target.value)} className="input-field resize-none" />
+              <textarea rows={2} placeholder="What will be discussed?" value={agenda} onChange={(e) => setAgenda(e.target.value)} className="input-field resize-none" />
             </div>
           </div>
 

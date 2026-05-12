@@ -24,8 +24,8 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Unikove — AI-First Workplace",
-    default: "Unikove — AI-First Workplace Platform",
+    template: "%s | Monja — AI-First Workplace",
+    default: "Monja — AI-First Workplace Platform",
   },
   description:
     "Enterprise HRMS + Collaboration platform. Manage people, communicate in real time, and drive productivity with AI-powered automation — all in one place.",

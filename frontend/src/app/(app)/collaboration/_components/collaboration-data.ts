@@ -116,7 +116,7 @@ export const GENERAL_MESSAGES: Message[] = [
     author: "Elena Torres",
     avatar: "/images/user/user-03.png",
     timestamp: "9:18 AM",
-    text: "Yes Daniel, same portal at hr.unikove.com/reviews — I've updated the Q2 templates this morning so they should be ready to go!",
+    text: "Yes Daniel, same portal at hr.Monja.com/reviews — I've updated the Q2 templates this morning so they should be ready to go!",
     reactions: [
       { emoji: "🎉", count: 6 },
       { emoji: "👏", count: 3 },

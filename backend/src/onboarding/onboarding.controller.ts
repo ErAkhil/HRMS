@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Param } from '@nestjs/common';
 import { OnboardingService } from './onboarding.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -18,10 +18,31 @@ export class OnboardingController {
     return this.onboarding.getOffboardingStats(user);
   }
 
+  @Get('offboarding/active-employees')
+  @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
+  getActiveEmployees(@CurrentUser() user: JwtPayload) {
+    return this.onboarding.getActiveEmployees(user);
+  }
+
   @Get('offboarding')
   @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
   getOffboarding(@CurrentUser() user: JwtPayload) {
     return this.onboarding.getOffboardingRecords(user);
+  }
+
+  @Post('offboarding')
+  @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
+  initiateOffboarding(
+    @Body() dto: { employeeId: string; lastWorkingDay: string; reason?: string },
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.onboarding.initiateOffboarding(dto, user);
+  }
+
+  @Post('offboarding/:id/remind')
+  @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
+  sendReminder(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.onboarding.sendOffboardingReminder(id, user);
   }
 
   @Get()

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -110,6 +110,113 @@ export class AuthService {
       orgName: user.org.name,
       plan: user.org.plan,
       employee: user.employee ?? null,
+    };
+  }
+
+  async googleSignIn(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      include: {
+        org: { select: { name: true, plan: true } },
+        employee: { select: { id: true } },
+      },
+    });
+
+    if (!user || !user.isActive) throw new UnauthorizedException('No account found for this Google email. Contact your HR admin.');
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      orgId: user.orgId,
+      orgName: user.org.name,
+      plan: user.org.plan,
+      employeeId: user.employee?.id ?? null,
+    };
+
+    return {
+      accessToken: this.signAccess(payload),
+      refreshToken: this.signRefresh(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        orgId: user.orgId,
+        orgName: user.org.name,
+        plan: user.org.plan,
+        employeeId: user.employee?.id ?? null,
+      },
+    };
+  }
+
+  async registerOrg(data: {
+    orgName: string;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) {
+    const existing = await this.prisma.user.findUnique({ where: { email: data.email.toLowerCase() } });
+    if (existing) throw new ConflictException('Email already registered');
+
+    const slug = data.orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const uniqueSlug = `${slug}-${Date.now().toString(36)}`;
+    const passwordHash = await bcrypt.hash(data.password, 12);
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      const org = await tx.organization.create({
+        data: { name: data.orgName, slug: uniqueSlug, plan: 'BASIC' },
+      });
+
+      const user = await tx.user.create({
+        data: { email: data.email.toLowerCase(), passwordHash, role: 'SUPER_ADMIN', orgId: org.id },
+      });
+
+      const employee = await tx.employee.create({
+        data: {
+          userId: user.id,
+          orgId: org.id,
+          employeeCode: `EMP-001`,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email.toLowerCase(),
+          title: 'Administrator',
+          salary: 0,
+          startDate: new Date(),
+          isActive: true,
+        },
+      });
+
+      return { org, user, employee };
+    });
+
+    const payload: JwtPayload = {
+      sub: result.user.id,
+      email: result.user.email,
+      role: result.user.role,
+      orgId: result.org.id,
+      orgName: result.org.name,
+      plan: result.org.plan,
+      employeeId: result.employee.id,
+    };
+
+    return {
+      accessToken: this.signAccess(payload),
+      refreshToken: this.signRefresh(payload),
+      user: {
+        id: result.user.id,
+        email: result.user.email,
+        role: result.user.role,
+        orgId: result.org.id,
+        orgName: result.org.name,
+        plan: result.org.plan,
+        employeeId: result.employee.id,
+      },
     };
   }
 

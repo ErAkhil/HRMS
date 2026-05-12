@@ -39,6 +39,7 @@ export class MeetingsService {
         scheduledAt: m.scheduledAt.toISOString(),
         durationMins: m.durationMins,
         platform: m.platform,
+        meetingUrl: m.meetingUrl,
         agenda: m.agenda,
         isLive,
         isPast,
@@ -87,6 +88,7 @@ export class MeetingsService {
         scheduledAt,
         durationMins: dto.durationMins,
         platform: dto.platform,
+        meetingUrl: dto.meetingUrl ?? null,
         agenda: dto.agenda ?? null,
         createdById: user.sub,
         participants: {

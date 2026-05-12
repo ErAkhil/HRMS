@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useState } from "react";
@@ -42,7 +42,7 @@ export function ChannelSidebar({
     <aside className="flex w-70 flex-shrink-0 flex-col border-r border-gray-3 bg-white dark:border-dark-3 dark:bg-dark-2">
       {/* Workspace header */}
       <div className="flex items-center justify-between border-b border-gray-3 px-4 py-3.5 dark:border-dark-3">
-        <span className="text-sm font-bold text-dark dark:text-white">Unikove HQ</span>
+        <span className="text-sm font-bold text-dark dark:text-white">Monja HQ</span>
         <button className="flex size-7 items-center justify-center rounded-lg text-dark-5 hover:bg-gray-2 dark:text-dark-6 dark:hover:bg-dark-3">
           <svg className="size-4" viewBox="0 0 24 24" fill="none">
             <path
@@ -260,7 +260,7 @@ export function ChannelSidebar({
               >
                 <span className="flex size-5 items-center justify-center rounded-full bg-gray-3 dark:bg-dark-3">
                   <span className="text-xs font-bold">
-                    {showAllDms ? "−" : `+${hiddenCount}`}
+                    {showAllDms ? "âˆ’" : `+${hiddenCount}`}
                   </span>
                 </span>
                 <span className="text-xs">

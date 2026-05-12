@@ -22,7 +22,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/performance": { title: "Performance", subtitle: "KPIs & reviews" },
   "/learning": { title: "Learning", subtitle: "Courses & certifications" },
   "/reports": { title: "Reports", subtitle: "Analytics & insights" },
-  "/ai": { title: "AI Assistant", subtitle: "Powered by Unikove AI" },
+  "/ai": { title: "AI Assistant", subtitle: "Powered by Monja AI" },
   "/admin": { title: "Admin", subtitle: "System configuration" },
 };
 
@@ -57,7 +57,7 @@ export function Header() {
           </button>
 
           {isMobile && (
-            <Link href="/" className="max-[430px]:hidden">
+            <Link href="/dashboard" className="max-[430px]:hidden">
               <Image
                 src="/images/logo/logo-icon.svg"
                 width={28}

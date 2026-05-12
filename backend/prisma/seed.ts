@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+﻿import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import * as fs from "fs";
@@ -17,7 +17,7 @@ import * as path from "path";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const db = new PrismaClient({ adapter });
 
-// ─── Shared helpers ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Shared helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PAYROLL_MONTHS = [
   { month: 11, year: 2025 }, { month: 12, year: 2025 },
@@ -80,7 +80,7 @@ async function seedPayroll(orgId: string, emps: { empId: string; salary: number 
   }
 }
 
-// ─── Org 1: Unikove Technologies ──────────────────────────────────────────────
+// â”€â”€â”€ Org 1: Monja Technologies â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const UNI_DEPTS = [
   { name: "Engineering",      color: "#6366F1", description: "Software development, platform infrastructure, and DevOps" },
@@ -95,38 +95,38 @@ const UNI_DEPTS = [
 
 // [email, role, dept, first, last, title, salary, avatar, startDate, isHead]
 const UNI_EMPS = [
-  ["admin@unikove.com",           "SUPER_ADMIN", "HR",              "Sarah",   "Johnson",  "HR Director",               180000, "/images/user/user-01.png", "2022-01-15", true ],
-  ["chris.walker@unikove.com",    "EMPLOYEE",    "HR",              "Chris",   "Walker",   "HR Specialist",              85000, "/images/user/user-02.png", "2023-06-01", false],
-  ["james.williams@unikove.com",  "MANAGER",     "Engineering",     "James",   "Williams", "VP of Engineering",         200000, "/images/user/user-03.png", "2021-06-01", true ],
-  ["sarah.mitchell@unikove.com",  "EMPLOYEE",    "Engineering",     "Sarah",   "Mitchell", "Senior Software Engineer",  150000, "/images/user/user-15.png", "2023-03-10", false],
-  ["daniel.park@unikove.com",     "EMPLOYEE",    "Engineering",     "Daniel",  "Park",     "Frontend Engineer",         130000, "/images/user/user-04.png", "2023-07-01", false],
-  ["arjun.mehta@unikove.com",     "EMPLOYEE",    "Engineering",     "Arjun",   "Mehta",    "Backend Engineer",          125000, "/images/user/user-05.png", "2024-01-08", false],
-  ["elena.torres@unikove.com",    "EMPLOYEE",    "Engineering",     "Elena",   "Torres",   "QA Engineer",               110000, "/images/user/user-06.png", "2023-09-01", false],
-  ["marcus.chen@unikove.com",     "EMPLOYEE",    "Engineering",     "Marcus",  "Chen",     "DevOps Engineer",           145000, "/images/user/user-07.png", "2022-08-20", false],
-  ["priya.sharma@unikove.com",    "EMPLOYEE",    "Product",         "Priya",   "Sharma",   "Product Designer",          130000, "/images/user/user-26.png", "2022-11-15", true ],
-  ["lisa.chen@unikove.com",       "EMPLOYEE",    "Product",         "Lisa",    "Chen",     "Product Manager",           145000, "/images/user/user-08.png", "2023-02-01", false],
-  ["alex.kumar@unikove.com",      "EMPLOYEE",    "Product",         "Alex",    "Kumar",    "UX Researcher",             105000, "/images/user/user-09.png", "2024-03-01", false],
-  ["michael.brown@unikove.com",   "MANAGER",     "Sales",           "Michael", "Brown",    "Head of Sales",             160000, "/images/user/user-10.png", "2021-09-01", true ],
-  ["jessica.davis@unikove.com",   "EMPLOYEE",    "Sales",           "Jessica", "Davis",    "Account Executive",          95000, "/images/user/user-11.png", "2022-11-01", false],
-  ["ryan.wilson@unikove.com",     "EMPLOYEE",    "Sales",           "Ryan",    "Wilson",   "Sales Development Rep",      75000, "/images/user/user-12.png", "2024-02-01", false],
-  ["amanda.taylor@unikove.com",   "EMPLOYEE",    "Sales",           "Amanda",  "Taylor",   "Senior Account Executive",  115000, "/images/user/user-13.png", "2023-01-15", false],
-  ["sophia.martinez@unikove.com", "EMPLOYEE",    "Marketing",       "Sophia",  "Martinez", "Marketing Director",        148000, "/images/user/user-14.png", "2022-04-01", true ],
-  ["thomas.lee@unikove.com",      "EMPLOYEE",    "Marketing",       "Thomas",  "Lee",      "Growth Marketer",            95000, "/images/user/user-16.png", "2023-08-01", false],
-  ["nicole.white@unikove.com",    "EMPLOYEE",    "Marketing",       "Nicole",  "White",    "Content Strategist",         90000, "/images/user/user-17.png", "2024-01-15", false],
-  ["rachel.harris@unikove.com",   "EMPLOYEE",    "Finance",         "Rachel",  "Harris",   "Finance Manager",           135000, "/images/user/user-18.png", "2022-07-01", true ],
-  ["david.clark@unikove.com",     "EMPLOYEE",    "Finance",         "David",   "Clark",    "Financial Analyst",         102000, "/images/user/user-19.png", "2023-04-01", false],
-  ["emma.robinson@unikove.com",   "EMPLOYEE",    "Finance",         "Emma",    "Robinson", "Accountant",                 85000, "/images/user/user-20.png", "2024-06-01", false],
-  ["brandon.allen@unikove.com",   "EMPLOYEE",    "Operations",      "Brandon", "Allen",    "Operations Manager",        128000, "/images/user/user-21.png", "2022-03-01", true ],
-  ["megan.young@unikove.com",     "EMPLOYEE",    "Operations",      "Megan",   "Young",    "Process Coordinator",        82000, "/images/user/user-22.png", "2023-05-01", false],
-  ["tyler.king@unikove.com",      "EMPLOYEE",    "Operations",      "Tyler",   "King",     "Operations Analyst",         90000, "/images/user/user-23.png", "2024-04-01", false],
-  ["ashley.wright@unikove.com",   "EMPLOYEE",    "Customer Success","Ashley",  "Wright",   "Customer Success Lead",     112000, "/images/user/user-24.png", "2022-09-01", true ],
-  ["jordan.scott@unikove.com",    "EMPLOYEE",    "Customer Success","Jordan",  "Scott",    "Customer Success Manager",   95000, "/images/user/user-25.png", "2023-07-01", false],
-  ["maya.patel@unikove.com",      "EMPLOYEE",    "Customer Success","Maya",    "Patel",    "Support Specialist",         75000, "/images/user/user-27.png", "2024-05-01", false],
+  ["admin@Monja.com",           "SUPER_ADMIN", "HR",              "Sarah",   "Johnson",  "HR Director",               180000, "/images/user/user-01.png", "2022-01-15", true ],
+  ["chris.walker@Monja.com",    "EMPLOYEE",    "HR",              "Chris",   "Walker",   "HR Specialist",              85000, "/images/user/user-02.png", "2023-06-01", false],
+  ["james.williams@Monja.com",  "MANAGER",     "Engineering",     "James",   "Williams", "VP of Engineering",         200000, "/images/user/user-03.png", "2021-06-01", true ],
+  ["sarah.mitchell@Monja.com",  "EMPLOYEE",    "Engineering",     "Sarah",   "Mitchell", "Senior Software Engineer",  150000, "/images/user/user-15.png", "2023-03-10", false],
+  ["daniel.park@Monja.com",     "EMPLOYEE",    "Engineering",     "Daniel",  "Park",     "Frontend Engineer",         130000, "/images/user/user-04.png", "2023-07-01", false],
+  ["arjun.mehta@Monja.com",     "EMPLOYEE",    "Engineering",     "Arjun",   "Mehta",    "Backend Engineer",          125000, "/images/user/user-05.png", "2024-01-08", false],
+  ["elena.torres@Monja.com",    "EMPLOYEE",    "Engineering",     "Elena",   "Torres",   "QA Engineer",               110000, "/images/user/user-06.png", "2023-09-01", false],
+  ["marcus.chen@Monja.com",     "EMPLOYEE",    "Engineering",     "Marcus",  "Chen",     "DevOps Engineer",           145000, "/images/user/user-07.png", "2022-08-20", false],
+  ["priya.sharma@Monja.com",    "EMPLOYEE",    "Product",         "Priya",   "Sharma",   "Product Designer",          130000, "/images/user/user-26.png", "2022-11-15", true ],
+  ["lisa.chen@Monja.com",       "EMPLOYEE",    "Product",         "Lisa",    "Chen",     "Product Manager",           145000, "/images/user/user-08.png", "2023-02-01", false],
+  ["alex.kumar@Monja.com",      "EMPLOYEE",    "Product",         "Alex",    "Kumar",    "UX Researcher",             105000, "/images/user/user-09.png", "2024-03-01", false],
+  ["michael.brown@Monja.com",   "MANAGER",     "Sales",           "Michael", "Brown",    "Head of Sales",             160000, "/images/user/user-10.png", "2021-09-01", true ],
+  ["jessica.davis@Monja.com",   "EMPLOYEE",    "Sales",           "Jessica", "Davis",    "Account Executive",          95000, "/images/user/user-11.png", "2022-11-01", false],
+  ["ryan.wilson@Monja.com",     "EMPLOYEE",    "Sales",           "Ryan",    "Wilson",   "Sales Development Rep",      75000, "/images/user/user-12.png", "2024-02-01", false],
+  ["amanda.taylor@Monja.com",   "EMPLOYEE",    "Sales",           "Amanda",  "Taylor",   "Senior Account Executive",  115000, "/images/user/user-13.png", "2023-01-15", false],
+  ["sophia.martinez@Monja.com", "EMPLOYEE",    "Marketing",       "Sophia",  "Martinez", "Marketing Director",        148000, "/images/user/user-14.png", "2022-04-01", true ],
+  ["thomas.lee@Monja.com",      "EMPLOYEE",    "Marketing",       "Thomas",  "Lee",      "Growth Marketer",            95000, "/images/user/user-16.png", "2023-08-01", false],
+  ["nicole.white@Monja.com",    "EMPLOYEE",    "Marketing",       "Nicole",  "White",    "Content Strategist",         90000, "/images/user/user-17.png", "2024-01-15", false],
+  ["rachel.harris@Monja.com",   "EMPLOYEE",    "Finance",         "Rachel",  "Harris",   "Finance Manager",           135000, "/images/user/user-18.png", "2022-07-01", true ],
+  ["david.clark@Monja.com",     "EMPLOYEE",    "Finance",         "David",   "Clark",    "Financial Analyst",         102000, "/images/user/user-19.png", "2023-04-01", false],
+  ["emma.robinson@Monja.com",   "EMPLOYEE",    "Finance",         "Emma",    "Robinson", "Accountant",                 85000, "/images/user/user-20.png", "2024-06-01", false],
+  ["brandon.allen@Monja.com",   "EMPLOYEE",    "Operations",      "Brandon", "Allen",    "Operations Manager",        128000, "/images/user/user-21.png", "2022-03-01", true ],
+  ["megan.young@Monja.com",     "EMPLOYEE",    "Operations",      "Megan",   "Young",    "Process Coordinator",        82000, "/images/user/user-22.png", "2023-05-01", false],
+  ["tyler.king@Monja.com",      "EMPLOYEE",    "Operations",      "Tyler",   "King",     "Operations Analyst",         90000, "/images/user/user-23.png", "2024-04-01", false],
+  ["ashley.wright@Monja.com",   "EMPLOYEE",    "Customer Success","Ashley",  "Wright",   "Customer Success Lead",     112000, "/images/user/user-24.png", "2022-09-01", true ],
+  ["jordan.scott@Monja.com",    "EMPLOYEE",    "Customer Success","Jordan",  "Scott",    "Customer Success Manager",   95000, "/images/user/user-25.png", "2023-07-01", false],
+  ["maya.patel@Monja.com",      "EMPLOYEE",    "Customer Success","Maya",    "Patel",    "Support Specialist",         75000, "/images/user/user-27.png", "2024-05-01", false],
 ] as const;
 
-async function seedUnikove(hash: string) {
+async function seedMonja(hash: string) {
   const org = await db.organization.create({
-    data: { name: "Unikove Technologies", slug: "unikove", plan: "PRO_MAX", address: "12th Floor, Prestige Tower, MG Road, Bangalore 560001, India", taxId: "GSTIN: 29AABCU1234B1Z5" },
+    data: { name: "Monja Technologies", slug: "Monja", plan: "PRO_MAX", address: "12th Floor, Prestige Tower, MG Road, Bangalore 560001, India", taxId: "GSTIN: 29AABCU1234B1Z5" },
   });
 
   const deptMap = new Map<string, string>();
@@ -155,10 +155,10 @@ async function seedUnikove(hash: string) {
     if (p.isHead)
       await db.department.update({ where: { name_orgId: { name: p.deptName, orgId: org.id } }, data: { headId: p.empId } });
 
-  const jamesId   = byEmail("james.williams@unikove.com").empId;
-  const michaelId = byEmail("michael.brown@unikove.com").empId;
-  await db.employee.updateMany({ where: { id: { in: ["sarah.mitchell","daniel.park","arjun.mehta","elena.torres","marcus.chen"].map((n) => byEmail(`${n}@unikove.com`).empId) } }, data: { managerId: jamesId } });
-  await db.employee.updateMany({ where: { id: { in: ["jessica.davis","ryan.wilson","amanda.taylor"].map((n) => byEmail(`${n}@unikove.com`).empId) } }, data: { managerId: michaelId } });
+  const jamesId   = byEmail("james.williams@Monja.com").empId;
+  const michaelId = byEmail("michael.brown@Monja.com").empId;
+  await db.employee.updateMany({ where: { id: { in: ["sarah.mitchell","daniel.park","arjun.mehta","elena.torres","marcus.chen"].map((n) => byEmail(`${n}@Monja.com`).empId) } }, data: { managerId: jamesId } });
+  await db.employee.updateMany({ where: { id: { in: ["jessica.davis","ryan.wilson","amanda.taylor"].map((n) => byEmail(`${n}@Monja.com`).empId) } }, data: { managerId: michaelId } });
 
   const empIds = pairs.map((p) => p.empId);
   await seedLeaveBalances(empIds);
@@ -167,30 +167,30 @@ async function seedUnikove(hash: string) {
 
   // Leave requests
   await db.leaveRequest.createMany({ data: [
-    { employeeId: byEmail("sarah.mitchell@unikove.com").empId, leaveType: "ANNUAL", startDate: new Date("2026-04-07"), endDate: new Date("2026-04-09"), days: 3, reason: "Family vacation", status: "APPROVED" },
-    { employeeId: byEmail("daniel.park@unikove.com").empId,    leaveType: "SICK",   startDate: new Date("2026-04-14"), endDate: new Date("2026-04-15"), days: 2, reason: "Not feeling well", status: "APPROVED" },
-    { employeeId: byEmail("priya.sharma@unikove.com").empId,   leaveType: "CASUAL", startDate: new Date("2026-04-22"), endDate: new Date("2026-04-22"), days: 1, reason: "Personal work", status: "APPROVED" },
-    { employeeId: byEmail("arjun.mehta@unikove.com").empId,    leaveType: "SICK",   startDate: new Date("2026-04-28"), endDate: new Date("2026-04-29"), days: 2, reason: "Medical appointment", status: "APPROVED" },
-    { employeeId: byEmail("jessica.davis@unikove.com").empId,  leaveType: "ANNUAL", startDate: new Date("2026-05-05"), endDate: new Date("2026-05-07"), days: 3, reason: "Trip to Goa", status: "APPROVED" },
-    { employeeId: byEmail("sarah.mitchell@unikove.com").empId, leaveType: "SICK",   startDate: new Date("2026-05-12"), endDate: new Date("2026-05-12"), days: 1, reason: "Doctor visit", status: "PENDING" },
-    { employeeId: byEmail("marcus.chen@unikove.com").empId,    leaveType: "CASUAL", startDate: new Date("2026-05-19"), endDate: new Date("2026-05-20"), days: 2, reason: "Personal errands", status: "PENDING" },
-    { employeeId: byEmail("daniel.park@unikove.com").empId,    leaveType: "ANNUAL", startDate: new Date("2026-05-26"), endDate: new Date("2026-05-30"), days: 5, reason: "Summer vacation", status: "PENDING" },
-    { employeeId: byEmail("amanda.taylor@unikove.com").empId,  leaveType: "SICK",   startDate: new Date("2026-05-08"), endDate: new Date("2026-05-09"), days: 2, reason: "Flu", status: "APPROVED" },
-    { employeeId: byEmail("brandon.allen@unikove.com").empId,  leaveType: "ANNUAL", startDate: new Date("2026-06-10"), endDate: new Date("2026-06-13"), days: 4, reason: "Family trip", status: "APPROVED" },
+    { employeeId: byEmail("sarah.mitchell@Monja.com").empId, leaveType: "ANNUAL", startDate: new Date("2026-04-07"), endDate: new Date("2026-04-09"), days: 3, reason: "Family vacation", status: "APPROVED" },
+    { employeeId: byEmail("daniel.park@Monja.com").empId,    leaveType: "SICK",   startDate: new Date("2026-04-14"), endDate: new Date("2026-04-15"), days: 2, reason: "Not feeling well", status: "APPROVED" },
+    { employeeId: byEmail("priya.sharma@Monja.com").empId,   leaveType: "CASUAL", startDate: new Date("2026-04-22"), endDate: new Date("2026-04-22"), days: 1, reason: "Personal work", status: "APPROVED" },
+    { employeeId: byEmail("arjun.mehta@Monja.com").empId,    leaveType: "SICK",   startDate: new Date("2026-04-28"), endDate: new Date("2026-04-29"), days: 2, reason: "Medical appointment", status: "APPROVED" },
+    { employeeId: byEmail("jessica.davis@Monja.com").empId,  leaveType: "ANNUAL", startDate: new Date("2026-05-05"), endDate: new Date("2026-05-07"), days: 3, reason: "Trip to Goa", status: "APPROVED" },
+    { employeeId: byEmail("sarah.mitchell@Monja.com").empId, leaveType: "SICK",   startDate: new Date("2026-05-12"), endDate: new Date("2026-05-12"), days: 1, reason: "Doctor visit", status: "PENDING" },
+    { employeeId: byEmail("marcus.chen@Monja.com").empId,    leaveType: "CASUAL", startDate: new Date("2026-05-19"), endDate: new Date("2026-05-20"), days: 2, reason: "Personal errands", status: "PENDING" },
+    { employeeId: byEmail("daniel.park@Monja.com").empId,    leaveType: "ANNUAL", startDate: new Date("2026-05-26"), endDate: new Date("2026-05-30"), days: 5, reason: "Summer vacation", status: "PENDING" },
+    { employeeId: byEmail("amanda.taylor@Monja.com").empId,  leaveType: "SICK",   startDate: new Date("2026-05-08"), endDate: new Date("2026-05-09"), days: 2, reason: "Flu", status: "APPROVED" },
+    { employeeId: byEmail("brandon.allen@Monja.com").empId,  leaveType: "ANNUAL", startDate: new Date("2026-06-10"), endDate: new Date("2026-06-13"), days: 4, reason: "Family trip", status: "APPROVED" },
   ]});
 
   // Claims
   await db.claim.createMany({ data: [
-    { employeeId: byEmail("sarah.mitchell@unikove.com").empId, category: "TRAVEL",   amount: 4500,  date: new Date("2026-04-10"), description: "Client meeting travel to Mumbai", status: "APPROVED", reviewedAt: new Date("2026-04-10") },
-    { employeeId: byEmail("sarah.mitchell@unikove.com").empId, category: "TRAINING", amount: 12000, date: new Date("2026-04-20"), description: "AWS certification exam fee", status: "PENDING" },
-    { employeeId: byEmail("daniel.park@unikove.com").empId,    category: "EQUIPMENT",amount: 8000,  date: new Date("2026-04-25"), description: "External monitor for home office", status: "PENDING" },
-    { employeeId: byEmail("marcus.chen@unikove.com").empId,    category: "TRAVEL",   amount: 3200,  date: new Date("2026-05-02"), description: "Conference transport to Delhi", status: "APPROVED", reviewedAt: new Date("2026-05-02") },
-    { employeeId: byEmail("james.williams@unikove.com").empId, category: "MEALS",    amount: 1800,  date: new Date("2026-05-03"), description: "Team lunch — sprint retrospective", status: "APPROVED", reviewedAt: new Date("2026-05-03") },
-    { employeeId: byEmail("priya.sharma@unikove.com").empId,   category: "TRAINING", amount: 9500,  date: new Date("2026-04-30"), description: "Figma Advanced certification", status: "APPROVED", reviewedAt: new Date("2026-04-30") },
-    { employeeId: byEmail("michael.brown@unikove.com").empId,  category: "TRAVEL",   amount: 15000, date: new Date("2026-04-18"), description: "Enterprise client visit — Hyderabad", status: "APPROVED", reviewedAt: new Date("2026-04-18") },
-    { employeeId: byEmail("rachel.harris@unikove.com").empId,  category: "TRAINING", amount: 7500,  date: new Date("2026-05-01"), description: "CPA continuing education credits", status: "PENDING" },
-    { employeeId: byEmail("arjun.mehta@unikove.com").empId,    category: "EQUIPMENT",amount: 5500,  date: new Date("2026-04-22"), description: "Mechanical keyboard for development", status: "REJECTED", reviewedAt: new Date("2026-04-22") },
-    { employeeId: byEmail("amanda.taylor@unikove.com").empId,  category: "TRAVEL",   amount: 6200,  date: new Date("2026-05-06"), description: "Sales conference — Mumbai", status: "PENDING" },
+    { employeeId: byEmail("sarah.mitchell@Monja.com").empId, category: "TRAVEL",   amount: 4500,  date: new Date("2026-04-10"), description: "Client meeting travel to Mumbai", status: "APPROVED", reviewedAt: new Date("2026-04-10") },
+    { employeeId: byEmail("sarah.mitchell@Monja.com").empId, category: "TRAINING", amount: 12000, date: new Date("2026-04-20"), description: "AWS certification exam fee", status: "PENDING" },
+    { employeeId: byEmail("daniel.park@Monja.com").empId,    category: "EQUIPMENT",amount: 8000,  date: new Date("2026-04-25"), description: "External monitor for home office", status: "PENDING" },
+    { employeeId: byEmail("marcus.chen@Monja.com").empId,    category: "TRAVEL",   amount: 3200,  date: new Date("2026-05-02"), description: "Conference transport to Delhi", status: "APPROVED", reviewedAt: new Date("2026-05-02") },
+    { employeeId: byEmail("james.williams@Monja.com").empId, category: "MEALS",    amount: 1800,  date: new Date("2026-05-03"), description: "Team lunch â€” sprint retrospective", status: "APPROVED", reviewedAt: new Date("2026-05-03") },
+    { employeeId: byEmail("priya.sharma@Monja.com").empId,   category: "TRAINING", amount: 9500,  date: new Date("2026-04-30"), description: "Figma Advanced certification", status: "APPROVED", reviewedAt: new Date("2026-04-30") },
+    { employeeId: byEmail("michael.brown@Monja.com").empId,  category: "TRAVEL",   amount: 15000, date: new Date("2026-04-18"), description: "Enterprise client visit â€” Hyderabad", status: "APPROVED", reviewedAt: new Date("2026-04-18") },
+    { employeeId: byEmail("rachel.harris@Monja.com").empId,  category: "TRAINING", amount: 7500,  date: new Date("2026-05-01"), description: "CPA continuing education credits", status: "PENDING" },
+    { employeeId: byEmail("arjun.mehta@Monja.com").empId,    category: "EQUIPMENT",amount: 5500,  date: new Date("2026-04-22"), description: "Mechanical keyboard for development", status: "REJECTED", reviewedAt: new Date("2026-04-22") },
+    { employeeId: byEmail("amanda.taylor@Monja.com").empId,  category: "TRAVEL",   amount: 6200,  date: new Date("2026-05-06"), description: "Sales conference â€” Mumbai", status: "PENDING" },
   ]});
 
   // Courses
@@ -206,38 +206,38 @@ async function seedUnikove(hash: string) {
   ]);
 
   await db.courseEnrollment.createMany({ data: [
-    { courseId: cReact.id,  employeeId: byEmail("sarah.mitchell@unikove.com").empId, progress: 75, enrolledAt: new Date("2026-03-01") },
-    { courseId: cAws.id,    employeeId: byEmail("sarah.mitchell@unikove.com").empId, progress: 40, enrolledAt: new Date("2026-04-01") },
-    { courseId: cTs.id,     employeeId: byEmail("sarah.mitchell@unikove.com").empId, progress: 100, completedAt: new Date("2026-03-15"), enrolledAt: new Date("2026-02-01") },
-    { courseId: cReact.id,  employeeId: byEmail("daniel.park@unikove.com").empId,    progress: 60, enrolledAt: new Date("2026-03-15") },
-    { courseId: cTs.id,     employeeId: byEmail("arjun.mehta@unikove.com").empId,    progress: 85, enrolledAt: new Date("2026-04-10") },
-    { courseId: cDb.id,     employeeId: byEmail("marcus.chen@unikove.com").empId,    progress: 50, enrolledAt: new Date("2026-04-01") },
-    { courseId: cMgmt.id,   employeeId: byEmail("james.williams@unikove.com").empId, progress: 90, enrolledAt: new Date("2026-02-01") },
-    { courseId: cDesign.id, employeeId: byEmail("priya.sharma@unikove.com").empId,   progress: 100, completedAt: new Date("2026-04-20"), enrolledAt: new Date("2026-03-01") },
-    { courseId: cDesign.id, employeeId: byEmail("lisa.chen@unikove.com").empId,      progress: 65, enrolledAt: new Date("2026-04-15") },
-    { courseId: cSales.id,  employeeId: byEmail("michael.brown@unikove.com").empId,  progress: 100, completedAt: new Date("2026-03-30"), enrolledAt: new Date("2026-02-15") },
-    { courseId: cSales.id,  employeeId: byEmail("jessica.davis@unikove.com").empId,  progress: 80, enrolledAt: new Date("2026-04-05") },
-    { courseId: cFin.id,    employeeId: byEmail("rachel.harris@unikove.com").empId,  progress: 70, enrolledAt: new Date("2026-03-20") },
+    { courseId: cReact.id,  employeeId: byEmail("sarah.mitchell@Monja.com").empId, progress: 75, enrolledAt: new Date("2026-03-01") },
+    { courseId: cAws.id,    employeeId: byEmail("sarah.mitchell@Monja.com").empId, progress: 40, enrolledAt: new Date("2026-04-01") },
+    { courseId: cTs.id,     employeeId: byEmail("sarah.mitchell@Monja.com").empId, progress: 100, completedAt: new Date("2026-03-15"), enrolledAt: new Date("2026-02-01") },
+    { courseId: cReact.id,  employeeId: byEmail("daniel.park@Monja.com").empId,    progress: 60, enrolledAt: new Date("2026-03-15") },
+    { courseId: cTs.id,     employeeId: byEmail("arjun.mehta@Monja.com").empId,    progress: 85, enrolledAt: new Date("2026-04-10") },
+    { courseId: cDb.id,     employeeId: byEmail("marcus.chen@Monja.com").empId,    progress: 50, enrolledAt: new Date("2026-04-01") },
+    { courseId: cMgmt.id,   employeeId: byEmail("james.williams@Monja.com").empId, progress: 90, enrolledAt: new Date("2026-02-01") },
+    { courseId: cDesign.id, employeeId: byEmail("priya.sharma@Monja.com").empId,   progress: 100, completedAt: new Date("2026-04-20"), enrolledAt: new Date("2026-03-01") },
+    { courseId: cDesign.id, employeeId: byEmail("lisa.chen@Monja.com").empId,      progress: 65, enrolledAt: new Date("2026-04-15") },
+    { courseId: cSales.id,  employeeId: byEmail("michael.brown@Monja.com").empId,  progress: 100, completedAt: new Date("2026-03-30"), enrolledAt: new Date("2026-02-15") },
+    { courseId: cSales.id,  employeeId: byEmail("jessica.davis@Monja.com").empId,  progress: 80, enrolledAt: new Date("2026-04-05") },
+    { courseId: cFin.id,    employeeId: byEmail("rachel.harris@Monja.com").empId,  progress: 70, enrolledAt: new Date("2026-03-20") },
   ]});
 
   await db.employeeCertification.createMany({ data: [
-    { employeeId: byEmail("sarah.mitchell@unikove.com").empId, name: "TypeScript Developer",              issuer: "Microsoft",     credential: "MSFT-TS-2025",  earnedAt: new Date("2025-08-15") },
-    { employeeId: byEmail("sarah.mitchell@unikove.com").empId, name: "React Certified Developer",         issuer: "Meta",          credential: "META-RCD-2025", earnedAt: new Date("2025-12-10"), expiresAt: new Date("2027-12-10") },
-    { employeeId: byEmail("marcus.chen@unikove.com").empId,    name: "AWS Solutions Architect Associate", issuer: "Amazon",        credential: "AWS-SAA-2025",  earnedAt: new Date("2025-11-20"), expiresAt: new Date("2028-11-20") },
-    { employeeId: byEmail("james.williams@unikove.com").empId, name: "Certified Scrum Master",            issuer: "Scrum Alliance", credential: "CSM-2025-007", earnedAt: new Date("2025-06-01") },
-    { employeeId: byEmail("priya.sharma@unikove.com").empId,   name: "Google UX Design Certificate",      issuer: "Google",        credential: "GOOG-UX-2025",  earnedAt: new Date("2025-09-15"), expiresAt: new Date("2028-09-15") },
-    { employeeId: byEmail("michael.brown@unikove.com").empId,  name: "Certified Sales Professional",      issuer: "NASP",          credential: "CSP-2024-112",  earnedAt: new Date("2024-11-01") },
-    { employeeId: byEmail("rachel.harris@unikove.com").empId,  name: "CPA — Chartered Public Accountant", issuer: "ICAI",          credential: "CPA-2023-556",  earnedAt: new Date("2023-05-20") },
-    { employeeId: byEmail("arjun.mehta@unikove.com").empId,    name: "Node.js Application Developer",     issuer: "OpenJS",        credential: "OADN-2026-009", earnedAt: new Date("2026-01-15") },
+    { employeeId: byEmail("sarah.mitchell@Monja.com").empId, name: "TypeScript Developer",              issuer: "Microsoft",     credential: "MSFT-TS-2025",  earnedAt: new Date("2025-08-15") },
+    { employeeId: byEmail("sarah.mitchell@Monja.com").empId, name: "React Certified Developer",         issuer: "Meta",          credential: "META-RCD-2025", earnedAt: new Date("2025-12-10"), expiresAt: new Date("2027-12-10") },
+    { employeeId: byEmail("marcus.chen@Monja.com").empId,    name: "AWS Solutions Architect Associate", issuer: "Amazon",        credential: "AWS-SAA-2025",  earnedAt: new Date("2025-11-20"), expiresAt: new Date("2028-11-20") },
+    { employeeId: byEmail("james.williams@Monja.com").empId, name: "Certified Scrum Master",            issuer: "Scrum Alliance", credential: "CSM-2025-007", earnedAt: new Date("2025-06-01") },
+    { employeeId: byEmail("priya.sharma@Monja.com").empId,   name: "Google UX Design Certificate",      issuer: "Google",        credential: "GOOG-UX-2025",  earnedAt: new Date("2025-09-15"), expiresAt: new Date("2028-09-15") },
+    { employeeId: byEmail("michael.brown@Monja.com").empId,  name: "Certified Sales Professional",      issuer: "NASP",          credential: "CSP-2024-112",  earnedAt: new Date("2024-11-01") },
+    { employeeId: byEmail("rachel.harris@Monja.com").empId,  name: "CPA â€” Chartered Public Accountant", issuer: "ICAI",          credential: "CPA-2023-556",  earnedAt: new Date("2023-05-20") },
+    { employeeId: byEmail("arjun.mehta@Monja.com").empId,    name: "Node.js Application Developer",     issuer: "OpenJS",        credential: "OADN-2026-009", earnedAt: new Date("2026-01-15") },
   ]});
 
-  const sarahE = byEmail("sarah.mitchell@unikove.com").empId;
+  const sarahE = byEmail("sarah.mitchell@Monja.com").empId;
   const jamesE = jamesId;
-  const danielE = byEmail("daniel.park@unikove.com").empId;
-  const marcusE = byEmail("marcus.chen@unikove.com").empId;
-  const arjunE  = byEmail("arjun.mehta@unikove.com").empId;
-  const elenaE  = byEmail("elena.torres@unikove.com").empId;
-  const priyaE  = byEmail("priya.sharma@unikove.com").empId;
+  const danielE = byEmail("daniel.park@Monja.com").empId;
+  const marcusE = byEmail("marcus.chen@Monja.com").empId;
+  const arjunE  = byEmail("arjun.mehta@Monja.com").empId;
+  const elenaE  = byEmail("elena.torres@Monja.com").empId;
+  const priyaE  = byEmail("priya.sharma@Monja.com").empId;
 
   await db.goal.createMany({ data: [
     { employeeId: sarahE,  title: "Complete Platform v2.0 Auth Module",     progress: 65,  status: "IN_PROGRESS", dueDate: new Date("2026-06-30") },
@@ -250,8 +250,8 @@ async function seedUnikove(hash: string) {
     { employeeId: arjunE,  title: "Complete TypeScript Fundamentals Course",  progress: 100, status: "COMPLETED",   dueDate: new Date("2026-04-30") },
     { employeeId: priyaE,  title: "Deliver Mobile App Wireframes v1",         progress: 88,  status: "IN_PROGRESS", dueDate: new Date("2026-05-22") },
     { employeeId: jamesE,  title: "Hire 2 Senior Engineers in Q2",            progress: 50,  status: "IN_PROGRESS", dueDate: new Date("2026-06-30") },
-    { employeeId: byEmail("michael.brown@unikove.com").empId, title: "Close 3 Enterprise Accounts Q2", progress: 66, status: "IN_PROGRESS", dueDate: new Date("2026-06-30") },
-    { employeeId: byEmail("rachel.harris@unikove.com").empId, title: "Close FY2026 Books by June 30",  progress: 20, status: "NOT_STARTED",  dueDate: new Date("2026-06-30") },
+    { employeeId: byEmail("michael.brown@Monja.com").empId, title: "Close 3 Enterprise Accounts Q2", progress: 66, status: "IN_PROGRESS", dueDate: new Date("2026-06-30") },
+    { employeeId: byEmail("rachel.harris@Monja.com").empId, title: "Close FY2026 Books by June 30",  progress: 20, status: "NOT_STARTED",  dueDate: new Date("2026-06-30") },
   ]});
 
   const [p1, p2, p3] = await Promise.all([
@@ -294,7 +294,7 @@ async function seedUnikove(hash: string) {
   await db.candidate.createMany({ data: [
     { jobId: job1.id, name: "Rahul Kumar",   email: "rahul.k@gmail.com",   stage: "INTERVIEW", source: "LinkedIn", notes: "Strong React + Next.js experience, 5 years" },
     { jobId: job1.id, name: "Anjali Singh",  email: "anjali.s@gmail.com",  stage: "SCREENING", source: "Referral", notes: "Recommended by Sarah Mitchell" },
-    { jobId: job1.id, name: "Vikram Nair",   email: "v.nair@gmail.com",    stage: "OFFER",     source: "Indeed",   notes: "Offer sent: ₹140k package" },
+    { jobId: job1.id, name: "Vikram Nair",   email: "v.nair@gmail.com",    stage: "OFFER",     source: "Indeed",   notes: "Offer sent: â‚¹140k package" },
     { jobId: job2.id, name: "Kunal Agarwal", email: "kunal.a@gmail.com",   stage: "INTERVIEW", source: "Referral", notes: "Strong PM background at Flipkart" },
     { jobId: job3.id, name: "Pooja Verma",   email: "pooja.v@gmail.com",   stage: "INTERVIEW", source: "Naukri",   notes: "7 years enterprise SaaS sales" },
   ]});
@@ -302,8 +302,8 @@ async function seedUnikove(hash: string) {
   await db.onboardingRecord.createMany({ data: [
     { employeeId: arjunE,  status: "IN_PROGRESS", startDate: new Date("2026-04-01"), dueDate: new Date("2026-05-30"), tasks: JSON.stringify([{ id:"1", title:"Complete HR paperwork", done:true },{ id:"2", title:"Setup dev environment", done:true },{ id:"3", title:"Meet the team", done:true },{ id:"4", title:"Complete security training", done:false }]) },
     { employeeId: elenaE,  status: "IN_PROGRESS", startDate: new Date("2026-04-15"), dueDate: new Date("2026-06-15"), tasks: JSON.stringify([{ id:"1", title:"Complete HR paperwork", done:true },{ id:"2", title:"Setup QA environment", done:true },{ id:"3", title:"Review test case library", done:false }]) },
-    { employeeId: byEmail("ryan.wilson@unikove.com").empId, status: "IN_PROGRESS", startDate: new Date("2026-03-01"), dueDate: new Date("2026-05-01"), tasks: JSON.stringify([{ id:"1", title:"HR paperwork", done:true },{ id:"2", title:"CRM training", done:true },{ id:"3", title:"Shadow 5 sales calls", done:true },{ id:"4", title:"First independent demo", done:false }]) },
-    { employeeId: byEmail("tyler.king@unikove.com").empId,  status: "NOT_STARTED",  startDate: new Date("2026-05-01"), dueDate: new Date("2026-06-30"), tasks: JSON.stringify([{ id:"1", title:"HR paperwork", done:false },{ id:"2", title:"Operations walkthrough", done:false }]) },
+    { employeeId: byEmail("ryan.wilson@Monja.com").empId, status: "IN_PROGRESS", startDate: new Date("2026-03-01"), dueDate: new Date("2026-05-01"), tasks: JSON.stringify([{ id:"1", title:"HR paperwork", done:true },{ id:"2", title:"CRM training", done:true },{ id:"3", title:"Shadow 5 sales calls", done:true },{ id:"4", title:"First independent demo", done:false }]) },
+    { employeeId: byEmail("tyler.king@Monja.com").empId,  status: "NOT_STARTED",  startDate: new Date("2026-05-01"), dueDate: new Date("2026-06-30"), tasks: JSON.stringify([{ id:"1", title:"HR paperwork", done:false },{ id:"2", title:"Operations walkthrough", done:false }]) },
   ]});
 
   const uids = pairs.map((p) => p.userId);
@@ -317,21 +317,21 @@ async function seedUnikove(hash: string) {
     db.channel.create({ data: { orgId: org.id, name: "random",      isPrivate: false } }),
   ]);
   await db.message.createMany({ data: [
-    { channelId: chGen.id,  senderId: getUid("admin@unikove.com"),           content: "Good morning everyone! Hope you had a great weekend.",                    createdAt: new Date("2026-05-04T09:00:00") },
-    { channelId: chGen.id,  senderId: getUid("james.williams@unikove.com"),  content: "Morning! Ready for sprint planning today?",                               createdAt: new Date("2026-05-04T09:05:00") },
-    { channelId: chGen.id,  senderId: getUid("sarah.mitchell@unikove.com"),  content: "Sprint planning at 10 AM, right? I'll be there.",                         createdAt: new Date("2026-05-04T09:10:00") },
-    { channelId: chGen.id,  senderId: getUid("admin@unikove.com"),           content: "Reminder: Q2 performance reviews due by May 15th.",                       createdAt: new Date("2026-05-05T10:00:00") },
-    { channelId: chGen.id,  senderId: getUid("james.williams@unikove.com"),  content: "Platform v2.0 is on track for Q3. Great work everyone!",                  createdAt: new Date("2026-05-06T11:00:00") },
-    { channelId: chGen.id,  senderId: getUid("daniel.park@unikove.com"),     content: "Dark mode is live on staging! Feel free to test it out.",                 createdAt: new Date("2026-05-08T14:00:00") },
-    { channelId: chGen.id,  senderId: getUid("michael.brown@unikove.com"),   content: "Sales team closed 2 enterprise deals this week. Big win!",               createdAt: new Date("2026-05-09T09:00:00") },
-    { channelId: chEng.id,  senderId: getUid("james.williams@unikove.com"),  content: "Code review session at 3 PM for the rate limiting PR.",                   createdAt: new Date("2026-05-07T09:00:00") },
-    { channelId: chEng.id,  senderId: getUid("marcus.chen@unikove.com"),     content: "K8s migration going well — auth and user services migrated.",             createdAt: new Date("2026-05-07T10:00:00") },
-    { channelId: chEng.id,  senderId: getUid("arjun.mehta@unikove.com"),     content: "Backend notifications API is merged. Passing to QA now.",                 createdAt: new Date("2026-05-08T11:00:00") },
-    { channelId: chProd.id, senderId: getUid("priya.sharma@unikove.com"),    content: "New wireframes for the mobile app are in Figma. Please review!",          createdAt: new Date("2026-05-07T13:00:00") },
-    { channelId: chProd.id, senderId: getUid("james.williams@unikove.com"),  content: "Looks great Priya! The onboarding flow is much cleaner now.",             createdAt: new Date("2026-05-07T13:30:00") },
-    { channelId: chSales.id,senderId: getUid("amanda.taylor@unikove.com"),   content: "GlobalBank renewal signed! $180k ARR. Big quarter!",                      createdAt: new Date("2026-05-09T10:00:00") },
-    { channelId: chRnd.id,  senderId: getUid("daniel.park@unikove.com"),     content: "Anyone for lunch at the new Thai place near the office?",                 createdAt: new Date("2026-05-08T12:00:00") },
-    { channelId: chRnd.id,  senderId: getUid("sarah.mitchell@unikove.com"),  content: "I'm in! See you at 1 PM?",                                               createdAt: new Date("2026-05-08T12:10:00") },
+    { channelId: chGen.id,  senderId: getUid("admin@Monja.com"),           content: "Good morning everyone! Hope you had a great weekend.",                    createdAt: new Date("2026-05-04T09:00:00") },
+    { channelId: chGen.id,  senderId: getUid("james.williams@Monja.com"),  content: "Morning! Ready for sprint planning today?",                               createdAt: new Date("2026-05-04T09:05:00") },
+    { channelId: chGen.id,  senderId: getUid("sarah.mitchell@Monja.com"),  content: "Sprint planning at 10 AM, right? I'll be there.",                         createdAt: new Date("2026-05-04T09:10:00") },
+    { channelId: chGen.id,  senderId: getUid("admin@Monja.com"),           content: "Reminder: Q2 performance reviews due by May 15th.",                       createdAt: new Date("2026-05-05T10:00:00") },
+    { channelId: chGen.id,  senderId: getUid("james.williams@Monja.com"),  content: "Platform v2.0 is on track for Q3. Great work everyone!",                  createdAt: new Date("2026-05-06T11:00:00") },
+    { channelId: chGen.id,  senderId: getUid("daniel.park@Monja.com"),     content: "Dark mode is live on staging! Feel free to test it out.",                 createdAt: new Date("2026-05-08T14:00:00") },
+    { channelId: chGen.id,  senderId: getUid("michael.brown@Monja.com"),   content: "Sales team closed 2 enterprise deals this week. Big win!",               createdAt: new Date("2026-05-09T09:00:00") },
+    { channelId: chEng.id,  senderId: getUid("james.williams@Monja.com"),  content: "Code review session at 3 PM for the rate limiting PR.",                   createdAt: new Date("2026-05-07T09:00:00") },
+    { channelId: chEng.id,  senderId: getUid("marcus.chen@Monja.com"),     content: "K8s migration going well â€” auth and user services migrated.",             createdAt: new Date("2026-05-07T10:00:00") },
+    { channelId: chEng.id,  senderId: getUid("arjun.mehta@Monja.com"),     content: "Backend notifications API is merged. Passing to QA now.",                 createdAt: new Date("2026-05-08T11:00:00") },
+    { channelId: chProd.id, senderId: getUid("priya.sharma@Monja.com"),    content: "New wireframes for the mobile app are in Figma. Please review!",          createdAt: new Date("2026-05-07T13:00:00") },
+    { channelId: chProd.id, senderId: getUid("james.williams@Monja.com"),  content: "Looks great Priya! The onboarding flow is much cleaner now.",             createdAt: new Date("2026-05-07T13:30:00") },
+    { channelId: chSales.id,senderId: getUid("amanda.taylor@Monja.com"),   content: "GlobalBank renewal signed! $180k ARR. Big quarter!",                      createdAt: new Date("2026-05-09T10:00:00") },
+    { channelId: chRnd.id,  senderId: getUid("daniel.park@Monja.com"),     content: "Anyone for lunch at the new Thai place near the office?",                 createdAt: new Date("2026-05-08T12:00:00") },
+    { channelId: chRnd.id,  senderId: getUid("sarah.mitchell@Monja.com"),  content: "I'm in! See you at 1 PM?",                                               createdAt: new Date("2026-05-08T12:10:00") },
   ]});
 
   await db.workflow.createMany({ data: [
@@ -347,7 +347,7 @@ async function seedUnikove(hash: string) {
   return org.id;
 }
 
-// ─── Org 2: Meridian Health Systems ───────────────────────────────────────────
+// â”€â”€â”€ Org 2: Meridian Health Systems â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MER_EMPS = [
   { email: "admin@meridian.com",     role: "SUPER_ADMIN", dept: "Administration", first: "Sarah",   last: "Thompson", title: "HR Director",            salary: 165000, avatar: "/images/user/user-01.png", start: "2021-03-01", isHead: true  },
@@ -409,7 +409,7 @@ async function seedMeridian(hash: string) {
   ]});
 
   await db.claim.createMany({ data: [
-    { employeeId: g("dr.kane@meridian.com").empId,   category: "TRAVEL",   amount: 18500, date: new Date("2026-04-15"), description: "International medical conference — Singapore", status: "APPROVED", reviewedAt: new Date("2026-04-15") },
+    { employeeId: g("dr.kane@meridian.com").empId,   category: "TRAVEL",   amount: 18500, date: new Date("2026-04-15"), description: "International medical conference â€” Singapore", status: "APPROVED", reviewedAt: new Date("2026-04-15") },
     { employeeId: g("dr.patel@meridian.com").empId,  category: "TRAINING", amount: 25000, date: new Date("2026-04-20"), description: "Advanced surgical techniques workshop", status: "APPROVED", reviewedAt: new Date("2026-04-20") },
     { employeeId: g("m.stevens@meridian.com").empId, category: "EQUIPMENT",amount: 12000, date: new Date("2026-05-01"), description: "Network security hardware upgrade", status: "PENDING" },
     { employeeId: g("j.walsh@meridian.com").empId,   category: "TRAINING", amount: 6500,  date: new Date("2026-04-25"), description: "Nursing leadership certification", status: "APPROVED", reviewedAt: new Date("2026-04-25") },
@@ -432,10 +432,10 @@ async function seedMeridian(hash: string) {
   ]});
 
   await db.employeeCertification.createMany({ data: [
-    { employeeId: g("dr.kane@meridian.com").empId,   name: "Fellow — Royal College of Physicians",  issuer: "RCP",   credential: "FRCP-2020-441", earnedAt: new Date("2020-05-15") },
+    { employeeId: g("dr.kane@meridian.com").empId,   name: "Fellow â€” Royal College of Physicians",  issuer: "RCP",   credential: "FRCP-2020-441", earnedAt: new Date("2020-05-15") },
     { employeeId: g("dr.patel@meridian.com").empId,  name: "Board Certified Internal Medicine",     issuer: "ABIM",  credential: "ABIM-2022-789", earnedAt: new Date("2022-06-01"), expiresAt: new Date("2032-06-01") },
     { employeeId: g("m.stevens@meridian.com").empId, name: "CompTIA Security+",                     issuer: "CompTIA", credential: "COMP-SEC-2024", earnedAt: new Date("2024-03-10"), expiresAt: new Date("2027-03-10") },
-    { employeeId: g("j.walsh@meridian.com").empId,   name: "Registered Nurse — Advanced Practice",  issuer: "NMC",   credential: "NMC-RN-AP-2021", earnedAt: new Date("2021-01-20") },
+    { employeeId: g("j.walsh@meridian.com").empId,   name: "Registered Nurse â€” Advanced Practice",  issuer: "NMC",   credential: "NMC-RN-AP-2021", earnedAt: new Date("2021-01-20") },
   ]});
 
   await db.goal.createMany({ data: [
@@ -485,7 +485,7 @@ async function seedMeridian(hash: string) {
     db.channel.create({ data: { orgId: org.id, name: "it-helpdesk", isPrivate: false } }),
   ]);
   await db.message.createMany({ data: [
-    { channelId: mGen.id,  senderId: mUids.get("admin@meridian.com")!,    content: "Good morning team! Busy week ahead — let's stay coordinated.",        createdAt: new Date("2026-05-04T08:30:00") },
+    { channelId: mGen.id,  senderId: mUids.get("admin@meridian.com")!,    content: "Good morning team! Busy week ahead â€” let's stay coordinated.",        createdAt: new Date("2026-05-04T08:30:00") },
     { channelId: mGen.id,  senderId: mUids.get("dr.kane@meridian.com")!,  content: "Reminder: all ward rounds start at 7 AM sharp this week.",            createdAt: new Date("2026-05-04T08:45:00") },
     { channelId: mGen.id,  senderId: mUids.get("j.walsh@meridian.com")!,  content: "Nursing rosters for Q3 have been updated. Please check your shifts.", createdAt: new Date("2026-05-05T09:00:00") },
     { channelId: mGen.id,  senderId: mUids.get("e.brooks@meridian.com")!, content: "Q1 financial report submitted. Numbers look healthy this quarter.",   createdAt: new Date("2026-05-06T10:00:00") },
@@ -505,7 +505,7 @@ async function seedMeridian(hash: string) {
   return org.id;
 }
 
-// ─── Org 3: Apex Financial Group ──────────────────────────────────────────────
+// â”€â”€â”€ Org 3: Apex Financial Group â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const APX_EMPS = [
   { email: "admin@apex.com",      role: "SUPER_ADMIN", dept: "HR",                 first: "Victoria", last: "Clarke",  title: "HR Director",            salary: 165000, avatar: "/images/user/user-01.png", start: "2020-09-01", isHead: true  },
@@ -564,9 +564,9 @@ async function seedApex(hash: string) {
   ]});
 
   await db.claim.createMany({ data: [
-    { employeeId: g("j.ford@apex.com").empId,    category: "TRAVEL",   amount: 45000, date: new Date("2026-04-12"), description: "Client roadshow — London & New York",     status: "APPROVED", reviewedAt: new Date("2026-04-12") },
+    { employeeId: g("j.ford@apex.com").empId,    category: "TRAVEL",   amount: 45000, date: new Date("2026-04-12"), description: "Client roadshow â€” London & New York",     status: "APPROVED", reviewedAt: new Date("2026-04-12") },
     { employeeId: g("s.chen@apex.com").empId,    category: "TRAINING", amount: 28000, date: new Date("2026-04-22"), description: "CFA Level 3 exam and study materials",     status: "APPROVED", reviewedAt: new Date("2026-04-22") },
-    { employeeId: g("m.ross@apex.com").empId,    category: "TRAVEL",   amount: 22000, date: new Date("2026-05-02"), description: "Risk management summit — Singapore",       status: "PENDING" },
+    { employeeId: g("m.ross@apex.com").empId,    category: "TRAVEL",   amount: 22000, date: new Date("2026-05-02"), description: "Risk management summit â€” Singapore",       status: "PENDING" },
     { employeeId: g("l.morgan@apex.com").empId,  category: "EQUIPMENT",amount: 15000, date: new Date("2026-04-18"), description: "Bloomberg terminal subscription",          status: "APPROVED", reviewedAt: new Date("2026-04-18") },
     { employeeId: g("d.wu@apex.com").empId,      category: "TRAINING", amount: 18000, date: new Date("2026-05-05"), description: "Quantitative finance certification",       status: "PENDING" },
   ]});
@@ -660,10 +660,10 @@ async function seedApex(hash: string) {
   return org.id;
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function main() {
-  console.log("🌱 Seeding database — 3 organisations…\n");
+  console.log("ðŸŒ± Seeding database â€” 3 organisationsâ€¦\n");
 
   // Wipe all data in reverse dependency order
   await db.auditLog.deleteMany();
@@ -696,23 +696,23 @@ async function main() {
 
   const hash = await bcrypt.hash("password123", 12);
 
-  console.log("Seeding Org 1: Unikove Technologies…");
-  await seedUnikove(hash);
-  console.log("  ✅ Unikove Technologies — 27 employees");
+  console.log("Seeding Org 1: Monja Technologiesâ€¦");
+  await seedMonja(hash);
+  console.log("  âœ… Monja Technologies â€” 27 employees");
 
-  console.log("Seeding Org 2: Meridian Health Systems…");
+  console.log("Seeding Org 2: Meridian Health Systemsâ€¦");
   await seedMeridian(hash);
-  console.log("  ✅ Meridian Health Systems — 10 employees");
+  console.log("  âœ… Meridian Health Systems â€” 10 employees");
 
-  console.log("Seeding Org 3: Apex Financial Group…");
+  console.log("Seeding Org 3: Apex Financial Groupâ€¦");
   await seedApex(hash);
-  console.log("  ✅ Apex Financial Group — 8 employees");
+  console.log("  âœ… Apex Financial Group â€” 8 employees");
 
-  console.log("\n✅ Seed complete — 3 organisations, 45 employees total\n");
-  console.log("📋 Demo accounts (all passwords: password123)");
-  console.log("  Unikove    : admin@unikove.com      (Super Admin)");
-  console.log("               james.williams@unikove.com  (Manager)");
-  console.log("               sarah.mitchell@unikove.com  (Employee)");
+  console.log("\nâœ… Seed complete â€” 3 organisations, 45 employees total\n");
+  console.log("ðŸ“‹ Demo accounts (all passwords: password123)");
+  console.log("  Monja    : admin@Monja.com      (Super Admin)");
+  console.log("               james.williams@Monja.com  (Manager)");
+  console.log("               sarah.mitchell@Monja.com  (Employee)");
   console.log("  Meridian   : admin@meridian.com     (Super Admin)");
   console.log("               dr.kane@meridian.com   (Manager / CMO)");
   console.log("  Apex       : admin@apex.com         (Super Admin)");

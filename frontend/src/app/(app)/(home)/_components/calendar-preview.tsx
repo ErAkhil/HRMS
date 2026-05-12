@@ -1,120 +1,116 @@
 import Link from "next/link";
-
-const EVENTS = [
-  {
-    title: "All-Hands Meeting",
-    time: "10:00 AM",
-    duration: "1h",
-    type: "meeting",
-    participants: 48,
-  },
-  {
-    title: "Q2 Performance Review",
-    time: "2:00 PM",
-    duration: "30m",
-    type: "review",
-    participants: 3,
-  },
-  {
-    title: "Daniel Park — Leave",
-    time: "All day",
-    duration: "",
-    type: "leave",
-    participants: 0,
-  },
-  {
-    title: "Payroll Submission",
-    time: "5:00 PM",
-    duration: "",
-    type: "deadline",
-    participants: 0,
-  },
-  {
-    title: "New Hire Onboarding",
-    time: "Tomorrow 9:00 AM",
-    duration: "2h",
-    type: "onboarding",
-    participants: 5,
-  },
-];
+import type { CalendarData } from "@/lib/actions/reports";
 
 const TYPE_STYLE: Record<string, { bar: string; badge: string; label: string }> = {
-  meeting: {
-    bar: "bg-primary-500",
-    badge: "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
-    label: "Meeting",
-  },
-  review: {
-    bar: "bg-violet-DEFAULT",
-    badge: "bg-violet-light text-violet-dark dark:bg-violet-dark/20 dark:text-violet-300",
-    label: "Review",
-  },
   leave: {
-    bar: "bg-amber",
+    bar: "bg-amber-dark",
     badge: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
     label: "Leave",
   },
-  deadline: {
-    bar: "bg-rose",
+  task: {
+    bar: "bg-rose-dark",
     badge: "bg-rose-light text-rose-dark dark:bg-rose-dark/20 dark:text-rose",
-    label: "Deadline",
-  },
-  onboarding: {
-    bar: "bg-emerald",
-    badge: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
-    label: "Onboarding",
+    label: "Due",
   },
 };
 
-export function CalendarPreview() {
+interface Props {
+  calendarData: CalendarData;
+}
+
+function getCurrentWeekDays(): { label: string; date: number; isToday: boolean }[] {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diffToMon);
+
+  const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
+  return DAY_LABELS.map((label, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return {
+      label,
+      date: d.getDate(),
+      isToday: d.toDateString() === now.toDateString(),
+    };
+  });
+}
+
+export function CalendarPreview({ calendarData }: Readonly<Props>) {
+  const weekDays = getCurrentWeekDays();
+  const todayStr = new Date().toDateString();
+
+  const todayLeaves = calendarData.leaveEvents.filter((e) => {
+    const start = new Date(e.startDate);
+    const end = new Date(e.endDate);
+    const now = new Date();
+    return start <= now && now <= end && e.status === "APPROVED";
+  });
+
+  const todayTasks = calendarData.taskEvents.filter((e) => {
+    if (!e.dueDate) return false;
+    return new Date(e.dueDate).toDateString() === todayStr && e.status !== "DONE";
+  });
+
+  const events = [
+    ...todayLeaves.map((e) => ({
+      title: e.title,
+      time: "All day",
+      type: "leave" as const,
+    })),
+    ...todayTasks.map((e) => ({
+      title: e.title,
+      time: `Due today · ${e.priority}`,
+      type: "task" as const,
+    })),
+  ];
+
   return (
     <div className="flex h-full flex-col card-p">
       <div className="flex items-center justify-between">
-        <h3 className="section-title">Today's Schedule</h3>
+        <h3 className="section-title">Today&apos;s Schedule</h3>
         <Link href="/calendar" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
           Calendar
         </Link>
       </div>
 
-      {/* Mini month strip */}
       <div className="mt-3 flex gap-1">
-        {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+        {weekDays.map((d, i) => (
           <div
             key={i}
-            className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-[10px] font-medium ${i === 2 ? "bg-primary-600 text-white" : "text-dark-5 dark:text-dark-6"}`}
+            className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-[10px] font-medium ${
+              d.isToday ? "bg-primary-600 text-white" : "text-dark-5 dark:text-dark-6"
+            }`}
           >
-            <span>{d}</span>
-            <span className={`mt-0.5 font-bold ${i === 2 ? "text-white" : "text-dark dark:text-white"}`}>
-              {[5, 6, 7, 8, 9, 10, 11][i]}
+            <span>{d.label}</span>
+            <span className={`mt-0.5 font-bold ${d.isToday ? "text-white" : "text-dark dark:text-white"}`}>
+              {d.date}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Events */}
       <ul className="mt-4 flex-1 space-y-2.5 overflow-y-auto">
-        {EVENTS.map((ev, i) => {
-          const style = TYPE_STYLE[ev.type];
-          return (
-            <li key={i} className="flex items-start gap-2.5">
-              <div className={`mt-0.5 h-full w-0.5 shrink-0 self-stretch rounded-full ${style.bar}`} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-dark dark:text-white">{ev.title}</p>
-                <div className="mt-0.5 flex items-center gap-2">
-                  <span className="text-[10px] text-dark-5 dark:text-dark-6">{ev.time}{ev.duration ? ` · ${ev.duration}` : ""}</span>
-                  {ev.participants > 0 && (
-                    <span className="text-[10px] text-dark-5 dark:text-dark-6">
-                      · {ev.participants} attendees
-                    </span>
-                  )}
+        {events.length === 0 ? (
+          <li className="py-4 text-center text-xs text-dark-5 dark:text-dark-6">No events today.</li>
+        ) : (
+          events.map((ev, i) => {
+            const style = TYPE_STYLE[ev.type];
+            return (
+              <li key={i} className="flex items-start gap-2.5">
+                <div className={`mt-0.5 w-0.5 self-stretch shrink-0 rounded-full ${style.bar}`} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-dark dark:text-white">{ev.title}</p>
+                  <span className="text-[10px] text-dark-5 dark:text-dark-6">{ev.time}</span>
                 </div>
-              </div>
-              <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${style.badge}`}>
-                {style.label}
-              </span>
-            </li>
-          );
-        })}
+                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${style.badge}`}>
+                  {style.label}
+                </span>
+              </li>
+            );
+          })
+        )}
       </ul>
     </div>
   );

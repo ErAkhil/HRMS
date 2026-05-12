@@ -11,6 +11,11 @@ const goalSchema = z.object({
   dueDate: z.string().optional(),
 });
 
+const reviewCycleSchema = z.object({
+  period: z.string().min(1),
+  type: z.string().min(1),
+});
+
 export type SerializedGoal = {
   id: string;
   title: string;
@@ -73,6 +78,23 @@ export type TeamPerformanceSummary = {
   distribution: { bucket: string; count: number }[];
   attentionEmployees: { name: string; score: number; dept: string }[];
 };
+
+export async function scheduleReview(data: { type: string; period: string; notes?: string }) {
+  await requireAuth();
+  await api.post<unknown>("/performance/reviews/self", data);
+  revalidatePath("/performance");
+}
+
+export async function createReviewCycle(data: z.infer<typeof reviewCycleSchema>) {
+  await requireRole("SUPER_ADMIN", "HR_ADMIN", "MANAGER");
+
+  const parsed = reviewCycleSchema.safeParse(data);
+  if (!parsed.success) throw new Error("Invalid data");
+
+  const result = await api.post<{ created: number }>("/performance/reviews", parsed.data);
+  revalidatePath("/performance/reviews");
+  return result;
+}
 
 export async function getMyGoals(): Promise<SerializedGoal[]> {
   await requireAuth();

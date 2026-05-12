@@ -83,7 +83,32 @@ export function CertificationsClient({ certifications }: Readonly<{ certificatio
                   )}
                 </div>
                 <button
-                  onClick={() => setToast("Downloading certificate PDF...")}
+                  onClick={() => {
+                    const html = `<!DOCTYPE html><html><head><title>Certificate – ${cert.name}</title>
+<style>body{font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f9fafb}
+.cert{border:6px double #4f46e5;padding:48px 56px;max-width:600px;text-align:center;background:white}
+h1{font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:#6366f1;margin:0 0 24px}
+h2{font-size:28px;margin:0 0 8px;color:#111}
+.issuer{color:#555;font-size:16px;margin:0 0 32px}
+.credential{font-family:monospace;font-size:11px;color:#888;margin:24px 0 0}
+.dates{display:flex;gap:32px;justify-content:center;margin:24px 0;font-size:13px;color:#555}
+.seal{width:60px;height:60px;border-radius:50%;background:#eff6ff;border:2px solid #4f46e5;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px}
+@media print{body{background:white}}</style></head><body>
+<div class="cert">
+<div class="seal">🏅</div>
+<h1>Certificate of Achievement</h1>
+<h2>${cert.name}</h2>
+<p class="issuer">Issued by ${cert.issuer}</p>
+<div class="dates">
+<span>Earned: ${formatDate(cert.earnedAt)}</span>
+${cert.expiresAt ? `<span>Expires: ${formatDate(cert.expiresAt)}</span>` : "<span>No expiry</span>"}
+</div>
+${cert.credential ? `<p class="credential">Credential ID: ${cert.credential}</p>` : ""}
+</div>
+<script>window.onload=()=>{window.print()}</script></body></html>`;
+                    const w = window.open("", "_blank");
+                    if (w) { w.document.write(html); w.document.close(); }
+                  }}
                   className="btn-secondary w-full py-1.5 text-xs"
                 >
                   Download Certificate

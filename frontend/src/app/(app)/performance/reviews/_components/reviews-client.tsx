@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
+import { createReviewCycle } from "@/lib/actions/performance";
 
 type Review = {
   id: string;
@@ -31,14 +32,42 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
   const [filterStatus, setFilterStatus] = useState("All");
   const [cycleName, setCycleName] = useState("");
   const [reviewType, setReviewType] = useState("Quarterly");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  function handleCreate() {
+    if (!cycleName.trim()) { setToast("Cycle name is required"); return; }
+    startTransition(async () => {
+      try {
+        const result = await createReviewCycle({ period: cycleName.trim(), type: reviewType });
+        setShowModal(false);
+        setCycleName("");
+        setReviewType("Quarterly");
+        setToast(`Review cycle created — ${result.created} review${result.created !== 1 ? "s" : ""} scheduled`);
+        router.refresh();
+      } catch (err) {
+        setToast(err instanceof Error ? err.message : "Failed to create review cycle");
+      }
+    });
+  }
 
   const filtered = reviews.filter((r) => filterStatus === "All" || r.status === filterStatus);
   const pending = reviews.filter((r) => r.status === "PENDING").length;
   const completed = reviews.filter((r) => r.status === "COMPLETED").length;
   const avgScore = reviews.filter((r) => r.score !== null).length > 0
     ? Math.round(reviews.filter((r) => r.score !== null).reduce((s, r) => s + (r.score ?? 0), 0) / reviews.filter((r) => r.score !== null).length)
+    : 0;
+
+  const activePeriod = (() => {
+    const freq: Record<string, number> = {};
+    for (const r of reviews) {
+      if (r.status !== "COMPLETED") freq[r.period] = (freq[r.period] ?? 0) + 1;
+    }
+    return Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? reviews[0]?.period ?? null;
+  })();
+  const activePeriodReviews = activePeriod ? reviews.filter((r) => r.period === activePeriod) : [];
+  const activePeriodCompleted = activePeriodReviews.filter((r) => r.status === "COMPLETED").length;
+  const activePeriodPct = activePeriodReviews.length > 0
+    ? Math.round((activePeriodCompleted / activePeriodReviews.length) * 100)
     : 0;
 
   return (
@@ -73,30 +102,36 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
       </div>
 
       {/* Active cycle banner */}
-      <div className="rounded-xl p-6 text-white" style={{ background: "linear-gradient(135deg, #4F46E5, #8B5CF6)" }}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white">Active</span>
-            <h2 className="mt-1 text-xl font-bold text-white">Q2 2026 Performance Review</h2>
-            <p className="mt-1 text-sm text-white/70">May 1 – May 31, 2026</p>
+      {activePeriod && (
+        <div className="rounded-xl p-6 text-white" style={{ background: "linear-gradient(135deg, #4F46E5, #8B5CF6)" }}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white">
+                {activePeriodPct === 100 ? "Completed" : "Active"}
+              </span>
+              <h2 className="mt-1 text-xl font-bold text-white">{activePeriod}</h2>
+              <p className="mt-1 text-sm text-white/70">
+                {activePeriodCompleted} of {activePeriodReviews.length} reviews completed
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/performance")}
+              className="self-start rounded-lg bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30"
+            >
+              View My Review
+            </button>
           </div>
-          <button
-            onClick={() => router.push("/performance")}
-            className="self-start rounded-lg bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/30"
-          >
-            View My Review
-          </button>
+          <div className="mt-4">
+            <div className="mb-1.5 flex justify-between">
+              <span className="text-sm text-white/80">Cycle Completion</span>
+              <span className="text-sm font-bold text-white">{activePeriodPct}%</span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/20">
+              <div className="h-full rounded-full bg-white" style={{ width: `${activePeriodPct}%` }} />
+            </div>
+          </div>
         </div>
-        <div className="mt-4">
-          <div className="mb-1.5 flex justify-between">
-            <span className="text-sm text-white/80">Overall Completion</span>
-            <span className="text-sm font-bold text-white">{reviews.length > 0 ? Math.round((completed / reviews.length) * 100) : 0}%</span>
-          </div>
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/20">
-            <div className="h-full rounded-full bg-white" style={{ width: `${reviews.length > 0 ? Math.round((completed / reviews.length) * 100) : 0}%` }} />
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Table */}
       <div className="card overflow-hidden">
@@ -176,7 +211,7 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="label-field mb-1.5">Cycle Name</label>
+                <label className="label-field mb-1.5">Cycle Name <span className="text-rose-500">*</span></label>
                 <input type="text" value={cycleName} onChange={(e) => setCycleName(e.target.value)} placeholder="e.g. Q3 2026 Review" className="input-field h-9 w-full" />
               </div>
               <div>
@@ -187,20 +222,13 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
                   <option value="Quarterly">Quarterly</option>
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="label-field mb-1.5">Start Date</label>
-                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input-field h-9 w-full" />
-                </div>
-                <div>
-                  <label className="label-field mb-1.5">End Date</label>
-                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="input-field h-9 w-full" />
-                </div>
-              </div>
+              <p className="text-xs text-dark-5 dark:text-dark-6">This will create a pending review for every active employee, assigned to their manager.</p>
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="btn-secondary">Cancel</button>
-              <button onClick={() => { setShowModal(false); setToast("Review cycle created!"); router.refresh(); }} className="btn-primary">Create</button>
+              <button onClick={() => setShowModal(false)} className="btn-secondary" disabled={isPending}>Cancel</button>
+              <button onClick={handleCreate} disabled={isPending} className="btn-primary disabled:opacity-60">
+                {isPending ? "Creating…" : "Create"}
+              </button>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { TaskPriority } from '@prisma/client';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 import type { CreateTaskDto } from './dto/create-task.dto';
 import type { CreateProjectDto } from './dto/create-project.dto';
@@ -126,7 +127,7 @@ export class TasksService {
       where: { id: taskId, orgId: user.orgId },
       data: {
         ...(dto.title !== undefined && { title: dto.title }),
-        ...(dto.priority !== undefined && { priority: dto.priority }),
+        ...(dto.priority !== undefined && { priority: dto.priority as TaskPriority }),
         ...(dto.dueDate !== undefined && {
           dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
         }),
