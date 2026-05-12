@@ -14,11 +14,16 @@ backend/dist/
 backend/*.tsbuildinfo
 
 # ─── Environment / secrets ───────────────────────────────────────────────────
+.env
+.env.*
 .env*.local
+frontend/.env
+frontend/.env.*
 frontend/.env*.local
 backend/.env
 backend/.env.*
 !backend/.env.example
+!frontend/.env.example
 
 # ─── Logs & runtime ──────────────────────────────────────────────────────────
 logs/

@@ -1,4 +1,4 @@
-# Unikove HRMS — Coding Standards
+# Monja HRMS — Coding Standards
 
 ## Stack
 Next.js 15 (App Router) · TypeScript · Tailwind CSS · Prisma 7 · Supabase (PostgreSQL) · NextAuth v5

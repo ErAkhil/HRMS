@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterOrgDto } from './dto/register-org.dto';
+import { GoogleSignInDto } from './dto/google-signin.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JwtPayload } from './types/jwt-payload.type';
@@ -31,8 +32,8 @@ export class AuthController {
   @Post('google-signin')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  googleSignIn(@Body() body: { email: string }) {
-    return this.auth.googleSignIn(body.email);
+  googleSignIn(@Body() dto: GoogleSignInDto) {
+    return this.auth.googleSignIn(dto.email);
   }
 
   @Post('register-org')
