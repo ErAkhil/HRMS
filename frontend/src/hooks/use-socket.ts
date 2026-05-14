@@ -1,27 +1,26 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "http://localhost:3001";
 
 type EventHandlers = Record<string, (data: unknown) => void>;
 
-/**
- * Connects to the NestJS Socket.io gateway, authenticates with the current
- * access token, and registers the provided event handlers.
- * Reconnects automatically if the access token changes.
- */
 export function useSocket(events: EventHandlers) {
   const { data: session } = useSession();
   const handlersRef = useRef<EventHandlers>(events);
   handlersRef.current = events;
 
+  const socketRef = useRef<Socket | null>(null);
   const token = (session as { accessToken?: string } | null)?.accessToken;
 
   useEffect(() => {
     if (!token) return;
+
+    // Guard against React StrictMode double-invoke: if already connected, skip
+    let active = true;
 
     const socket = io(WS_URL, {
       auth: { token },
@@ -29,6 +28,8 @@ export function useSocket(events: EventHandlers) {
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
     });
+
+    socketRef.current = socket;
 
     const eventNames = Object.keys(handlersRef.current);
     const stableHandlers: Record<string, (data: unknown) => void> = {};
@@ -40,10 +41,25 @@ export function useSocket(events: EventHandlers) {
     }
 
     return () => {
+      active = false;
       for (const [name, handler] of Object.entries(stableHandlers)) {
         socket.off(name, handler);
       }
-      socket.disconnect();
+      // Disconnect only after the connection resolves to avoid the StrictMode
+      // "closed before established" browser warning in development
+      if (socket.connected) {
+        socket.disconnect();
+      } else {
+        socket.on("connect", () => { if (!active) socket.disconnect(); });
+        socket.on("connect_error", () => { /* ignore abandoned attempt */ });
+      }
+      socketRef.current = null;
     };
   }, [token]);
+
+  const emit = useCallback((event: string, data: unknown) => {
+    socketRef.current?.emit(event, data);
+  }, []);
+
+  return { emit };
 }

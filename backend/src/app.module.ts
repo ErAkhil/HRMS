@@ -24,6 +24,7 @@ import { AdminModule } from './admin/admin.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
+import { DmModule } from './dm/dm.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { ReimbursementsModule } from './reimbursements/reimbursements.module';
 import { AiContextModule } from './ai-context/ai-context.module';
@@ -67,6 +68,7 @@ import { HealthModule } from './health/health.module';
     OrganizationsModule,
     DepartmentsModule,
     CollaborationModule,
+    DmModule,
     OnboardingModule,
     ReimbursementsModule,
     AiContextModule,

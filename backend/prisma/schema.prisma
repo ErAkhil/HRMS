@@ -609,6 +609,31 @@ model Message {
   @@map("messages")
 }
 
+model DirectConversation {
+  id        String          @id @default(cuid())
+  orgId     String
+  user1Id   String
+  user2Id   String
+  createdAt DateTime        @default(now())
+  messages  DirectMessage[]
+
+  @@unique([user1Id, user2Id])
+  @@map("direct_conversations")
+}
+
+model DirectMessage {
+  id             String             @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  readAt         DateTime?
+  createdAt      DateTime           @default(now())
+
+  conversation   DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("direct_messages")
+}
+
 // ─── Meetings ────────────────────────────────────────────────────────────────
 
 model Meeting {

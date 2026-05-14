@@ -92,6 +92,7 @@ export class CollaborationService {
     this.events.emitToOrg(user.orgId, 'message:new', {
       id: message.id,
       channelId,
+      channelName: channel.name,
       content: trimmed,
       senderId: user.sub,
       senderName: emp ? `${emp.firstName} ${emp.lastName}` : user.email.split('@')[0],
