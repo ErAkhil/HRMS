@@ -15,7 +15,7 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:8081', 'exp://localhost:8081'],
+    origin: (process.env.CORS_ORIGIN ?? 'http://localhost:3000').split(',').map(o => o.trim()),
     credentials: true,
   },
 })
@@ -24,15 +24,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    private jwt: JwtService,
-    private config: ConfigService,
-    private prisma: PrismaService,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
   ) {}
 
-  async handleConnection(client: Socket) {
-    const token =
-      client.handshake.auth?.token ||
-      (client.handshake.headers.authorization as string)?.split(' ')[1];
+  handleConnection(client: Socket) {
+    const authToken =
+      typeof client.handshake.auth?.token === 'string' ? client.handshake.auth.token : undefined;
+    const authorizationHeader = client.handshake.headers.authorization;
+    const bearerToken =
+      typeof authorizationHeader === 'string' ? authorizationHeader.split(' ')[1] : undefined;
+    const token = authToken ?? bearerToken;
 
     if (!token) {
       client.disconnect();
@@ -40,22 +43,28 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
+      const secret = this.config.get<string>('JWT_ACCESS_SECRET');
+      if (!secret) {
+        client.disconnect();
+        return;
+      }
+
       const payload = this.jwt.verify<JwtPayload>(token, {
-        secret: this.config.get<string>('JWT_ACCESS_SECRET'),
+        secret,
       });
-      client.data.user = payload;
-      client.join(`org:${payload.orgId}`);
-      client.join(`user:${payload.sub}`);
+      this.setSocketUser(client, payload);
+      void client.join(`org:${payload.orgId}`);
+      void client.join(`user:${payload.sub}`);
     } catch {
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    const user = client.data.user as JwtPayload | undefined;
+    const user = this.getSocketUser(client);
     if (user) {
-      client.leave(`org:${user.orgId}`);
-      client.leave(`user:${user.sub}`);
+      void client.leave(`org:${user.orgId}`);
+      void client.leave(`user:${user.sub}`);
     }
   }
 
@@ -64,29 +73,75 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('pong', data);
   }
 
+  // ─── Channel management ──────────────────────────────────────────────────────
+
+  @SubscribeMessage('channel:join')
+  async handleChannelJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { channelId: string },
+  ) {
+    const user = this.getSocketUser(client);
+    if (!user) return;
+
+    const channel = await this.prisma.channel.findFirst({
+      where: { id: data.channelId, orgId: user.orgId },
+    });
+    if (channel) {
+      void client.join(`channel:${data.channelId}`);
+    }
+  }
+
+  @SubscribeMessage('channel:leave')
+  handleChannelLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { channelId: string },
+  ) {
+    void client.leave(`channel:${data.channelId}`);
+  }
+
   // ─── Call signaling ──────────────────────────────────────────────────────────
 
   @SubscribeMessage('call:invite')
   handleCallInvite(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { calleeId: string; conversationId: string; type: 'audio' | 'video'; callerName: string },
+    @MessageBody() data: { calleeId?: string; channelId?: string; channelName?: string; conversationId?: string; type: 'audio' | 'video'; callerName: string },
   ) {
-    const caller = client.data.user as JwtPayload;
-    this.server.to(`user:${data.calleeId}`).emit('call:invite', {
-      callerId: caller.sub,
-      callerName: data.callerName,
-      conversationId: data.conversationId,
-      type: data.type,
-    });
+    const caller = this.getSocketUser(client);
+    if (!caller) return;
+
+    if (data.calleeId) {
+      this.server.to(`user:${data.calleeId}`).emit('call:invite', {
+        callerId: caller.sub,
+        callerName: data.callerName,
+        conversationId: data.conversationId,
+        type: data.type,
+      });
+      return;
+    }
+
+    if (data.channelId) {
+      client.broadcast.to(`org:${caller.orgId}`).emit('call:invite', {
+        callerId: caller.sub,
+        callerName: data.callerName,
+        channelId: data.channelId,
+        channelName: data.channelName ?? null,
+        type: data.type,
+      });
+    }
   }
 
   @SubscribeMessage('call:accepted')
   handleCallAccepted(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { callerId: string },
+    @MessageBody() data: { callerId: string; conversationId?: string; channelId?: string },
   ) {
+    const user = this.getSocketUser(client);
+    if (!user) return;
+
     this.server.to(`user:${data.callerId}`).emit('call:accepted', {
-      calleeId: (client.data.user as JwtPayload).sub,
+      calleeId: user.sub,
+      conversationId: data.conversationId ?? null,
+      channelId: data.channelId ?? null,
     });
   }
 
@@ -95,7 +150,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { callerId: string; conversationId?: string; callType?: 'audio' | 'video' },
   ) {
-    const callee = client.data.user as JwtPayload;
+    const callee = this.getSocketUser(client);
+    if (!callee) return;
+
     this.server.to(`user:${data.callerId}`).emit('call:rejected', {
       calleeId: callee.sub,
     });
@@ -114,55 +171,100 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('call:offer')
   handleCallOffer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { targetId: string; offer: RTCSessionDescriptionInit },
+    @MessageBody() data: { targetId?: string; channelId?: string; offer: RTCSessionDescriptionInit },
   ) {
-    this.server.to(`user:${data.targetId}`).emit('call:offer', {
+    const user = this.getSocketUser(client);
+    if (!user) return;
+
+    const payload = {
       offer: data.offer,
-      fromId: (client.data.user as JwtPayload).sub,
-    });
+      fromId: user.sub,
+    };
+
+    if (data.targetId) {
+      this.server.to(`user:${data.targetId}`).emit('call:offer', payload);
+    } else if (data.channelId) {
+      this.server.to(`channel:${data.channelId}`).emit('call:offer', {
+        ...payload,
+        channelId: data.channelId,
+      });
+    }
   }
 
   @SubscribeMessage('call:answer')
   handleCallAnswer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { targetId: string; answer: RTCSessionDescriptionInit },
+    @MessageBody() data: { targetId?: string; channelId?: string; answer: RTCSessionDescriptionInit },
   ) {
-    this.server.to(`user:${data.targetId}`).emit('call:answer', {
+    const user = this.getSocketUser(client);
+    if (!user) return;
+
+    const payload = {
       answer: data.answer,
-      fromId: (client.data.user as JwtPayload).sub,
-    });
+      fromId: user.sub,
+    };
+
+    if (data.targetId) {
+      this.server.to(`user:${data.targetId}`).emit('call:answer', payload);
+    } else if (data.channelId) {
+      this.server.to(`channel:${data.channelId}`).emit('call:answer', {
+        ...payload,
+        channelId: data.channelId,
+      });
+    }
   }
 
   @SubscribeMessage('call:ice-candidate')
   handleIceCandidate(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { targetId: string; candidate: RTCIceCandidateInit },
+    @MessageBody() data: { targetId?: string; channelId?: string; candidate: RTCIceCandidateInit },
   ) {
-    this.server.to(`user:${data.targetId}`).emit('call:ice-candidate', {
+    const user = this.getSocketUser(client);
+    if (!user) return;
+
+    const payload = {
       candidate: data.candidate,
-      fromId: (client.data.user as JwtPayload).sub,
-    });
+      fromId: user.sub,
+    };
+
+    if (data.targetId) {
+      this.server.to(`user:${data.targetId}`).emit('call:ice-candidate', payload);
+    } else if (data.channelId) {
+      this.server.to(`channel:${data.channelId}`).emit('call:ice-candidate', {
+        ...payload,
+        channelId: data.channelId,
+      });
+    }
   }
 
   @SubscribeMessage('call:end')
   async handleCallEnd(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { targetId: string; conversationId?: string; callType?: 'audio' | 'video'; duration?: number },
+    @MessageBody() data: { targetId?: string; channelId?: string; conversationId?: string; callType?: 'audio' | 'video'; duration?: number },
   ) {
-    const caller = client.data.user as JwtPayload;
-    this.server.to(`user:${data.targetId}`).emit('call:end', {
-      fromId: caller.sub,
-    });
-    if (data.conversationId) {
-      const duration = data.duration ?? 0;
-      await this.createCallStamp(
-        data.conversationId,
-        caller.sub,
-        data.callType ?? 'audio',
-        duration > 0 ? 'ended' : 'missed',
-        duration,
-        caller.orgId,
-      );
+    const caller = this.getSocketUser(client);
+    if (!caller) return;
+
+    if (data.targetId) {
+      this.server.to(`user:${data.targetId}`).emit('call:end', {
+        fromId: caller.sub,
+      });
+      if (data.conversationId) {
+        const duration = data.duration ?? 0;
+        await this.createCallStamp(
+          data.conversationId,
+          caller.sub,
+          data.callType ?? 'audio',
+          duration > 0 ? 'ended' : 'missed',
+          duration,
+          caller.orgId,
+        );
+      }
+    } else if (data.channelId) {
+      this.server.to(`channel:${data.channelId}`).emit('call:end', {
+        fromId: caller.sub,
+        channelId: data.channelId,
+      });
     }
   }
 
@@ -223,5 +325,27 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch {
       // non-critical — call stamp failure should not crash the gateway
     }
+  }
+
+  private getSocketUser(client: Socket): JwtPayload | undefined {
+    const data = client.data as Record<string, unknown>;
+    const candidate = data.user;
+    if (!this.isJwtPayload(candidate)) return undefined;
+    return candidate;
+  }
+
+  private setSocketUser(client: Socket, user: JwtPayload): void {
+    const data = client.data as Record<string, unknown>;
+    data.user = user;
+  }
+
+  private isJwtPayload(value: unknown): value is JwtPayload {
+    if (typeof value !== 'object' || value === null) return false;
+    const candidate = value as Partial<JwtPayload>;
+    return (
+      typeof candidate.sub === 'string' &&
+      typeof candidate.orgId === 'string' &&
+      typeof candidate.role === 'string'
+    );
   }
 }

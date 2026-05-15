@@ -3,12 +3,15 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import * as compression from 'compression';
+import compression from 'compression';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggerService } from './common/logger/logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const logger = new LoggerService();
+  app.useLogger(logger);
 
   // Security headers
   app.use(helmet({
@@ -19,16 +22,16 @@ async function bootstrap() {
   // Gzip responses
   app.use(compression());
 
+  // CORS configuration from environment
+  const allowedOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:3000').split(',').map(o => o.trim());
   app.enableCors({
-    origin: [
-      'http://localhost:3000',  // Next.js web
-      'http://localhost:8081',  // React Native metro bundler
-      'exp://localhost:8081',   // Expo Go
-    ],
+    origin: allowedOrigins,
     credentials: true,
   });
+  logger.log(`CORS enabled for origins: ${allowedOrigins.join(', ')}`);
 
-  app.setGlobalPrefix('api');
+  // API versioning: v1 prefix
+  app.setGlobalPrefix('api/v1');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -57,10 +60,10 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port);
-  console.log(`API running on http://localhost:${port}/api`);
+  logger.log(`API running on http://localhost:${port}/api/v1`);
   if (process.env.NODE_ENV !== 'production') {
-    console.log(`Swagger docs at http://localhost:${port}/api/docs`);
+    logger.log(`Swagger docs at http://localhost:${port}/api/docs`);
   }
 }
 
-bootstrap();
+void bootstrap();

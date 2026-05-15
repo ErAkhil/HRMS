@@ -20,7 +20,7 @@ const EXIT_TASKS = [
 
 @Injectable()
 export class OnboardingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getRecords(user: JwtPayload) {
     const today = new Date();
@@ -194,7 +194,7 @@ export class OnboardingService {
     };
   }
 
-  async createOrUpdate(dto: CreateOnboardingDto, user: JwtPayload) {
+  async createOrUpdate(dto: CreateOnboardingDto) {
     const existing = await this.prisma.onboardingRecord.findFirst({
       where: { employeeId: dto.employeeId },
       select: { id: true },

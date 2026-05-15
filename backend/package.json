@@ -1,12 +1,16 @@
-﻿{
+{
   "name": "Monja-api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "nest build",
+    "lint": "eslint src prisma --ext .ts",
+    "lint:fix": "eslint src prisma --ext .ts --fix",
+    "lint:ci": "eslint src prisma --ext .ts",
     "start": "node dist/src/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
+    "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:seed": "tsx prisma/seed.ts"
@@ -34,9 +38,11 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.5",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
     "@nestjs/cli": "^10.4.0",
     "@nestjs/schematics": "^10.1.0",
     "@types/bcryptjs": "^2.4.6",
@@ -45,10 +51,13 @@
     "@types/helmet": "^0.0.48",
     "@types/node": "^20.14.0",
     "@types/passport-jwt": "^4.0.1",
+    "eslint": "^9.27.0",
+    "globals": "^16.1.0",
     "prisma": "^7.0.0",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "typescript-eslint": "^8.32.0",
     "typescript": "^5.5.0"
   }
 }

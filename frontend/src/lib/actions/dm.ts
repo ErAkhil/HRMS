@@ -21,8 +21,13 @@ export type DmMessage = {
   senderName: string;
   senderAvatar: string | null;
   isMe: boolean;
-  readAt: string | null;
   createdAt: string;
+  readBy: Array<{
+    userId: string;
+    name: string;
+    avatar: string | null;
+    readAt: string;
+  }>;
 };
 
 export type DmUser = {

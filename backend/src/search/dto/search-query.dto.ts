@@ -1,7 +1,10 @@
-import { IsString, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
 export class SearchQueryDto {
+  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MinLength(2)
+  @MaxLength(64)
   q: string;
 }

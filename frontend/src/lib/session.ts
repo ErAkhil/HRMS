@@ -1,14 +1,17 @@
 import { auth } from "@/auth";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import type { UserRole, Plan } from "@/types/domain";
 
+const getCachedSession = cache(async () => auth());
+
 export async function getSession() {
-  const session = await auth();
+  const session = await getCachedSession();
   return session;
 }
 
 export async function requireAuth() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user) redirect("/login");
   return session.user;
 }

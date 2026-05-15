@@ -3,7 +3,6 @@ import {
   ConflictException,
   NotFoundException,
   ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { hash } from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,8 +14,8 @@ import type { UpdatePlanDto } from './dto/update-plan.dto';
 @Injectable()
 export class OrganizationsService {
   constructor(
-    private prisma: PrismaService,
-    private audit: AuditService,
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
   ) {}
 
   async getAll() {
@@ -60,9 +59,9 @@ export class OrganizationsService {
       data: { name: dto.name, slug: dto.slug, plan: dto.plan },
     });
 
-    let newUser;
+    let newUserId: string;
     try {
-      newUser = await this.prisma.user.create({
+      const newUser = await this.prisma.user.create({
         data: {
           email: dto.adminEmail,
           passwordHash,
@@ -70,6 +69,7 @@ export class OrganizationsService {
           orgId: newOrg.id,
         },
       });
+      newUserId = newUser.id;
     } catch {
       await this.prisma.organization.delete({ where: { id: newOrg.id } }).catch(() => null);
       throw new ConflictException('Failed to create admin user — email may already be in use');
@@ -79,7 +79,7 @@ export class OrganizationsService {
       const empCount = await this.prisma.employee.count({ where: { orgId: newOrg.id } });
       await this.prisma.employee.create({
         data: {
-          userId: newUser.id,
+          userId: newUserId,
           orgId: newOrg.id,
           employeeCode: `EMP-${String(empCount + 1).padStart(4, '0')}`,
           firstName,

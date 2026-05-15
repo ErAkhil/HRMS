@@ -1,14 +1,14 @@
 ﻿import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 (function loadEnv() {
   const envPath = path.resolve(process.cwd(), ".env");
   if (!fs.existsSync(envPath)) return;
   for (const line of fs.readFileSync(envPath, "utf-8").split("\n")) {
-    const m = line.match(/^([^=]+)=(.*)$/);
+    const m = /^([^=]+)=(.*)$/.exec(line);
     if (m && !process.env[m[1].trim()])
       process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
   }
@@ -16,6 +16,8 @@ import * as path from "path";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const db = new PrismaClient({ adapter });
+
+type OrgUserRole = "SUPER_ADMIN" | "MANAGER" | "EMPLOYEE";
 
 // â”€â”€â”€ Shared helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -38,27 +40,47 @@ async function seedLeaveBalances(empIds: string[]) {
   await db.leaveBalance.createMany({ data: records, skipDuplicates: true });
 }
 
+type AttendanceStatusValue = "PRESENT" | "ABSENT" | "LATE" | "REMOTE" | "HALF_DAY";
+
+function pickStatus(d: number, r: number): AttendanceStatusValue {
+  if (d === 0) return "PRESENT";
+  if (r < 0.05) return "ABSENT";
+  if (r < 0.12) return "LATE";
+  if (r < 0.18) return "REMOTE";
+  if (r < 0.2)  return "HALF_DAY";
+  return "PRESENT";
+}
+
+function attendanceCheckIn(date: Date, status: AttendanceStatusValue): Date | null {
+  if (status === "ABSENT") return null;
+  const offsetHours = status === "LATE" ? 10.5 : 9;
+  return new Date(date.getTime() + offsetHours * 3600000);
+}
+
+function attendanceCheckOut(date: Date, status: AttendanceStatusValue): Date | null {
+  if (status === "ABSENT") return null;
+  if (status === "HALF_DAY") return new Date(date.getTime() + 13 * 3600000);
+  return new Date(date.getTime() + 18 * 3600000);
+}
+
+function attendanceHours(status: AttendanceStatusValue): number | null {
+  if (status === "ABSENT") return null;
+  if (status === "HALF_DAY") return 4;
+  if (status === "LATE") return 7.5;
+  return 9;
+}
+
 async function seedAttendance(empIds: string[]) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const records: { employeeId: string; date: Date; checkIn: Date | null; checkOut: Date | null; status: "PRESENT" | "ABSENT" | "LATE" | "REMOTE" | "HALF_DAY"; hoursWorked: number | null }[] = [];
+  const records: { employeeId: string; date: Date; checkIn: Date | null; checkOut: Date | null; status: AttendanceStatusValue; hoursWorked: number | null }[] = [];
   for (let d = 0; d < 30; d++) {
     const date = new Date(today);
     date.setDate(date.getDate() - d);
     if (date.getDay() === 0 || date.getDay() === 6) continue;
     for (const id of empIds) {
-      const r = Math.random();
-      let status: "PRESENT" | "ABSENT" | "LATE" | "REMOTE" | "HALF_DAY" = "PRESENT";
-      if (d > 0) {
-        if (r < 0.05) status = "ABSENT";
-        else if (r < 0.12) status = "LATE";
-        else if (r < 0.18) status = "REMOTE";
-        else if (r < 0.20) status = "HALF_DAY";
-      }
-      const checkIn  = status !== "ABSENT" ? new Date(date.getTime() + (status === "LATE" ? 10.5 : 9) * 3600000) : null;
-      const checkOut = status === "ABSENT" ? null : status === "HALF_DAY" ? new Date(date.getTime() + 13 * 3600000) : new Date(date.getTime() + 18 * 3600000);
-      const hours    = status === "ABSENT" ? null : status === "HALF_DAY" ? 4 : status === "LATE" ? 7.5 : 9;
-      records.push({ employeeId: id, date, checkIn, checkOut, status, hoursWorked: hours });
+      const status = pickStatus(d, Math.random());
+      records.push({ employeeId: id, date, checkIn: attendanceCheckIn(date, status), checkOut: attendanceCheckOut(date, status), status, hoursWorked: attendanceHours(status) });
     }
   }
   await db.attendanceRecord.createMany({ data: records, skipDuplicates: true });
@@ -141,7 +163,7 @@ async function seedMonja(hash: string) {
   for (let i = 0; i < UNI_EMPS.length; i++) {
     const [email, role, deptName, firstName, lastName, title, salary, avatar, startDate, isHead] = UNI_EMPS[i];
     const user = await db.user.create({
-      data: { email, passwordHash: hash, role: role as "SUPER_ADMIN" | "MANAGER" | "EMPLOYEE", orgId: org.id },
+      data: { email, passwordHash: hash, role: role, orgId: org.id },
     });
     const emp = await db.employee.create({
       data: { userId: user.id, orgId: org.id, employeeCode: `EMP-${String(i + 1).padStart(4, "0")}`, firstName, lastName, email, title, departmentId: deptMap.get(deptName)!, salary, avatarUrl: avatar, startDate: new Date(startDate), employmentType: "Full-time" },
@@ -309,12 +331,13 @@ async function seedMonja(hash: string) {
   const uids = pairs.map((p) => p.userId);
   const getUid = (e: string) => uids[UNI_EMPS.findIndex((r) => r[0] === e)];
 
+  const adminUserId = getUid("admin@Monja.com");
   const [chGen, chEng, chProd, chSales, chRnd] = await Promise.all([
-    db.channel.create({ data: { orgId: org.id, name: "general",     isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "engineering", isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "product",     isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "sales",       isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "random",      isPrivate: false } }),
+    db.channel.create({ data: { orgId: org.id, name: "general",     isPrivate: false, createdBy: adminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "engineering", isPrivate: false, createdBy: adminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "product",     isPrivate: false, createdBy: adminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "sales",       isPrivate: false, createdBy: adminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "random",      isPrivate: false, createdBy: adminUserId } }),
   ]);
   await db.message.createMany({ data: [
     { channelId: chGen.id,  senderId: getUid("admin@Monja.com"),           content: "Good morning everyone! Hope you had a great weekend.",                    createdAt: new Date("2026-05-04T09:00:00") },
@@ -384,7 +407,7 @@ async function seedMeridian(hash: string) {
   const pairs = new Map<string, { empId: string; userId: string }>();
   for (let i = 0; i < MER_EMPS.length; i++) {
     const e = MER_EMPS[i];
-    const user = await db.user.create({ data: { email: e.email, passwordHash: hash, role: e.role as "SUPER_ADMIN" | "MANAGER" | "EMPLOYEE", orgId: org.id } });
+    const user = await db.user.create({ data: { email: e.email, passwordHash: hash, role: e.role as OrgUserRole, orgId: org.id } });
     const emp  = await db.employee.create({ data: { userId: user.id, orgId: org.id, employeeCode: `EMP-${String(i + 1).padStart(4, "0")}`, firstName: e.first, lastName: e.last, email: e.email, title: e.title, departmentId: deptMap.get(e.dept)!, salary: e.salary, avatarUrl: e.avatar, startDate: new Date(e.start), employmentType: "Full-time" } });
     pairs.set(e.email, { empId: emp.id, userId: user.id });
     if (e.isHead) await db.department.update({ where: { name_orgId: { name: e.dept, orgId: org.id } }, data: { headId: emp.id } });
@@ -479,10 +502,11 @@ async function seedMeridian(hash: string) {
   ]});
 
   const mUids = new Map(MER_EMPS.map((e) => [e.email, g(e.email).userId]));
+  const merAdminUserId = g("admin@meridian.com").userId;
   const [mGen, mClin, mAdmin] = await Promise.all([
-    db.channel.create({ data: { orgId: org.id, name: "general",  isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "clinical", isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "it-helpdesk", isPrivate: false } }),
+    db.channel.create({ data: { orgId: org.id, name: "general",    isPrivate: false, createdBy: merAdminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "clinical",   isPrivate: false, createdBy: merAdminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "it-helpdesk",isPrivate: false, createdBy: merAdminUserId } }),
   ]);
   await db.message.createMany({ data: [
     { channelId: mGen.id,  senderId: mUids.get("admin@meridian.com")!,    content: "Good morning team! Busy week ahead â€” let's stay coordinated.",        createdAt: new Date("2026-05-04T08:30:00") },
@@ -540,7 +564,7 @@ async function seedApex(hash: string) {
   const pairs = new Map<string, { empId: string; userId: string }>();
   for (let i = 0; i < APX_EMPS.length; i++) {
     const e = APX_EMPS[i];
-    const user = await db.user.create({ data: { email: e.email, passwordHash: hash, role: e.role as "SUPER_ADMIN" | "MANAGER" | "EMPLOYEE", orgId: org.id } });
+    const user = await db.user.create({ data: { email: e.email, passwordHash: hash, role: e.role as OrgUserRole, orgId: org.id } });
     const emp  = await db.employee.create({ data: { userId: user.id, orgId: org.id, employeeCode: `EMP-${String(i + 1).padStart(4, "0")}`, firstName: e.first, lastName: e.last, email: e.email, title: e.title, departmentId: deptMap.get(e.dept)!, salary: e.salary, avatarUrl: e.avatar, startDate: new Date(e.start), employmentType: "Full-time" } });
     pairs.set(e.email, { empId: emp.id, userId: user.id });
     if (e.isHead) await db.department.update({ where: { name_orgId: { name: e.dept, orgId: org.id } }, data: { headId: emp.id } });
@@ -634,10 +658,11 @@ async function seedApex(hash: string) {
   ]});
 
   const aUids = new Map(APX_EMPS.map((e) => [e.email, g(e.email).userId]));
+  const apxAdminUserId = g("admin@apex.com").userId;
   const [aGen, aTrade, aComp] = await Promise.all([
-    db.channel.create({ data: { orgId: org.id, name: "general",    isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "trading",    isPrivate: false } }),
-    db.channel.create({ data: { orgId: org.id, name: "compliance", isPrivate: false } }),
+    db.channel.create({ data: { orgId: org.id, name: "general",    isPrivate: false, createdBy: apxAdminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "trading",    isPrivate: false, createdBy: apxAdminUserId } }),
+    db.channel.create({ data: { orgId: org.id, name: "compliance", isPrivate: false, createdBy: apxAdminUserId } }),
   ]);
   await db.message.createMany({ data: [
     { channelId: aGen.id,   senderId: aUids.get("admin@apex.com")!,     content: "Q2 all-hands is Thursday at 5 PM. Attendance mandatory.",                  createdAt: new Date("2026-05-04T09:00:00") },

@@ -4,7 +4,7 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
 @Injectable()
 export class ReportsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getReportsData(user: JwtPayload) {
     const [totalEmployees, departments, openJobs, leaveStats, taskStats] = await Promise.all([
@@ -168,8 +168,8 @@ export class ReportsService {
         id: l.id,
         type: 'leave' as const,
         title: `${l.employee.firstName} ${l.employee.lastName.charAt(0)}.`,
-        status: l.status as string,
-        leaveType: l.leaveType as string,
+        status: l.status,
+        leaveType: l.leaveType,
         startDate: l.startDate.toISOString(),
         endDate: l.endDate.toISOString(),
       })),
@@ -177,8 +177,8 @@ export class ReportsService {
         id: t.id,
         type: 'task' as const,
         title: t.title,
-        status: t.status as string,
-        priority: t.priority as string,
+        status: t.status,
+        priority: t.priority,
         dueDate: t.dueDate?.toISOString() ?? '',
         assignee: t.assignee
           ? `${t.assignee.firstName} ${t.assignee.lastName.charAt(0)}.`

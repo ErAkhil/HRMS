@@ -8,7 +8,7 @@ import type { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private serializeTask(t: {
     id: string; title: string; description: string | null;
@@ -37,7 +37,7 @@ export class TasksService {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return rows.map(this.serializeTask);
+    return rows.map((row) => this.serializeTask(row));
   }
 
   async getOrgTasks(user: JwtPayload) {
@@ -49,7 +49,7 @@ export class TasksService {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return rows.map(this.serializeTask);
+    return rows.map((row) => this.serializeTask(row));
   }
 
   async getProjects(user: JwtPayload) {

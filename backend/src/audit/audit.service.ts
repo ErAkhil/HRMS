@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
@@ -18,7 +18,9 @@ interface LogFilters {
 
 @Injectable()
 export class AuditService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(AuditService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
 
   async log(user: JwtPayload, params: LogParams): Promise<void> {
     try {
@@ -34,8 +36,17 @@ export class AuditService {
           severity: params.severity ?? 'Info',
         },
       });
-    } catch {
-      // Audit failures must never surface to callers
+    } catch (error) {
+      this.logger.error(
+        `Failed to create audit log: ${params.action} for resource: ${params.resource}`,
+        {
+          userId: user.sub,
+          orgId: user.orgId,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
+      // Don't throw - audit failures should never impact application flow
+      // but they are now logged for operational visibility
     }
   }
 

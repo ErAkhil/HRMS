@@ -1,17 +1,34 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+import { validatePasswordStrength } from '../common/utils/password-validator';
 import type { JwtPayload } from './types/jwt-payload.type';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwt: JwtService,
-    private config: ConfigService,
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
   ) {}
+
+  private buildPayload(
+    user: { id: string; email: string; role: JwtPayload['role']; orgId: string },
+    org: { name: string; plan: JwtPayload['plan'] },
+    employeeId: string | null,
+  ): JwtPayload {
+    return {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      orgId: user.orgId,
+      orgName: org.name,
+      plan: org.plan,
+      employeeId,
+    };
+  }
 
   async login(email: string, password: string) {
     const user = await this.prisma.user.findUnique({
@@ -22,7 +39,7 @@ export class AuthService {
       },
     });
 
-    if (!user || !user.isActive) throw new UnauthorizedException('Invalid credentials');
+    if (!user?.isActive) throw new UnauthorizedException('Invalid credentials');
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
@@ -32,15 +49,7 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
-    const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-      orgId: user.orgId,
-      orgName: user.org.name,
-      plan: user.org.plan,
-      employeeId: user.employee?.id ?? null,
-    };
+    const payload = this.buildPayload(user, user.org, user.employee?.id ?? null);
 
     return {
       accessToken: this.signAccess(payload),
@@ -70,17 +79,9 @@ export class AuthService {
         },
       });
 
-      if (!user || !user.isActive) throw new UnauthorizedException();
+      if (!user?.isActive) throw new UnauthorizedException();
 
-      const newPayload: JwtPayload = {
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-        orgId: user.orgId,
-        orgName: user.org.name,
-        plan: user.org.plan,
-        employeeId: user.employee?.id ?? null,
-      };
+      const newPayload = this.buildPayload(user, user.org, user.employee?.id ?? null);
 
       return {
         accessToken: this.signAccess(newPayload),
@@ -122,22 +123,14 @@ export class AuthService {
       },
     });
 
-    if (!user || !user.isActive) throw new UnauthorizedException('No account found for this Google email. Contact your HR admin.');
+    if (!user?.isActive) throw new UnauthorizedException('No account found for this Google email. Contact your HR admin.');
 
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
 
-    const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-      orgId: user.orgId,
-      orgName: user.org.name,
-      plan: user.org.plan,
-      employeeId: user.employee?.id ?? null,
-    };
+    const payload = this.buildPayload(user, user.org, user.employee?.id ?? null);
 
     return {
       accessToken: this.signAccess(payload),
@@ -161,6 +154,15 @@ export class AuthService {
     firstName: string;
     lastName: string;
   }) {
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(data.password);
+    if (!passwordValidation.isValid) {
+      throw new BadRequestException({
+        message: 'Password does not meet strength requirements',
+        errors: passwordValidation.errors,
+      });
+    }
+
     const existing = await this.prisma.user.findUnique({ where: { email: data.email.toLowerCase() } });
     if (existing) throw new ConflictException('Email already registered');
 
@@ -195,15 +197,7 @@ export class AuthService {
       return { org, user, employee };
     });
 
-    const payload: JwtPayload = {
-      sub: result.user.id,
-      email: result.user.email,
-      role: result.user.role,
-      orgId: result.org.id,
-      orgName: result.org.name,
-      plan: result.org.plan,
-      employeeId: result.employee.id,
-    };
+    const payload = this.buildPayload(result.user, result.org, result.employee.id);
 
     return {
       accessToken: this.signAccess(payload),

@@ -7,8 +7,8 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 @Injectable()
 export class AttendanceService {
   constructor(
-    private prisma: PrismaService,
-    private events: EventsGateway,
+    private readonly prisma: PrismaService,
+    private readonly events: EventsGateway,
   ) {}
 
   private today() {
@@ -211,7 +211,7 @@ export class AttendanceService {
     return updated;
   }
 
-  async updateStatus(employeeId: string, date: string, status: AttendanceStatus, user: JwtPayload) {
+  async updateStatus(employeeId: string, date: string, status: AttendanceStatus) {
     const d = new Date(date);
     await this.prisma.attendanceRecord.upsert({
       where: { employeeId_date: { employeeId, date: d } },

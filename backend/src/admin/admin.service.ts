@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
@@ -8,8 +8,8 @@ import type { CreateWorkflowDto } from './dto/create-workflow.dto';
 @Injectable()
 export class AdminService {
   constructor(
-    private prisma: PrismaService,
-    private audit: AuditService,
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
   ) {}
 
   async getOrgUsers(user: JwtPayload) {
@@ -48,7 +48,7 @@ export class AdminService {
       select: { orgId: true, role: true },
     });
 
-    if (!target || target.orgId !== user.orgId) {
+    if (target?.orgId !== user.orgId) {
       throw new NotFoundException('User not found');
     }
 
@@ -71,7 +71,7 @@ export class AdminService {
       select: { orgId: true, isActive: true },
     });
 
-    if (!target || target.orgId !== user.orgId) {
+    if (target?.orgId !== user.orgId) {
       throw new NotFoundException('User not found');
     }
 
@@ -112,7 +112,7 @@ export class AdminService {
       select: { orgId: true, isEnabled: true },
     });
 
-    if (!wf || wf.orgId !== user.orgId) throw new NotFoundException('Workflow not found');
+    if (wf?.orgId !== user.orgId) throw new NotFoundException('Workflow not found');
 
     await this.prisma.workflow.update({
       where: { id: workflowId },

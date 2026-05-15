@@ -7,8 +7,8 @@ import type { SubmitClaimDto } from './dto/submit-claim.dto';
 @Injectable()
 export class ReimbursementsService {
   constructor(
-    private prisma: PrismaService,
-    private audit: AuditService,
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
   ) {}
 
   async getClaims(status: string | undefined, user: JwtPayload) {
@@ -51,7 +51,7 @@ export class ReimbursementsService {
       select: { id: true, employee: { select: { orgId: true } } },
     });
 
-    if (!existing || existing.employee.orgId !== user.orgId) {
+    if (existing?.employee?.orgId !== user.orgId) {
       throw new NotFoundException('Claim not found');
     }
 
@@ -59,11 +59,12 @@ export class ReimbursementsService {
       where: { id: claimId },
       data: { status: 'APPROVED', reviewedBy: user.sub, reviewedAt: new Date() },
     });
+    const amount = Number(claim.amount);
 
     await this.audit.log(user, {
       action: 'claim.approved',
       resource: `Claim ${claimId}`,
-      details: `Approved ₹${claim.amount}`,
+      details: `Approved claim amount ${amount.toFixed(2)}`,
       ipAddress,
     });
 
@@ -76,7 +77,7 @@ export class ReimbursementsService {
       select: { id: true, employee: { select: { orgId: true } } },
     });
 
-    if (!existing || existing.employee.orgId !== user.orgId) {
+    if (existing?.employee?.orgId !== user.orgId) {
       throw new NotFoundException('Claim not found');
     }
 
@@ -84,11 +85,12 @@ export class ReimbursementsService {
       where: { id: claimId },
       data: { status: 'REJECTED', reviewedBy: user.sub, reviewedAt: new Date() },
     });
+    const amount = Number(claim.amount);
 
     await this.audit.log(user, {
       action: 'claim.rejected',
       resource: `Claim ${claimId}`,
-      details: `Rejected claim ₹${claim.amount}`,
+      details: `Rejected claim amount ${amount.toFixed(2)}`,
       ipAddress,
     });
 

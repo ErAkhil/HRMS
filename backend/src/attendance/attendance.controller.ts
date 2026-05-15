@@ -10,7 +10,7 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 @Controller('attendance')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AttendanceController {
-  constructor(private attendance: AttendanceService) {}
+  constructor(private readonly attendance: AttendanceService) {}
 
   @Get('today')
   getTodayAttendance(@CurrentUser() user: JwtPayload) {
@@ -66,7 +66,7 @@ export class AttendanceController {
 
   @Patch('status')
   @Roles('HR_ADMIN', 'SUPER_ADMIN', 'MANAGER')
-  updateStatus(@Body() dto: UpdateAttendanceStatusDto, @CurrentUser() user: JwtPayload) {
-    return this.attendance.updateStatus(dto.employeeId, dto.date, dto.status, user);
+  updateStatus(@Body() dto: UpdateAttendanceStatusDto) {
+    return this.attendance.updateStatus(dto.employeeId, dto.date, dto.status);
   }
 }

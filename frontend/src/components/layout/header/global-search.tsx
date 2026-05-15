@@ -27,11 +27,21 @@ export function GlobalSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sequenceRef = useRef(0);
+  const localCacheRef = useRef<Map<string, { expiresAt: number; data: SearchResults }>>(new Map());
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResults>(EMPTY);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   // ⌘K / Ctrl+K to focus
   useEffect(() => {
@@ -42,8 +52,8 @@ export function GlobalSearch() {
         inputRef.current?.select();
       }
     }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    globalThis.addEventListener("keydown", onKeyDown);
+    return () => globalThis.removeEventListener("keydown", onKeyDown);
   }, []);
 
   // Close on outside click
@@ -58,17 +68,39 @@ export function GlobalSearch() {
   }, []);
 
   const runSearch = useCallback((q: string) => {
-    if (q.trim().length < 2) {
+    const normalized = q.trim().toLowerCase();
+    if (normalized.length < 2) {
       setResults(EMPTY);
       setOpen(false);
       return;
     }
+
+    const cached = localCacheRef.current.get(normalized);
+    if (cached && cached.expiresAt > Date.now()) {
+      setResults(cached.data);
+      setOpen(true);
+      return;
+    }
+
+    const requestSeq = ++sequenceRef.current;
     startTransition(async () => {
       try {
-        const res = await globalSearch(q);
+        const res = await globalSearch(normalized);
+        if (requestSeq !== sequenceRef.current) return;
+
+        localCacheRef.current.set(normalized, {
+          expiresAt: Date.now() + 20_000,
+          data: res,
+        });
+        if (localCacheRef.current.size > 100) {
+          const oldest = localCacheRef.current.keys().next().value;
+          if (oldest) localCacheRef.current.delete(oldest);
+        }
+
         setResults(res);
         setOpen(true);
       } catch {
+        if (requestSeq !== sequenceRef.current) return;
         setResults(EMPTY);
         setOpen(false);
       }
@@ -186,7 +218,7 @@ export function GlobalSearch() {
   );
 }
 
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
+function Section({ label, children }: Readonly<{ label: string; children: React.ReactNode }>) {
   return (
     <div>
       <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-dark-5 dark:text-dark-6">
@@ -197,7 +229,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-function EmployeeRow({ item, onNavigate }: { item: SearchResultItem; onNavigate: (href: string) => void }) {
+function EmployeeRow({ item, onNavigate }: Readonly<{ item: SearchResultItem; onNavigate: (href: string) => void }>) {
   return (
     <button
       type="button"
@@ -219,7 +251,7 @@ function EmployeeRow({ item, onNavigate }: { item: SearchResultItem; onNavigate:
   );
 }
 
-function GenericRow({ item, onNavigate, icon }: { item: SearchResultItem; onNavigate: (href: string) => void; icon: React.ReactNode }) {
+function GenericRow({ item, onNavigate, icon }: Readonly<{ item: SearchResultItem; onNavigate: (href: string) => void; icon: React.ReactNode }>) {
   return (
     <button
       type="button"

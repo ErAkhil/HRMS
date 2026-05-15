@@ -22,6 +22,15 @@ enum UserRole {
   EMPLOYEE
 }
 
+enum CallStatus {
+  INITIATED
+  RINGING
+  ACCEPTED
+  COMPLETED
+  REJECTED
+  MISSED
+}
+
 enum AttendanceStatus {
   PRESENT
   ABSENT
@@ -161,6 +170,8 @@ model User {
   email        String   @unique
   passwordHash String
   role         UserRole @default(EMPLOYEE)
+  lastReadMessageId String?
+  lastReadAt DateTime?
   orgId        String
   isActive     Boolean  @default(true)
   lastLoginAt  DateTime?
@@ -277,6 +288,9 @@ model Employee {
   onboardings    OnboardingRecord[]
   meetingSlots   MeetingParticipant[]
 
+  @@index([orgId, isActive])
+  @@index([orgId, departmentId])
+  @@index([orgId, managerId])
   @@unique([employeeCode, orgId])
   @@map("employees")
 }
@@ -296,6 +310,7 @@ model AttendanceRecord {
 
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
+  @@index([date])
   @@unique([employeeId, date])
   @@map("attendance_records")
 }
@@ -334,6 +349,8 @@ model LeaveRequest {
 
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
+  @@index([employeeId, status])
+  @@index([startDate, endDate])
   @@map("leave_requests")
 }
 
@@ -416,6 +433,7 @@ model Project {
 
   tasks       Task[]
 
+  @@index([orgId, status])
   @@map("projects")
 }
 
@@ -437,6 +455,9 @@ model Task {
   assignee    Employee? @relation("AssignedTasks", fields: [assigneeId], references: [id])
   createdBy   Employee  @relation("CreatedTasks", fields: [createdById], references: [id])
 
+  @@index([orgId, status])
+  @@index([orgId, assigneeId, status])
+  @@index([orgId, dueDate])
   @@map("tasks")
 }
 
@@ -455,6 +476,7 @@ model Goal {
 
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
+  @@index([employeeId, status])
   @@map("goals")
 }
 
@@ -474,6 +496,8 @@ model PerformanceReview {
   reviewee    Employee @relation("RevieweeReviews", fields: [revieweeId], references: [id], onDelete: Cascade)
   reviewer    Employee @relation("ReviewerReviews", fields: [reviewerId], references: [id])
 
+  @@index([revieweeId, status])
+  @@index([reviewerId, status])
   @@map("performance_reviews")
 }
 
@@ -493,6 +517,7 @@ model Course {
 
   enrollments CourseEnrollment[]
 
+  @@index([orgId, isActive])
   @@map("courses")
 }
 
@@ -543,6 +568,8 @@ model JobPosting {
 
   candidates   Candidate[]
 
+  @@index([orgId, isActive])
+  @@index([orgId, postedAt])
   @@map("job_postings")
 }
 
@@ -561,6 +588,8 @@ model Candidate {
 
   job         JobPosting @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
+  @@index([jobId, stage])
+  @@index([email])
   @@map("candidates")
 }
 
@@ -578,6 +607,7 @@ model OnboardingRecord {
 
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
+  @@index([employeeId, status])
   @@map("onboarding_records")
 }
 
@@ -588,12 +618,33 @@ model Channel {
   orgId     String
   name      String
   isPrivate Boolean  @default(false)
+  createdBy String   // userId of channel creator
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  messages  Message[]
+  messages      Message[]
+  videoCalls    VideoCall[] @relation("ChannelCalls")
+  participants  ChannelParticipant[]
 
+  @@index([orgId, createdAt])
   @@unique([name, orgId])
   @@map("channels")
+}
+
+model ChannelParticipant {
+  id        String   @id @default(cuid())
+  channelId String
+  userId    String
+  joinedAt  DateTime @default(now())
+  lastReadMessageId String?
+  lastReadAt        DateTime?
+
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([userId, channelId])
+  @@index([channelId, lastReadAt])
+  @@unique([channelId, userId])
+  @@map("channel_participants")
 }
 
 model Message {
@@ -606,6 +657,8 @@ model Message {
 
   channel    Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
+  @@index([channelId, createdAt])
+  @@index([channelId, senderId, createdAt])
   @@map("messages")
 }
 
@@ -615,8 +668,13 @@ model DirectConversation {
   user1Id   String
   user2Id   String
   createdAt DateTime        @default(now())
+  
   messages  DirectMessage[]
+  videoCalls VideoCall[] @relation("DMCalls")
 
+  @@index([orgId, createdAt])
+  @@index([orgId, user1Id])
+  @@index([orgId, user2Id])
   @@unique([user1Id, user2Id])
   @@map("direct_conversations")
 }
@@ -631,7 +689,47 @@ model DirectMessage {
 
   conversation   DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
+  @@index([conversationId, createdAt])
+  @@index([conversationId, readAt])
+  @@index([senderId, createdAt])
   @@map("direct_messages")
+}
+
+model VideoCall {
+  id                String     @id @default(cuid())
+  orgId             String
+  callType          String     @default("audio")
+  status            CallStatus @default(INITIATED)
+  initiatorId       String     // userId
+  channelId         String?    // null for DMs
+  conversationId    String?    // null for channels
+  startedAt         DateTime?
+  endedAt           DateTime?
+  durationSeconds   Int?
+  createdAt         DateTime   @default(now())
+
+  channel           Channel?           @relation("ChannelCalls", fields: [channelId], references: [id], onDelete: Cascade)
+  conversation      DirectConversation? @relation("DMCalls", fields: [conversationId], references: [id], onDelete: Cascade)
+  participants      CallParticipant[]
+
+  @@index([orgId, status, createdAt])
+  @@index([conversationId])
+  @@index([channelId])
+  @@map("video_calls")
+}
+
+model CallParticipant {
+  id       String   @id @default(cuid())
+  callId   String
+  userId   String
+  joinedAt DateTime @default(now())
+  leftAt   DateTime?
+
+  call     VideoCall @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@index([userId, callId])
+  @@unique([callId, userId])
+  @@map("call_participants")
 }
 
 // ─── Meetings ────────────────────────────────────────────────────────────────
@@ -650,6 +748,8 @@ model Meeting {
   participants MeetingParticipant[]
   createdAt    DateTime @default(now())
 
+  @@index([orgId, scheduledAt])
+  @@index([createdById])
   @@map("meetings")
 }
 
@@ -661,6 +761,7 @@ model MeetingParticipant {
   meeting  Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   employee Employee @relation(fields: [employeeId], references: [id])
 
+  @@index([employeeId, meetingId])
   @@unique([meetingId, employeeId])
   @@map("meeting_participants")
 }
@@ -681,6 +782,7 @@ model Workflow {
 
   org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
+  @@index([orgId, isEnabled])
   @@map("workflows")
 }
 
@@ -700,5 +802,7 @@ model AuditLog {
 
   org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
+  @@index([orgId, createdAt])
+  @@index([orgId, severity])
   @@map("audit_logs")
 }

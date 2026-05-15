@@ -21,6 +21,12 @@ export type ChannelMessage = {
   senderAvatar: string | null;
   isMe: boolean;
   createdAt: string;
+  readBy: Array<{
+    userId: string;
+    name: string;
+    avatar: string | null;
+    readAt: string;
+  }>;
 };
 
 export async function getChannels(): Promise<ChannelItem[]> {
@@ -41,4 +47,9 @@ export async function sendMessage(channelId: string, content: string) {
 
   await api.post<unknown>("/collaboration/messages", { channelId, content: trimmed });
   revalidatePath("/collaboration/messages");
+}
+
+export async function markChannelRead(channelId: string) {
+  await requireAuth();
+  await api.post<unknown>(`/collaboration/channels/${channelId}/read`);
 }

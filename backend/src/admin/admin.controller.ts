@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Patch, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -14,14 +15,17 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('HR_ADMIN', 'SUPER_ADMIN')
 export class AdminController {
-  constructor(private admin: AdminService) {}
+  private readonly admin: AdminService;
+  constructor(admin: AdminService) { this.admin = admin; }
 
   @Get('users')
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
   getOrgUsers(@CurrentUser() user: JwtPayload) {
     return this.admin.getOrgUsers(user);
   }
 
   @Patch('users/role')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   updateUserRole(
     @Body() dto: UpdateRoleDto,
     @CurrentUser() user: JwtPayload,
@@ -31,6 +35,7 @@ export class AdminController {
   }
 
   @Patch('users/:id/toggle-active')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   toggleUserActive(
     @Param('id') id: string,
     @CurrentUser() user: JwtPayload,
@@ -40,21 +45,25 @@ export class AdminController {
   }
 
   @Get('workflows')
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
   getWorkflows(@CurrentUser() user: JwtPayload) {
     return this.admin.getWorkflows(user);
   }
 
   @Post('workflows')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   createWorkflow(@Body() dto: CreateWorkflowDto, @CurrentUser() user: JwtPayload) {
     return this.admin.createWorkflow(dto, user);
   }
 
   @Patch('workflows/:id/toggle')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   toggleWorkflow(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.admin.toggleWorkflow(id, user);
   }
 
   @Get('security')
+  @Throttle({ default: { ttl: 60_000, limit: 15 } })
   getSecuritySettings(@CurrentUser() user: JwtPayload) {
     return this.admin.getSecuritySettings(user);
   }

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
 import { approveLeave, rejectLeave } from "@/lib/actions/leave";
+import Link from "next/link";
 
 type LeaveRequest = {
   id: string;
@@ -177,7 +177,7 @@ export function ApprovalsClient({ requests }: Readonly<{ requests: LeaveRequest[
                         </span>
                       </div>
                       {req.reason && (
-                        <p className="text-muted mt-2 italic">"{req.reason}"</p>
+                        <p className="text-muted mt-2 italic">&quot;{req.reason}&quot;</p>
                       )}
                     </div>
                   </div>

@@ -6,9 +6,9 @@ export const metadata = { title: "Messages" };
 
 export default async function MessagesPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ dm?: string; channel?: string }>;
-}) {
+}>) {
   const params = await searchParams;
 
   const [channels, conversations, dmUsers] = await Promise.all([

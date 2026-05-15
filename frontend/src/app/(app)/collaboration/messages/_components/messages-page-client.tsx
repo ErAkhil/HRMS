@@ -8,7 +8,7 @@ import { useSocket } from "@/hooks/use-socket";
 import { DmSidebar } from "./dm-sidebar";
 import { DmChatArea } from "./dm-chat-area";
 import { IncomingCallModal, ActiveCallOverlay } from "./call-modal";
-import { getChannelMessages, sendMessage } from "@/lib/actions/messages";
+import { getChannelMessages, sendMessage, markChannelRead } from "@/lib/actions/messages";
 import { getDmUsers, getDmMessages, sendDmMessage, markDmRead, getOrCreateConversation } from "@/lib/actions/dm";
 import type { ChannelItem, ChannelMessage } from "@/lib/actions/messages";
 import type { DmConversation, DmMessage, DmUser } from "@/lib/actions/dm";
@@ -17,16 +17,21 @@ const RTC_CONFIG: RTCConfiguration = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
 };
 
-interface MsgNewPayload { id: string; channelId: string; channelName: string; content: string; senderId: string; senderName: string; senderAvatar: string | null; createdAt: string; }
-interface DmNewPayload { id: string; conversationId: string; content: string; senderId: string; senderName: string; senderAvatar: string | null; readAt: null; createdAt: string; }
-interface DmReadPayload { conversationId: string; readById: string; }
-interface CallInvitePayload { callerId: string; callerName: string; conversationId: string; type: "audio" | "video"; }
+type ReadReceipt = { userId: string; name: string; avatar: string | null; readAt: string };
+function replaceReadReceipt(readBy: ReadReceipt[] | undefined, receipt: ReadReceipt) {
+  return [...(readBy ?? []).filter((item) => item.userId !== receipt.userId), receipt];
+}
+interface MsgNewPayload { id: string; channelId: string; channelName: string; content: string; senderId: string; senderName: string; senderAvatar: string | null; createdAt: string; readBy?: ReadReceipt[]; }
+interface DmNewPayload { id: string; conversationId: string; content: string; senderId: string; senderName: string; senderAvatar: string | null; createdAt: string; readBy?: ReadReceipt[]; }
+interface DmReadPayload { conversationId: string; readById: string; lastReadMessageId: string | null; readAt: string | null; readerName: string; readerAvatar: string | null; }
+interface ChannelReadPayload { channelId: string; lastReadMessageId: string | null; lastReadAt: string | null; readerId: string; readerName: string; readerAvatar: string | null; }
+interface CallInvitePayload { callerId: string; callerName: string; conversationId?: string; channelId?: string; channelName?: string | null; type: "audio" | "video"; }
 interface CallOfferPayload { offer: RTCSessionDescriptionInit; fromId: string; }
 interface CallAnswerPayload { answer: RTCSessionDescriptionInit; }
 interface IceCandidatePayload { candidate: RTCIceCandidateInit; }
 
 // ─── Self-fetching New DM picker ───────────────────────────────────────────────
-function NewDmPicker({ onSelect, onClose }: { onSelect: (u: DmUser) => void; onClose: () => void }) {
+function NewDmPicker({ onSelect, onClose }: Readonly<{ onSelect: (u: DmUser) => void; onClose: () => void }>) {
   const [q, setQ] = useState("");
   const [users, setUsers] = useState<DmUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,7 +124,7 @@ export function MessagesPageClient({
 
   // Call state
   const [incomingCall, setIncomingCall] = useState<CallInvitePayload | null>(null);
-  const [activeCall, setActiveCall] = useState<{ peerId: string; peerName: string; type: "audio" | "video" } | null>(null);
+  const [activeCall, setActiveCall] = useState<{ peerId: string; peerName: string; type: "audio" | "video"; scope: "dm" | "channel" } | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isCamOff, setIsCamOff] = useState(false);
 
@@ -130,6 +135,8 @@ export function MessagesPageClient({
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const callStartTimeRef = useRef<number | null>(null);
   const activeCallConvoIdRef = useRef<string | null>(null);
+  const activeCallChannelIdRef = useRef<string | null>(null);
+  const activeCallScopeRef = useRef<"dm" | "channel" | null>(null);
   const emitRef = useRef<(event: string, data: unknown) => void>(() => null);
 
   const currentUserId = session?.user?.id;
@@ -149,6 +156,8 @@ export function MessagesPageClient({
     if (remoteAudioRef.current) remoteAudioRef.current.srcObject = null;
     callStartTimeRef.current = null;
     activeCallConvoIdRef.current = null;
+    activeCallChannelIdRef.current = null;
+    activeCallScopeRef.current = null;
     setActiveCall(null);
     setIncomingCall(null);
     setIsMuted(false);
@@ -175,8 +184,11 @@ export function MessagesPageClient({
     if (p.channelId !== activeChannelId) return;
     setChannelMessages((prev) => {
       if (prev.some((m) => m.id === p.id)) return prev;
-      return [...prev, { id: p.id, content: p.content, senderId: p.senderId, senderName: p.senderName, senderAvatar: p.senderAvatar, isMe: p.senderId === currentUserId, createdAt: p.createdAt }];
+      return [...prev, { id: p.id, content: p.content, senderId: p.senderId, senderName: p.senderName, senderAvatar: p.senderAvatar, isMe: p.senderId === currentUserId, createdAt: p.createdAt, readBy: p.readBy ?? [] }];
     });
+    if (p.senderId !== currentUserId) {
+      markChannelRead(p.channelId).catch(() => null);
+    }
   }, [activeChannelId, currentUserId]);
 
   const activeDmIdRef = useRef(activeDmId);
@@ -188,7 +200,7 @@ export function MessagesPageClient({
     if (p.conversationId === curDmId) {
       setDmMessages((prev) => {
         if (prev.some((m) => m.id === p.id)) return prev;
-        return [...prev, { ...p, isMe: p.senderId === currentUserId }];
+        return [...prev, { ...p, isMe: p.senderId === currentUserId, readBy: p.readBy ?? [] }];
       });
       markDmRead(p.conversationId).catch(() => null);
     }
@@ -206,10 +218,24 @@ export function MessagesPageClient({
   const handleDmRead = useCallback((data: unknown) => {
     const p = data as DmReadPayload;
     if (p.conversationId === activeDmIdRef.current) {
-      setDmMessages((prev) => prev.map((m) => m.isMe && !m.readAt ? { ...m, readAt: new Date().toISOString() } : m));
+      const receipt = { userId: p.readById, name: p.readerName, avatar: p.readerAvatar, readAt: p.readAt ?? new Date().toISOString() };
+      setDmMessages((prev) => prev.map((m) => m.id === p.lastReadMessageId ? {
+        ...m,
+        readBy: replaceReadReceipt(m.readBy, receipt),
+      } : m));
     }
     setConversations((prev) => prev.map((c) => c.id === p.conversationId ? { ...c, unreadCount: 0 } : c));
   }, []);
+
+  const handleChannelRead = useCallback((data: unknown) => {
+    const p = data as ChannelReadPayload;
+    if (p.channelId !== activeChannelId) return;
+    const receipt = { userId: p.readerId, name: p.readerName, avatar: p.readerAvatar, readAt: p.lastReadAt ?? new Date().toISOString() };
+    setChannelMessages((prev) => prev.map((m) => m.id === p.lastReadMessageId ? {
+      ...m,
+      readBy: replaceReadReceipt(m.readBy, receipt),
+    } : m));
+  }, [activeChannelId]);
 
   const handleCallInvite = useCallback((data: unknown) => {
     setIncomingCall(data as CallInvitePayload);
@@ -255,7 +281,7 @@ export function MessagesPageClient({
 
   const handleIceCandidate = useCallback(async (data: unknown) => {
     const p = data as IceCandidatePayload;
-    try { await peerRef.current?.addIceCandidate(p.candidate); } catch { /* ignore */ }
+    await peerRef.current?.addIceCandidate(p.candidate).catch(() => null);
   }, []);
 
   const handleCallEnd = useCallback(() => {
@@ -268,6 +294,7 @@ export function MessagesPageClient({
     "message:new": handleMessageNew,
     "dm:new": handleDmNew,
     "dm:read": handleDmRead,
+    "channel:read": handleChannelRead,
     "call:invite": handleCallInvite,
     "call:accepted": handleCallAccepted,
     "call:rejected": handleCallRejected,
@@ -284,7 +311,12 @@ export function MessagesPageClient({
     setActiveChannelId(id);
     setActiveDmId(null);
     startTransition(async () => {
-      try { setChannelMessages(await getChannelMessages(id)); } catch { setChannelMessages([]); }
+      try {
+        setChannelMessages(await getChannelMessages(id));
+        await markChannelRead(id);
+      } catch {
+        setChannelMessages([]);
+      }
     });
   }
 
@@ -321,7 +353,7 @@ export function MessagesPageClient({
       try {
         const convo = await getOrCreateConversation(userId);
         setConversations((prev) => {
-          if (prev.find((c) => c.id === convo.id)) return prev;
+          if (prev.some((c) => c.id === convo.id)) return prev;
           return [{ id: convo.id, otherUserId: userId, otherUserName: name, otherUserAvatar: avatar, lastMessage: null, lastMessageAt: null, unreadCount: 0 }, ...prev];
         });
         handleSelectDm(convo.id);
@@ -337,7 +369,10 @@ export function MessagesPageClient({
 
     if (mode === "channel" && activeChannelId) {
       startTransition(async () => {
-        try { await sendMessage(activeChannelId, content); }
+        try {
+          await sendMessage(activeChannelId, content);
+          await markChannelRead(activeChannelId);
+        }
         catch (err) { setToast(err instanceof Error ? err.message : "Failed to send"); setInput(content); }
       });
     } else if (mode === "dm" && activeDmId) {
@@ -348,7 +383,7 @@ export function MessagesPageClient({
         senderName: currentUserName,
         senderAvatar: null,
         isMe: true,
-        readAt: null,
+        readBy: [],
         createdAt: new Date().toISOString(),
       };
       setDmMessages((prev) => [...prev, optimistic]);
@@ -373,16 +408,37 @@ export function MessagesPageClient({
       localStreamRef.current = stream;
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       activeCallConvoIdRef.current = conversationId;
-      setActiveCall({ peerId, peerName, type });
+      activeCallChannelIdRef.current = null;
+      activeCallScopeRef.current = "dm";
+      setActiveCall({ peerId, peerName, type, scope: "dm" });
       emit("call:invite", { calleeId: peerId, conversationId, type, callerName: currentUserName });
     } catch {
       setToast("Could not access camera/microphone");
     }
   }
 
+  async function initiateChannelCall(channelId: string, channelName: string, type: "audio" | "video") {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === "video" });
+      localStreamRef.current = stream;
+      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+      activeCallConvoIdRef.current = null;
+      activeCallChannelIdRef.current = channelId;
+      activeCallScopeRef.current = "channel";
+      setActiveCall({ peerId: channelId, peerName: channelName, type, scope: "channel" });
+      emit("call:invite", { channelId, channelName, type, callerName: currentUserName });
+    } catch {
+      setToast("Could not access camera/microphone");
+    }
+  }
+
   async function handleCall(type: "audio" | "video") {
-    if (!activeConversation) return;
-    await initiateCall(activeConversation.otherUserId, activeConversation.otherUserName, activeDmId!, type);
+    if (mode === "channel" && activeChannel) {
+      await initiateChannelCall(activeChannel.id, activeChannel.name, type);
+      return;
+    }
+    if (!activeConversation || !activeDmId) return;
+    await initiateCall(activeConversation.otherUserId, activeConversation.otherUserName, activeDmId, type);
   }
 
   async function handleCallUser(userId: string, name: string, type: "audio" | "video") {
@@ -390,7 +446,7 @@ export function MessagesPageClient({
       try {
         const convo = await getOrCreateConversation(userId);
         setConversations((prev) => {
-          if (prev.find((c) => c.id === convo.id)) return prev;
+          if (prev.some((c) => c.id === convo.id)) return prev;
           return [{ id: convo.id, otherUserId: userId, otherUserName: name, otherUserAvatar: null, lastMessage: null, lastMessageAt: null, unreadCount: 0 }, ...prev];
         });
         await initiateCall(userId, name, convo.id, type);
@@ -405,11 +461,13 @@ export function MessagesPageClient({
       localStreamRef.current = stream;
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       callStartTimeRef.current = Date.now();
-      activeCallConvoIdRef.current = incomingCall.conversationId;
+      activeCallConvoIdRef.current = incomingCall.conversationId ?? null;
+      activeCallChannelIdRef.current = incomingCall.channelId ?? null;
+      activeCallScopeRef.current = incomingCall.channelId ? "channel" : "dm";
       makePeer(incomingCall.callerId);
-      setActiveCall({ peerId: incomingCall.callerId, peerName: incomingCall.callerName, type: incomingCall.type });
+      setActiveCall({ peerId: incomingCall.callerId, peerName: incomingCall.channelName ?? incomingCall.callerName, type: incomingCall.type, scope: incomingCall.channelId ? "channel" : "dm" });
       setIncomingCall(null);
-      emit("call:accepted", { callerId: incomingCall.callerId });
+      emit("call:accepted", { callerId: incomingCall.callerId, conversationId: incomingCall.conversationId, channelId: incomingCall.channelId });
     } catch {
       setToast("Could not access camera/microphone");
       setIncomingCall(null);
@@ -421,6 +479,7 @@ export function MessagesPageClient({
     emit("call:rejected", {
       callerId: incomingCall.callerId,
       conversationId: incomingCall.conversationId,
+      channelId: incomingCall.channelId,
       callType: incomingCall.type,
     });
     setIncomingCall(null);
@@ -431,7 +490,11 @@ export function MessagesPageClient({
       const duration = callStartTimeRef.current
         ? Math.floor((Date.now() - callStartTimeRef.current) / 1000)
         : 0;
-      emit("call:end", {
+      emit("call:end", activeCallScopeRef.current === "channel" ? {
+        channelId: activeCallChannelIdRef.current,
+        callType: activeCall.type,
+        duration,
+      } : {
         targetId: activeCall.peerId,
         conversationId: activeCallConvoIdRef.current,
         callType: activeCall.type,
@@ -465,7 +528,7 @@ export function MessagesPageClient({
             mode={mode}
             channel={mode === "channel" ? activeChannel : null}
             conversation={mode === "dm" ? activeConversation : null}
-            messages={displayMessages as Parameters<typeof DmChatArea>[0]["messages"]}
+            messages={displayMessages}
             input={input}
             onInputChange={setInput}
             onSend={handleSend}
@@ -485,7 +548,13 @@ export function MessagesPageClient({
       )}
 
       {incomingCall && !activeCall && (
-        <IncomingCallModal callerName={incomingCall.callerName} type={incomingCall.type} onAccept={handleAcceptCall} onReject={handleRejectCall} />
+        <IncomingCallModal
+          callerName={incomingCall.callerName}
+          channelName={incomingCall.channelName}
+          type={incomingCall.type}
+          onAccept={handleAcceptCall}
+          onReject={handleRejectCall}
+        />
       )}
 
       {activeCall && (

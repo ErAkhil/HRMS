@@ -10,7 +10,7 @@ import type { JwtPayload } from '../auth/types/jwt-payload.type';
 @Controller('onboarding')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class OnboardingController {
-  constructor(private onboarding: OnboardingService) {}
+  constructor(private readonly onboarding: OnboardingService) {}
 
   @Get('offboarding/stats')
   @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
@@ -59,7 +59,7 @@ export class OnboardingController {
 
   @Post()
   @Roles('SUPER_ADMIN', 'HR_ADMIN', 'MANAGER')
-  createOrUpdate(@Body() dto: CreateOnboardingDto, @CurrentUser() user: JwtPayload) {
-    return this.onboarding.createOrUpdate(dto, user);
+  createOrUpdate(@Body() dto: CreateOnboardingDto) {
+    return this.onboarding.createOrUpdate(dto);
   }
 }

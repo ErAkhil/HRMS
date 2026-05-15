@@ -3,11 +3,12 @@
 interface IncomingCallProps {
   callerName: string;
   type: "audio" | "video";
+  channelName?: string | null;
   onAccept: () => void;
   onReject: () => void;
 }
 
-export function IncomingCallModal({ callerName, type, onAccept, onReject }: Readonly<IncomingCallProps>) {
+export function IncomingCallModal({ callerName, type, channelName, onAccept, onReject }: Readonly<IncomingCallProps>) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="w-80 rounded-2xl bg-white p-6 shadow-modal dark:bg-dark-2 text-center">
@@ -20,8 +21,8 @@ export function IncomingCallModal({ callerName, type, onAccept, onReject }: Read
             )}
           </svg>
         </div>
-        <p className="text-sm text-dark-5 dark:text-dark-6 mb-1">Incoming {type} call</p>
-        <p className="text-lg font-bold text-dark dark:text-white mb-6">{callerName}</p>
+        <p className="text-sm text-dark-5 dark:text-dark-6 mb-1">Incoming {type} call{channelName ? ` in #${channelName}` : ""}</p>
+        <p className="text-lg font-bold text-dark dark:text-white mb-6">{channelName ?? callerName}</p>
         <div className="flex gap-3">
           <button
             onClick={onReject}
@@ -75,18 +76,24 @@ export function ActiveCallOverlay({
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-dark/95">
       {/* Hidden audio element always present to play remote audio in audio-only calls */}
-      <audio ref={remoteAudioRef} autoPlay className="hidden" />
+      <audio ref={remoteAudioRef} autoPlay className="hidden">
+        <track kind="captions" srcLang="en" label="English captions" />
+      </audio>
 
       {type === "video" ? (
         <div className="relative w-full max-w-3xl aspect-video bg-dark-2 rounded-2xl overflow-hidden">
-          <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover" />
+          <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover">
+            <track kind="captions" srcLang="en" label="English captions" />
+          </video>
           <video
             ref={localVideoRef}
             autoPlay
             playsInline
             muted
             className="absolute bottom-4 right-4 h-28 w-40 rounded-xl object-cover border-2 border-white/20"
-          />
+          >
+            <track kind="captions" srcLang="en" label="English captions" />
+          </video>
         </div>
       ) : (
         <div className="flex size-32 items-center justify-center rounded-full bg-primary-600 text-white text-3xl font-bold mb-6">

@@ -91,3 +91,15 @@ All these features and more make **NextAdmin** a robust, well-rounded solution f
 ### Version 1.0
 - Initial Release - [May 13, 2024]
 # HRMS
+
+## Engineering Standards
+
+- See `ENGINEERING_STANDARDS.md` for architecture, quality, testing, database, security, and CI/CD standards.
+- CI quality gates run for backend and frontend on each push/PR.
+
+## Optimization Workflow
+
+1. Add/verify DB indexes in `backend/prisma/schema.prisma`.
+2. Prefer grouped queries over per-record queries (avoid N+1).
+3. Debounce and cache high-frequency UI calls such as global search.
+4. Run lint, typecheck, and build locally before opening PRs.

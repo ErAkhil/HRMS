@@ -45,5 +45,7 @@ export async function globalSearch(query: string): Promise<SearchResults> {
 
   if (query.trim().length < 2) return EMPTY;
 
-  return api.get<SearchResults>(`/search?q=${encodeURIComponent(query.trim())}`);
+  return api.get<SearchResults>(`/search?q=${encodeURIComponent(query.trim())}`, {
+    revalidate: 20,
+  });
 }

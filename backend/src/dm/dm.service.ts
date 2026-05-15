@@ -3,11 +3,18 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
+type ReadReceipt = {
+  userId: string;
+  name: string;
+  avatar: string | null;
+  readAt: string;
+};
+
 @Injectable()
 export class DmService {
   constructor(
-    private prisma: PrismaService,
-    private events: EventsGateway,
+    private readonly prisma: PrismaService,
+    private readonly events: EventsGateway,
   ) {}
 
   async listUsers(user: JwtPayload) {
@@ -25,7 +32,7 @@ export class DmService {
   }
 
   async getOrCreateConversation(targetUserId: string, user: JwtPayload) {
-    const [u1, u2] = [user.sub, targetUserId].sort();
+    const [u1, u2] = [user.sub, targetUserId].sort((a, b) => a.localeCompare(b));
     const convo = await this.prisma.directConversation.upsert({
       where: { user1Id_user2Id: { user1Id: u1, user2Id: u2 } },
       create: { orgId: user.orgId, user1Id: u1, user2Id: u2 },
@@ -59,17 +66,25 @@ export class DmService {
         : [];
     const empMap = new Map(employees.map((e) => [e.userId, e]));
 
-    const unreadCounts = await Promise.all(
-      convos.map((c) =>
-        this.prisma.directMessage.count({
-          where: { conversationId: c.id, senderId: { not: user.sub }, readAt: null },
-        }),
-      ),
+    const unreadGroups =
+      convos.length > 0
+        ? await this.prisma.directMessage.groupBy({
+            by: ['conversationId'],
+            where: {
+              conversationId: { in: convos.map((c) => c.id) },
+              senderId: { not: user.sub },
+              readAt: null,
+            },
+            _count: { _all: true },
+          })
+        : [];
+    const unreadCountMap = new Map(
+      unreadGroups.map((group) => [group.conversationId, group._count._all]),
     );
 
-    return convos.map((c, i) => {
+    return convos.map((c) => {
       const otherId = c.user1Id === user.sub ? c.user2Id : c.user1Id;
-      const emp = empMap.get(otherId ?? '');
+      const emp = otherId ? empMap.get(otherId) : undefined;
       const last = c.messages[0];
       return {
         id: c.id,
@@ -78,7 +93,7 @@ export class DmService {
         otherUserAvatar: emp?.avatarUrl ?? null,
         lastMessage: last?.content ?? null,
         lastMessageAt: last?.createdAt.toISOString() ?? null,
-        unreadCount: unreadCounts[i],
+        unreadCount: unreadCountMap.get(c.id) ?? 0,
       };
     });
   }
@@ -109,8 +124,24 @@ export class DmService {
         : [];
     const empMap = new Map(employees.map((e) => [e.userId, e]));
 
+    const otherUserId = convo.user1Id === user.sub ? convo.user2Id : convo.user1Id;
+    const otherUserEmp = otherUserId
+      ? await this.prisma.employee.findUnique({
+          where: { userId: otherUserId },
+          select: { userId: true, firstName: true, lastName: true, avatarUrl: true },
+        })
+      : null;
+
     return messages.map((m) => {
       const emp = empMap.get(m.senderId);
+      const readBy: ReadReceipt[] = m.readAt && m.senderId === user.sub && otherUserEmp
+        ? [{
+            userId: otherUserEmp.userId,
+            name: `${otherUserEmp.firstName} ${otherUserEmp.lastName}`,
+            avatar: otherUserEmp.avatarUrl ?? null,
+            readAt: m.readAt.toISOString(),
+          }]
+        : [];
       return {
         id: m.id,
         content: m.content,
@@ -118,8 +149,8 @@ export class DmService {
         senderName: emp ? `${emp.firstName} ${emp.lastName}` : 'Unknown',
         senderAvatar: emp?.avatarUrl ?? null,
         isMe: m.senderId === user.sub,
-        readAt: m.readAt?.toISOString() ?? null,
         createdAt: m.createdAt.toISOString(),
+        readBy,
       };
     });
   }
@@ -179,8 +210,151 @@ export class DmService {
       data: { readAt: new Date() },
     });
 
+    const lastReadMessage = await this.prisma.directMessage.findFirst({
+      where: { conversationId, senderId: { not: user.sub } },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, createdAt: true },
+    });
+
+    const readerEmp = user.employeeId
+      ? await this.prisma.employee.findUnique({
+          where: { id: user.employeeId },
+          select: { firstName: true, lastName: true, avatarUrl: true },
+        })
+      : null;
+
     const otherId = convo.user1Id === user.sub ? convo.user2Id : convo.user1Id;
-    this.events.emitToUser(otherId, 'dm:read', { conversationId, readById: user.sub });
+    this.events.emitToUser(otherId, 'dm:read', {
+      conversationId,
+      readById: user.sub,
+      lastReadMessageId: lastReadMessage?.id ?? null,
+      readAt: lastReadMessage?.createdAt.toISOString() ?? null,
+      readerName: readerEmp ? `${readerEmp.firstName} ${readerEmp.lastName}` : user.email.split('@')[0],
+      readerAvatar: readerEmp?.avatarUrl ?? null,
+    });
+
+    return {
+      ok: true,
+      lastReadMessageId: lastReadMessage?.id ?? null,
+    };
+  }
+
+  async initiateCall(conversationId: string, callType: 'audio' | 'video', user: JwtPayload) {
+    const convo = await this.prisma.directConversation.findFirst({
+      where: {
+        id: conversationId,
+        orgId: user.orgId,
+        OR: [{ user1Id: user.sub }, { user2Id: user.sub }],
+      },
+    });
+    if (!convo) throw new ForbiddenException('Not a participant');
+
+    const call = await this.prisma.videoCall.create({
+      data: {
+        orgId: user.orgId,
+        conversationId,
+        callType,
+        initiatorId: user.sub,
+        status: 'INITIATED',
+      },
+    });
+
+    await this.prisma.callParticipant.create({
+      data: {
+        callId: call.id,
+        userId: user.sub,
+      },
+    });
+
+    const emp = user.employeeId
+      ? await this.prisma.employee.findUnique({
+          where: { id: user.employeeId },
+          select: { firstName: true, lastName: true },
+        })
+      : null;
+
+    const callerName = emp ? `${emp.firstName} ${emp.lastName}` : user.email.split('@')[0];
+    const calleeId = convo.user1Id === user.sub ? convo.user2Id : convo.user1Id;
+
+    this.events.emitToUser(calleeId, 'call:incoming', {
+      callId: call.id,
+      conversationId,
+      callType,
+      callerId: user.sub,
+      callerName,
+      startedAt: call.createdAt.toISOString(),
+    });
+
+    return call;
+  }
+
+  async acceptCall(callId: string, user: JwtPayload) {
+    const call = await this.prisma.videoCall.findFirst({
+      where: {
+        id: callId,
+        orgId: user.orgId,
+        conversationId: { not: null },
+      },
+    });
+    if (!call) throw new NotFoundException('Call not found');
+
+    await this.prisma.callParticipant.upsert({
+      where: { callId_userId: { callId, userId: user.sub } },
+      create: { callId, userId: user.sub },
+      update: {},
+    });
+
+    await this.prisma.videoCall.update({
+      where: { id: callId },
+      data: { status: 'ACCEPTED', startedAt: new Date() },
+    });
+
+    this.events.emitToUser(call.initiatorId, 'call:accepted', {
+      callId,
+      acceptedById: user.sub,
+    });
+
+    return { ok: true };
+  }
+
+  async endCall(callId: string, user: JwtPayload) {
+    const call = await this.prisma.videoCall.findFirst({
+      where: {
+        id: callId,
+        orgId: user.orgId,
+      },
+    });
+    if (!call) throw new NotFoundException('Call not found');
+
+    const durationSeconds = call.startedAt
+      ? Math.floor((Date.now() - call.startedAt.getTime()) / 1000)
+      : 0;
+
+    await this.prisma.videoCall.update({
+      where: { id: callId },
+      data: {
+        status: 'COMPLETED',
+        endedAt: new Date(),
+        durationSeconds,
+      },
+    });
+
+    await this.prisma.callParticipant.update({
+      where: { callId_userId: { callId, userId: user.sub } },
+      data: { leftAt: new Date() },
+    });
+
+    const otherParticipant = await this.prisma.callParticipant.findFirst({
+      where: { callId, userId: { not: user.sub } },
+    });
+
+    if (otherParticipant) {
+      this.events.emitToUser(otherParticipant.userId, 'call:ended', {
+        callId,
+        endedBy: user.sub,
+        durationSeconds,
+      });
+    }
 
     return { ok: true };
   }
