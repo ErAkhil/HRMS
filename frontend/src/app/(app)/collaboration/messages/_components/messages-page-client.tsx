@@ -254,7 +254,7 @@ export function MessagesPageClient({
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
     emitRef.current("call:offer", { targetId: p.calleeId, offer });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   const handleCallRejected = useCallback(() => {
@@ -271,7 +271,7 @@ export function MessagesPageClient({
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
     emitRef.current("call:answer", { targetId: p.fromId, answer });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   const handleCallAnswer = useCallback(async (data: unknown) => {
@@ -344,7 +344,7 @@ export function MessagesPageClient({
     } else if (initialChannelParam) {
       handleSelectChannel(initialChannelParam);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [initialDmId, initialChannelParam]);
 
   // ─── Open / create a DM conversation ─────────────────────────────────────────

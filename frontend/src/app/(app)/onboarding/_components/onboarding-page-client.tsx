@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
@@ -173,7 +174,13 @@ export function OnboardingPageClient({ records, stats }: Readonly<{ records: Onb
             <div key={ob.id} className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
               <div className="flex items-start gap-3">
                 {ob.avatarUrl ? (
-                  <img src={ob.avatarUrl} alt={ob.name} className="h-10 w-10 rounded-full object-cover" />
+                  <Image
+                    src={ob.avatarUrl}
+                    alt={ob.name}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
                 ) : (
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
                     {getInitials(ob.name)}
@@ -234,10 +241,11 @@ export function OnboardingPageClient({ records, stats }: Readonly<{ records: Onb
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
+                <label htmlFor="employee-id" className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
                   Employee ID <span className="text-rose-500">*</span>
                 </label>
                 <input
+                  id="employee-id"
                   type="text"
                   required
                   placeholder="Employee ID from the system"
@@ -249,10 +257,11 @@ export function OnboardingPageClient({ records, stats }: Readonly<{ records: Onb
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
+                  <label htmlFor="start-date" className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">
                     Start Date <span className="text-rose-500">*</span>
                   </label>
                   <input
+                    id="start-date"
                     type="date"
                     required
                     value={form.startDate}
@@ -261,8 +270,9 @@ export function OnboardingPageClient({ records, stats }: Readonly<{ records: Onb
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Due Date</label>
+                  <label htmlFor="due-date" className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Due Date</label>
                   <input
+                    id="due-date"
                     type="date"
                     value={form.dueDate}
                     onChange={(e) => setForm((p) => ({ ...p, dueDate: e.target.value }))}

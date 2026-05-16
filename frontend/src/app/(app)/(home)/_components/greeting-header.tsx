@@ -52,39 +52,38 @@ function formatDate() {
   });
 }
 
+function extractUserInfo(session: any) {
+  return {
+    name: session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "there",
+    role: (session?.user?.role ?? "EMPLOYEE").replaceAll("_", " ").toLowerCase(),
+    org: session?.user?.orgName ?? "Monja",
+  };
+}
+
+function QuickActionButton({ action }: Readonly<{ action: (typeof QUICK_ACTIONS)[0] }>) {
+  return (
+    <Link href={action.href} className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${action.color}`}>
+      {action.icon}
+      {action.label}
+    </Link>
+  );
+}
+
 export function GreetingHeader() {
   const { data: session } = useSession();
-  const name = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "there";
-  const role = session?.user?.role?.replace(/_/g, " ").toLowerCase() ?? "employee";
-  const org = session?.user?.orgName ?? "Monja";
+  const user = extractUserInfo(session);
 
   return (
     <div className="card-p md:p-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        {/* Left: greeting */}
         <div className="space-y-1">
-          <p className="text-muted font-medium">
-            {formatDate()}
-          </p>
-          <h2 className="page-title md:text-2xl capitalize">
-            {getGreeting()}, {name}
-          </h2>
-          <p className="text-sm text-dark-5 dark:text-dark-6 capitalize">
-            {role} · {org}
-          </p>
+          <p className="text-muted font-medium">{formatDate()}</p>
+          <h2 className="page-title md:text-2xl capitalize">{getGreeting()}, {user.name}</h2>
+          <p className="text-sm text-dark-5 dark:text-dark-6 capitalize">{user.role} · {user.org}</p>
         </div>
-
-        {/* Right: quick actions */}
         <div className="flex shrink-0 flex-wrap gap-2">
           {QUICK_ACTIONS.map((a) => (
-            <Link
-              key={a.label}
-              href={a.href}
-              className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${a.color}`}
-            >
-              {a.icon}
-              {a.label}
-            </Link>
+            <QuickActionButton key={a.label} action={a} />
           ))}
         </div>
       </div>

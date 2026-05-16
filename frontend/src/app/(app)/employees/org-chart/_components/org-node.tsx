@@ -22,6 +22,18 @@ const DEPT_COLORS: Record<string, string> = {
   HR: "bg-amber-light text-amber-dark dark:bg-amber-dark/20 dark:text-amber",
 };
 
+function getNodeMinWidthClass(isRoot: boolean, isHead: boolean) {
+  if (isRoot) return "min-w-48 border-2 border-primary-200 dark:border-primary-800";
+  if (isHead) return "min-w-40";
+  return "min-w-36";
+}
+
+function getAvatarSize(isRoot: boolean, isHead: boolean) {
+  if (isRoot) return 64;
+  if (isHead) return 52;
+  return 44;
+}
+
 export function OrgNode({
   id,
   avatar,
@@ -31,30 +43,28 @@ export function OrgNode({
   reportsCount,
   isRoot = false,
   isHead = false,
-}: OrgNodeProps) {
+}: Readonly<OrgNodeProps>) {
+  const minWidthClass = getNodeMinWidthClass(isRoot, isHead);
+  const avatarSize = getAvatarSize(isRoot, isHead);
+  const nameSizeClass = isRoot ? "text-sm" : "text-xs";
+
   return (
     <Link
       href={`/employees/profile?id=${id}`}
-      className={`group flex flex-col items-center rounded-xl bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg dark:bg-dark-2 dark:border dark:border-dark-3 ${
-        isRoot ? "min-w-48 border-2 border-primary-200 dark:border-primary-800" : isHead ? "min-w-40" : "min-w-36"
-      }`}
+      className={`group flex flex-col items-center rounded-xl bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lg dark:bg-dark-2 dark:border dark:border-dark-3 ${minWidthClass}`}
     >
       <div className="relative">
         <Image
           src={avatar}
-          width={isRoot ? 64 : isHead ? 52 : 44}
-          height={isRoot ? 64 : isHead ? 52 : 44}
+          width={avatarSize}
+          height={avatarSize}
           alt={name}
           className="rounded-full object-cover ring-2 ring-white dark:ring-dark-2"
         />
         <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald dark:border-dark-2" />
       </div>
 
-      <p
-        className={`mt-2 text-center font-semibold text-dark dark:text-white ${
-          isRoot ? "text-sm" : "text-xs"
-        }`}
-      >
+      <p className={`mt-2 text-center font-semibold text-dark dark:text-white ${nameSizeClass}`}>
         {name}
       </p>
       <p className="mt-0.5 text-center text-[10px] text-dark-5 dark:text-dark-6">

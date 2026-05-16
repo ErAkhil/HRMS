@@ -2,11 +2,20 @@ import type { SerializedReview } from "@/lib/actions/performance";
 
 interface Props {
   score: number | null;
-  reviews: SerializedReview[];
+  reviews: readonly SerializedReview[];
 }
 
-export function ScoreCard({ score, reviews }: Props) {
+function getScoreLabel(score: number | null): string {
+  if (score === null) return "No Reviews Yet";
+  if (score >= 90) return "Outstanding";
+  if (score >= 80) return "Excellent";
+  if (score >= 70) return "Good";
+  return "Needs Improvement";
+}
+
+export function ScoreCard({ score, reviews }: Readonly<Props>) {
   const displayScore = score ?? 0;
+  const scoreText = score === null ? "--" : String(score);
   const circumference = 2 * Math.PI * 54;
   const offset = circumference - (displayScore / 100) * circumference;
   const completedReviews = reviews.filter((r) => r.status === "COMPLETED").length;
@@ -34,16 +43,14 @@ export function ScoreCard({ score, reviews }: Props) {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold text-white">{score ?? "—"}</span>
+              <span className="text-3xl font-bold text-white">{scoreText}</span>
               {score !== null && <span className="text-xs text-white/70">/ 100</span>}
             </div>
           </div>
 
           <div>
             <p className="text-sm font-medium text-white/70">Overall Performance Score</p>
-            <h2 className="mt-1 text-2xl font-bold text-white">
-              {score === null ? "No Reviews Yet" : score >= 90 ? "Outstanding" : score >= 80 ? "Excellent" : score >= 70 ? "Good" : "Needs Improvement"}
-            </h2>
+            <h2 className="mt-1 text-2xl font-bold text-white">{getScoreLabel(score)}</h2>
             <p className="mt-1 text-xs text-white/60">
               {latestReview
                 ? `Last reviewed ${new Date(latestReview.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}`

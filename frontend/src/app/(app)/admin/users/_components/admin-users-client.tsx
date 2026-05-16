@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
@@ -144,7 +145,13 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
                   <td className="td">
                     <div className="flex items-center gap-3">
                       {u.avatarUrl ? (
-                        <img src={u.avatarUrl} alt={u.name} className="h-8 w-8 rounded-full object-cover" />
+                        <Image
+                          src={u.avatarUrl}
+                          alt={u.name}
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
                       ) : (
                         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
                           {getInitials(u.name)}

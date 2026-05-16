@@ -9,7 +9,7 @@ const TYPE_DISPLAY: Record<string, string> = {
   PEER: "Peer Review",
 };
 
-export function ReviewsTab({ reviews }: Readonly<{ reviews: SerializedReview[] }>) {
+export function ReviewsTab({ reviews }: Readonly<{ reviews: readonly SerializedReview[] }>) {
   if (reviews.length === 0) {
     return (
       <div className="card-p flex flex-col items-center justify-center py-12 text-center">
@@ -33,7 +33,7 @@ export function ReviewsTab({ reviews }: Readonly<{ reviews: SerializedReview[] }
           <div className="mb-4 flex items-center justify-between">
             <h2 className="section-title">Review History</h2>
             <Link href="/performance/reviews" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
-              View all ?
+              {"View all ->"}
             </Link>
           </div>
           <div className="overflow-x-auto">
@@ -53,10 +53,10 @@ export function ReviewsTab({ reviews }: Readonly<{ reviews: SerializedReview[] }
                     </td>
                     <td className="px-3 py-3 text-muted">{TYPE_DISPLAY[row.type] ?? row.type}</td>
                     <td className="px-3 py-3 text-sm font-semibold text-dark dark:text-white">
-                      {row.score !== null ? `${row.score}/100` : "�"}
+                      {row.score === null ? "-" : `${row.score}/100`}
                     </td>
                     <td className="px-3 py-3 text-muted">
-                      {row.reviewer ? `${row.reviewer.firstName} ${row.reviewer.lastName}` : "�"}
+                      {row.reviewer ? `${row.reviewer.firstName} ${row.reviewer.lastName}` : "-"}
                     </td>
                     <td className="px-3 py-3">
                       <span className={row.status === "COMPLETED" ? "badge-success" : "badge-warning"}>
@@ -99,7 +99,7 @@ export function ReviewsTab({ reviews }: Readonly<{ reviews: SerializedReview[] }
             <h2 className="mb-3 section-title">Latest Feedback</h2>
             <p className="text-xs text-dark-5 dark:text-dark-6 italic">&ldquo;{reviews[0].comments}&rdquo;</p>
             <p className="mt-2 text-xs text-dark-5 dark:text-dark-6">
-              � {reviews[0].reviewer ? `${reviews[0].reviewer.firstName} ${reviews[0].reviewer.lastName}` : "Reviewer"}
+              - {reviews[0].reviewer ? `${reviews[0].reviewer.firstName} ${reviews[0].reviewer.lastName}` : "Reviewer"}
             </p>
           </div>
         )}

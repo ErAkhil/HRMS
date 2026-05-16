@@ -23,13 +23,26 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "analytics", label: "Analytics" },
 ];
 
-interface PerformancePageClientProps {
-  goals: SerializedGoal[];
-  reviews: SerializedReview[];
+type PerformancePageClientProps = {
+  goals: readonly SerializedGoal[];
+  reviews: readonly SerializedReview[];
   teamData: TeamPerformanceSummary | null;
+};
+
+function getGoalMetrics(goals: readonly SerializedGoal[]) {
+  const totalGoals = goals.length;
+  const completedGoals = goals.filter((goal) => goal.status === "COMPLETED").length;
+  const inProgressGoals = goals.filter((goal) => goal.status === "IN_PROGRESS").length;
+  const completionPct = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
+
+  return { totalGoals, completedGoals, inProgressGoals, completionPct };
 }
 
-export function PerformancePageClient({ goals: initialGoals, reviews, teamData }: PerformancePageClientProps) {
+function getLatestScore(reviews: readonly SerializedReview[]): number | null {
+  return reviews.find((review) => review.score !== null)?.score ?? null;
+}
+
+export function PerformancePageClient({ goals: initialGoals, reviews, teamData }: Readonly<PerformancePageClientProps>) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("goals");
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -40,10 +53,9 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
 
   useEffect(() => { setGoals(initialGoals); }, [initialGoals]);
 
-  const totalGoals = goals.length;
-  const completedGoals = goals.filter((g) => g.status === "COMPLETED").length;
-  const completionPct = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
-  const latestScore = reviews.find((r) => r.score !== null)?.score ?? null;
+  const { totalGoals, completedGoals, inProgressGoals, completionPct } = getGoalMetrics(goals);
+  const completedReviews = reviews.filter((review) => review.status === "COMPLETED").length;
+  const latestScore = getLatestScore(reviews);
   const latestReview = reviews[0];
 
   function handleCreateGoal(e: React.FormEvent<HTMLFormElement>) {
@@ -61,6 +73,26 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
         router.refresh();
       } catch (err) {
         setToast(err instanceof Error ? err.message : "Failed to create goal");
+      }
+    });
+  }
+
+  function handleScheduleReviewSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+
+    startTransition(async () => {
+      try {
+        await scheduleReview({
+          type: fd.get("type") as string,
+          period: fd.get("period") as string,
+          notes: (fd.get("notes") as string) || undefined,
+        });
+        setShowReviewModal(false);
+        setToast("Review scheduled successfully!");
+        router.refresh();
+      } catch (err) {
+        setToast(err instanceof Error ? err.message : "Failed to schedule review");
       }
     });
   }
@@ -106,14 +138,14 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
         <div className="card-p">
           <p className="text-muted">Reviews Done</p>
           <div className="mt-2">
-            <span className="text-3xl font-bold text-violet-600">{reviews.filter((r) => r.status === "COMPLETED").length}</span>
+            <span className="text-3xl font-bold text-violet-600">{completedReviews}</span>
           </div>
           <span className="mt-1 badge-ai">{reviews.length} total</span>
         </div>
         <div className="card-p">
           <p className="text-muted">In Progress Goals</p>
           <div className="mt-2 flex items-end gap-1">
-            <span className="text-3xl font-bold text-amber-600">{goals.filter((g) => g.status === "IN_PROGRESS").length}</span>
+            <span className="text-3xl font-bold text-amber-600">{inProgressGoals}</span>
             <span className="mb-1 text-muted">active</span>
           </div>
           <span className="mt-1 badge-warning">of {totalGoals} total</span>
@@ -150,24 +182,7 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
         <ScheduleReviewModal
           onClose={() => setShowReviewModal(false)}
           isPending={isPending}
-          onSubmit={(e) => {
-            e.preventDefault();
-            const fd = new FormData(e.currentTarget);
-            startTransition(async () => {
-              try {
-                await scheduleReview({
-                  type: fd.get("type") as string,
-                  period: fd.get("period") as string,
-                  notes: (fd.get("notes") as string) || undefined,
-                });
-                setShowReviewModal(false);
-                setToast("Review scheduled successfully!");
-                router.refresh();
-              } catch (err) {
-                setToast(err instanceof Error ? err.message : "Failed to schedule review");
-              }
-            });
-          }}
+          onSubmit={handleScheduleReviewSubmit}
         />
       )}
 
@@ -184,16 +199,16 @@ export function PerformancePageClient({ goals: initialGoals, reviews, teamData }
             </div>
             <form onSubmit={handleCreateGoal} className="space-y-4">
               <div>
-                <label className="label-field">Goal Title <span className="text-rose-500">*</span></label>
-                <input name="title" type="text" required placeholder="Enter goal title" className="input-field" />
+                <label htmlFor="goal-title" className="label-field">Goal Title <span className="text-rose-500">*</span></label>
+                <input id="goal-title" name="title" type="text" required placeholder="Enter goal title" className="input-field" />
               </div>
               <div>
-                <label className="label-field">Target Date</label>
-                <input name="dueDate" type="date" className="input-field" />
+                <label htmlFor="goal-due-date" className="label-field">Target Date</label>
+                <input id="goal-due-date" name="dueDate" type="date" className="input-field" />
               </div>
               <div>
-                <label className="label-field">Description</label>
-                <textarea name="description" rows={2} placeholder="Describe the goal..." className="input-field resize-none" />
+                <label htmlFor="goal-description" className="label-field">Description</label>
+                <textarea id="goal-description" name="description" rows={2} placeholder="Describe the goal..." className="input-field resize-none" />
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowGoalModal(false)} className="btn-secondary">Cancel</button>

@@ -37,6 +37,46 @@ function getCurrentWeekDays(): { label: string; date: number; isToday: boolean }
   });
 }
 
+function WeekDayGrid({ weekDays }: Readonly<{ weekDays: ReturnType<typeof getCurrentWeekDays> }>) {
+  return (
+    <div className="mt-3 flex gap-1">
+      {weekDays.map((d) => (
+        <div key={`${d.label}-${d.date}`} className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-[10px] font-medium ${d.isToday ? "bg-primary-600 text-white" : "text-dark-5 dark:text-dark-6"}`}>
+          <span>{d.label}</span>
+          <span className={`mt-0.5 font-bold ${d.isToday ? "text-white" : "text-dark dark:text-white"}`}>{d.date}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EventItem({ event }: Readonly<{ event: { title: string; time: string; type: "leave" | "task" } }>) {
+  const style = TYPE_STYLE[event.type];
+
+  return (
+    <li className="flex items-start gap-2.5">
+      <div className={`mt-0.5 w-0.5 self-stretch shrink-0 rounded-full ${style.bar}`} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-xs font-semibold text-dark dark:text-white">{event.title}</p>
+        <span className="text-[10px] text-dark-5 dark:text-dark-6">{event.time}</span>
+      </div>
+      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${style.badge}`}>{style.label}</span>
+    </li>
+  );
+}
+
+function EventsList({ events }: Readonly<{ events: Array<{ title: string; time: string; type: "leave" | "task" }> }>) {
+  return (
+    <ul className="mt-4 flex-1 space-y-2.5 overflow-y-auto">
+      {events.length === 0 ? (
+        <li className="py-4 text-center text-xs text-dark-5 dark:text-dark-6">No events today.</li>
+      ) : (
+        events.map((ev) => <EventItem key={`${ev.type}-${ev.title}-${ev.time}`} event={ev} />)
+      )}
+    </ul>
+  );
+}
+
 export function CalendarPreview({ calendarData }: Readonly<Props>) {
   const weekDays = getCurrentWeekDays();
   const todayStr = new Date().toDateString();
@@ -74,44 +114,8 @@ export function CalendarPreview({ calendarData }: Readonly<Props>) {
           Calendar
         </Link>
       </div>
-
-      <div className="mt-3 flex gap-1">
-        {weekDays.map((d, i) => (
-          <div
-            key={i}
-            className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-[10px] font-medium ${
-              d.isToday ? "bg-primary-600 text-white" : "text-dark-5 dark:text-dark-6"
-            }`}
-          >
-            <span>{d.label}</span>
-            <span className={`mt-0.5 font-bold ${d.isToday ? "text-white" : "text-dark dark:text-white"}`}>
-              {d.date}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <ul className="mt-4 flex-1 space-y-2.5 overflow-y-auto">
-        {events.length === 0 ? (
-          <li className="py-4 text-center text-xs text-dark-5 dark:text-dark-6">No events today.</li>
-        ) : (
-          events.map((ev, i) => {
-            const style = TYPE_STYLE[ev.type];
-            return (
-              <li key={i} className="flex items-start gap-2.5">
-                <div className={`mt-0.5 w-0.5 self-stretch shrink-0 rounded-full ${style.bar}`} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-dark dark:text-white">{ev.title}</p>
-                  <span className="text-[10px] text-dark-5 dark:text-dark-6">{ev.time}</span>
-                </div>
-                <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${style.badge}`}>
-                  {style.label}
-                </span>
-              </li>
-            );
-          })
-        )}
-      </ul>
+      <WeekDayGrid weekDays={weekDays} />
+      <EventsList events={events} />
     </div>
   );
 }

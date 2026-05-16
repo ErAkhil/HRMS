@@ -57,45 +57,15 @@ export class DmService {
     });
 
     const otherUserIds = convos.map((c) => (c.user1Id === user.sub ? c.user2Id : c.user1Id));
-    const employees =
-      otherUserIds.length > 0
-        ? await this.prisma.employee.findMany({
-            where: { userId: { in: otherUserIds }, orgId: user.orgId },
-            select: { userId: true, firstName: true, lastName: true, avatarUrl: true },
-          })
-        : [];
-    const empMap = new Map(employees.map((e) => [e.userId, e]));
-
-    const unreadGroups =
-      convos.length > 0
-        ? await this.prisma.directMessage.groupBy({
-            by: ['conversationId'],
-            where: {
-              conversationId: { in: convos.map((c) => c.id) },
-              senderId: { not: user.sub },
-              readAt: null,
-            },
-            _count: { _all: true },
-          })
-        : [];
-    const unreadCountMap = new Map(
-      unreadGroups.map((group) => [group.conversationId, group._count._all]),
+    const empMap = await this.getEmployeeMap(otherUserIds, user.orgId);
+    const unreadCountMap = await this.getUnreadCountMap(
+      convos.map((conversation) => conversation.id),
+      user.sub,
     );
 
-    return convos.map((c) => {
-      const otherId = c.user1Id === user.sub ? c.user2Id : c.user1Id;
-      const emp = otherId ? empMap.get(otherId) : undefined;
-      const last = c.messages[0];
-      return {
-        id: c.id,
-        otherUserId: otherId,
-        otherUserName: emp ? `${emp.firstName} ${emp.lastName}` : 'Unknown',
-        otherUserAvatar: emp?.avatarUrl ?? null,
-        lastMessage: last?.content ?? null,
-        lastMessageAt: last?.createdAt.toISOString() ?? null,
-        unreadCount: unreadCountMap.get(c.id) ?? 0,
-      };
-    });
+    return convos.map((conversation) =>
+      this.toConversationSummary(conversation, user.sub, empMap, unreadCountMap),
+    );
   }
 
   async getMessages(conversationId: string, user: JwtPayload) {
@@ -134,14 +104,8 @@ export class DmService {
 
     return messages.map((m) => {
       const emp = empMap.get(m.senderId);
-      const readBy: ReadReceipt[] = m.readAt && m.senderId === user.sub && otherUserEmp
-        ? [{
-            userId: otherUserEmp.userId,
-            name: `${otherUserEmp.firstName} ${otherUserEmp.lastName}`,
-            avatar: otherUserEmp.avatarUrl ?? null,
-            readAt: m.readAt.toISOString(),
-          }]
-        : [];
+      const readBy = this.buildReadReceipts(m, user.sub, otherUserEmp);
+
       return {
         id: m.id,
         content: m.content,
@@ -216,6 +180,93 @@ export class DmService {
       select: { id: true, createdAt: true },
     });
 
+    const readerProfile = await this.getReaderProfile(user);
+    const otherId = convo.user1Id === user.sub ? convo.user2Id : convo.user1Id;
+
+    this.events.emitToUser(otherId, 'dm:read', {
+      conversationId,
+      readById: user.sub,
+      lastReadMessageId: lastReadMessage?.id ?? null,
+      readAt: lastReadMessage?.createdAt.toISOString() ?? null,
+      readerName: readerProfile.name,
+      readerAvatar: readerProfile.avatar,
+    });
+
+    return {
+      ok: true,
+      lastReadMessageId: lastReadMessage?.id ?? null,
+    };
+  }
+
+  private async getEmployeeMap(userIds: string[], orgId: string) {
+    if (userIds.length === 0) return new Map<string, { firstName: string; lastName: string; avatarUrl: string | null }>();
+
+    const employees = await this.prisma.employee.findMany({
+      where: { userId: { in: userIds }, orgId },
+      select: { userId: true, firstName: true, lastName: true, avatarUrl: true },
+    });
+
+    return new Map(employees.map((employee) => [employee.userId, employee]));
+  }
+
+  private async getUnreadCountMap(conversationIds: string[], currentUserId: string) {
+    if (conversationIds.length === 0) return new Map<string, number>();
+
+    const unreadGroups = await this.prisma.directMessage.groupBy({
+      by: ['conversationId'],
+      where: {
+        conversationId: { in: conversationIds },
+        senderId: { not: currentUserId },
+        readAt: null,
+      },
+      _count: { _all: true },
+    });
+
+    return new Map(unreadGroups.map((group) => [group.conversationId, group._count._all]));
+  }
+
+  private toConversationSummary(
+    conversation: {
+      id: string;
+      user1Id: string;
+      user2Id: string;
+      messages: { content: string; createdAt: Date }[];
+    },
+    currentUserId: string,
+    empMap: Map<string, { firstName: string; lastName: string; avatarUrl: string | null }>,
+    unreadCountMap: Map<string, number>,
+  ) {
+    const otherUserId = conversation.user1Id === currentUserId ? conversation.user2Id : conversation.user1Id;
+    const employee = empMap.get(otherUserId);
+    const lastMessage = conversation.messages[0];
+
+    return {
+      id: conversation.id,
+      otherUserId,
+      otherUserName: employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown',
+      otherUserAvatar: employee?.avatarUrl ?? null,
+      lastMessage: lastMessage?.content ?? null,
+      lastMessageAt: lastMessage?.createdAt.toISOString() ?? null,
+      unreadCount: unreadCountMap.get(conversation.id) ?? 0,
+    };
+  }
+
+  private buildReadReceipts(
+    message: { readAt: Date | null; senderId: string },
+    currentUserId: string,
+    otherUserEmp: { userId: string; firstName: string; lastName: string; avatarUrl: string | null } | null,
+  ): ReadReceipt[] {
+    if (!message.readAt || message.senderId !== currentUserId || !otherUserEmp) return [];
+
+    return [{
+      userId: otherUserEmp.userId,
+      name: `${otherUserEmp.firstName} ${otherUserEmp.lastName}`,
+      avatar: otherUserEmp.avatarUrl ?? null,
+      readAt: message.readAt.toISOString(),
+    }];
+  }
+
+  private async getReaderProfile(user: JwtPayload) {
     const readerEmp = user.employeeId
       ? await this.prisma.employee.findUnique({
           where: { id: user.employeeId },
@@ -223,19 +274,9 @@ export class DmService {
         })
       : null;
 
-    const otherId = convo.user1Id === user.sub ? convo.user2Id : convo.user1Id;
-    this.events.emitToUser(otherId, 'dm:read', {
-      conversationId,
-      readById: user.sub,
-      lastReadMessageId: lastReadMessage?.id ?? null,
-      readAt: lastReadMessage?.createdAt.toISOString() ?? null,
-      readerName: readerEmp ? `${readerEmp.firstName} ${readerEmp.lastName}` : user.email.split('@')[0],
-      readerAvatar: readerEmp?.avatarUrl ?? null,
-    });
-
     return {
-      ok: true,
-      lastReadMessageId: lastReadMessage?.id ?? null,
+      name: readerEmp ? `${readerEmp.firstName} ${readerEmp.lastName}` : user.email.split('@')[0],
+      avatar: readerEmp?.avatarUrl ?? null,
     };
   }
 

@@ -22,7 +22,95 @@ interface Props {
   type: string;
 }
 
-export function AuditClient({ logs, from, to, type }: Props) {
+function AuditHeader({ logs, fromDate, toDate, onDateChange, onExport }: Readonly<{ logs: SerializedAuditLog[]; fromDate: string; toDate: string; onDateChange: (field: "from" | "to", value: string) => void; onExport: () => void }>) {
+  const eventSuffix = logs.length === 1 ? "" : "s";
+
+  return (
+    <div className="page-header">
+      <div>
+        <h1 className="page-title">Audit Logs</h1>
+        <p className="mt-0.5 text-muted">Complete activity trail — {logs.length} event{eventSuffix} found</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <input type="date" value={fromDate} onChange={(e) => onDateChange("from", e.target.value)} className="input-field h-9" />
+        <span className="text-muted">to</span>
+        <input type="date" value={toDate} onChange={(e) => onDateChange("to", e.target.value)} className="input-field h-9" />
+        <button onClick={onExport} className="btn-primary flex items-center gap-1.5">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Export
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function EventTypeFilter({ activeFilter, onFilter }: Readonly<{ activeFilter: string; onFilter: (t: string) => void }>) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {EVENT_TYPES.map((t) => (
+        <button key={t} onClick={() => onFilter(t)} className={`rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors ${activeFilter === t ? "bg-primary-600 text-white" : "btn-secondary"}`}>
+          {t === "All" ? "All" : t}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function AuditRow({ log }: Readonly<{ log: SerializedAuditLog }>) {
+  return (
+    <tr className="tr-body">
+      <td className="td font-mono text-xs whitespace-nowrap">{new Date(log.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}</td>
+      <td className="td font-medium whitespace-nowrap">{log.userEmail}</td>
+      <td className="td"><span className="text-body">{log.action}</span></td>
+      <td className="td text-muted">{log.resource}</td>
+      <td className="td font-mono text-xs text-muted">{log.ipAddress ?? "—"}</td>
+      <td className="td"><span className={severityColors[log.severity] ?? severityColors.Info}>{log.severity}</span></td>
+    </tr>
+  );
+}
+
+function AuditTable({ logs }: Readonly<{ logs: SerializedAuditLog[] }>) {
+  return (
+    <div className="card overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="thead-row">
+              <th className="th">Timestamp</th>
+              <th className="th">User</th>
+              <th className="th">Action</th>
+              <th className="th">Resource</th>
+              <th className="th">IP Address</th>
+              <th className="th">Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {logs.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-5 py-8 text-center text-muted">
+                  No audit events found for the selected period
+                </td>
+              </tr>
+            )}
+            {logs.map((log) => (
+              <AuditRow key={log.id} log={log} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function buildCsvExport(logs: SerializedAuditLog[], fromDate: string, toDate: string) {
+  const header = "Date,User,Action,Resource,Details,IP,Severity";
+  const rows = logs.map((l) => [new Date(l.createdAt).toISOString(), l.userEmail, l.action, l.resource, (l.details ?? "").replaceAll(",", ";"), l.ipAddress ?? "", l.severity].join(","));
+  return [header, ...rows].join("\n");
+}
+
+export function AuditClient({ logs, from, to, type }: Readonly<Props>) {
   const router = useRouter();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
@@ -48,135 +136,26 @@ export function AuditClient({ logs, from, to, type }: Props) {
     }
   }
 
-  function handleTypeFilter(t: string) {
-    setActiveFilter(t);
-    applyFilters(fromDate, toDate, t);
+  function handleExport() {
+    const csv = buildCsvExport(logs, fromDate, toDate);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `audit-log-${fromDate}-to-${toDate}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setToast("Audit log exported!");
   }
 
   return (
     <div className="page-container">
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Audit Logs</h1>
-          <p className="mt-0.5 text-muted">
-            Complete activity trail — {logs.length} event{logs.length !== 1 ? "s" : ""} found
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => handleDateChange("from", e.target.value)}
-            className="input-field h-9"
-          />
-          <span className="text-muted">to</span>
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => handleDateChange("to", e.target.value)}
-            className="input-field h-9"
-          />
-          <button
-            onClick={() => {
-              const header = "Date,User,Action,Resource,Details,IP,Severity";
-              const rows = logs.map((l) =>
-                [
-                  new Date(l.createdAt).toISOString(),
-                  l.userEmail,
-                  l.action,
-                  l.resource,
-                  (l.details ?? "").replace(/,/g, ";"),
-                  l.ipAddress ?? "",
-                  l.severity,
-                ].join(",")
-              );
-              const csv = [header, ...rows].join("\n");
-              const blob = new Blob([csv], { type: "text/csv" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `audit-log-${fromDate}-to-${toDate}.csv`;
-              a.click();
-              URL.revokeObjectURL(url);
-              setToast("Audit log exported!");
-            }}
-            className="btn-primary flex items-center gap-1.5"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Export
-          </button>
-        </div>
-      </div>
-
-      {/* Event Type Filter */}
-      <div className="flex flex-wrap gap-2">
-        {EVENT_TYPES.map((t) => (
-          <button
-            key={t}
-            onClick={() => handleTypeFilter(t)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors ${
-              activeFilter === t
-                ? "bg-primary-600 text-white"
-                : "btn-secondary"
-            }`}
-          >
-            {t === "All" ? "All" : t}
-          </button>
-        ))}
-      </div>
-
-      {/* Audit Table */}
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="thead-row">
-                <th className="th">Timestamp</th>
-                <th className="th">User</th>
-                <th className="th">Action</th>
-                <th className="th">Resource</th>
-                <th className="th">IP Address</th>
-                <th className="th">Severity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-muted">
-                    No audit events found for the selected period
-                  </td>
-                </tr>
-              )}
-              {logs.map((log) => (
-                <tr key={log.id} className="tr-body">
-                  <td className="td font-mono text-xs whitespace-nowrap">
-                    {new Date(log.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                  </td>
-                  <td className="td font-medium whitespace-nowrap">
-                    {log.userEmail}
-                  </td>
-                  <td className="td">
-                    <span className="text-body">{log.action}</span>
-                  </td>
-                  <td className="td text-muted">{log.resource}</td>
-                  <td className="td font-mono text-xs text-muted">
-                    {log.ipAddress ?? "—"}
-                  </td>
-                  <td className="td">
-                    <span className={severityColors[log.severity] ?? severityColors.Info}>
-                      {log.severity}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+      <AuditHeader logs={logs} fromDate={fromDate} toDate={toDate} onDateChange={handleDateChange} onExport={handleExport} />
+      <EventTypeFilter activeFilter={activeFilter} onFilter={(t) => {
+        setActiveFilter(t);
+        applyFilters(fromDate, toDate, t);
+      }} />
+      <AuditTable logs={logs} />
       <Toast message={toast} />
     </div>
   );

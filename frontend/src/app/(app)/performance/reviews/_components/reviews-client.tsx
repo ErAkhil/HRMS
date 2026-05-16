@@ -19,17 +19,75 @@ type Review = {
   completedAt: string | null;
 };
 
+type FilterStatus = "All" | "PENDING" | "COMPLETED";
+
 const STATUS_BADGE: Record<string, string> = {
   PENDING: "rounded-full bg-amber-light px-2.5 py-0.5 text-xs font-medium text-amber-dark",
   IN_PROGRESS: "rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-dark dark:bg-sky-dark/10 dark:text-sky",
   COMPLETED: "rounded-full bg-emerald-light px-2.5 py-0.5 text-xs font-medium text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
 };
 
+function getReviewStats(reviews: readonly Review[]) {
+  let pending = 0;
+  let completed = 0;
+  let scoredCount = 0;
+  let scoreTotal = 0;
+
+  for (const review of reviews) {
+    if (review.status === "PENDING") pending += 1;
+    if (review.status === "COMPLETED") completed += 1;
+
+    if (review.score !== null) {
+      scoredCount += 1;
+      scoreTotal += review.score;
+    }
+  }
+
+  return {
+    pending,
+    completed,
+    avgScore: scoredCount > 0 ? Math.round(scoreTotal / scoredCount) : 0,
+  };
+}
+
+function getActivePeriodData(reviews: readonly Review[]) {
+  const frequency: Record<string, number> = {};
+
+  for (const review of reviews) {
+    if (review.status !== "COMPLETED") {
+      frequency[review.period] = (frequency[review.period] ?? 0) + 1;
+    }
+  }
+
+  const activePeriod =
+    Object.entries(frequency)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] ?? reviews[0]?.period ?? null;
+
+  const activePeriodReviews = activePeriod
+    ? reviews.filter((review) => review.period === activePeriod)
+    : [];
+  const activePeriodCompleted = activePeriodReviews.filter((review) => review.status === "COMPLETED").length;
+  const activePeriodPct = activePeriodReviews.length > 0
+    ? Math.round((activePeriodCompleted / activePeriodReviews.length) * 100)
+    : 0;
+
+  return {
+    activePeriod,
+    activePeriodReviews,
+    activePeriodCompleted,
+    activePeriodPct,
+  };
+}
+
+function pluralizeReview(count: number): string {
+  return `review${count === 1 ? "" : "s"}`;
+}
+
 export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
   const router = useRouter();
   const { toast, setToast } = useToast();
   const [showModal, setShowModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState("All");
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("All");
   const [cycleName, setCycleName] = useState("");
   const [reviewType, setReviewType] = useState("Quarterly");
   const [isPending, startTransition] = useTransition();
@@ -42,7 +100,7 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
         setShowModal(false);
         setCycleName("");
         setReviewType("Quarterly");
-        setToast(`Review cycle created — ${result.created} review${result.created !== 1 ? "s" : ""} scheduled`);
+        setToast(`Review cycle created — ${result.created} ${pluralizeReview(result.created)} scheduled`);
         router.refresh();
       } catch (err) {
         setToast(err instanceof Error ? err.message : "Failed to create review cycle");
@@ -50,25 +108,9 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
     });
   }
 
-  const filtered = reviews.filter((r) => filterStatus === "All" || r.status === filterStatus);
-  const pending = reviews.filter((r) => r.status === "PENDING").length;
-  const completed = reviews.filter((r) => r.status === "COMPLETED").length;
-  const avgScore = reviews.filter((r) => r.score !== null).length > 0
-    ? Math.round(reviews.filter((r) => r.score !== null).reduce((s, r) => s + (r.score ?? 0), 0) / reviews.filter((r) => r.score !== null).length)
-    : 0;
-
-  const activePeriod = (() => {
-    const freq: Record<string, number> = {};
-    for (const r of reviews) {
-      if (r.status !== "COMPLETED") freq[r.period] = (freq[r.period] ?? 0) + 1;
-    }
-    return Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? reviews[0]?.period ?? null;
-  })();
-  const activePeriodReviews = activePeriod ? reviews.filter((r) => r.period === activePeriod) : [];
-  const activePeriodCompleted = activePeriodReviews.filter((r) => r.status === "COMPLETED").length;
-  const activePeriodPct = activePeriodReviews.length > 0
-    ? Math.round((activePeriodCompleted / activePeriodReviews.length) * 100)
-    : 0;
+  const filtered = reviews.filter((review) => filterStatus === "All" || review.status === filterStatus);
+  const { pending, completed, avgScore } = getReviewStats(reviews);
+  const { activePeriod, activePeriodReviews, activePeriodCompleted, activePeriodPct } = getActivePeriodData(reviews);
 
   return (
     <div className="page-container">
@@ -138,7 +180,7 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
         <div className="page-header border-b border-gray-3 px-5 py-4 dark:border-dark-3">
           <h2 className="section-title">All Reviews</h2>
           <div className="flex gap-2">
-            {["All", "PENDING", "COMPLETED"].map((s) => (
+            {(["All", "PENDING", "COMPLETED"] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setFilterStatus(s)}
@@ -179,13 +221,13 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
                     <td className="td text-dark-5 dark:text-dark-6">{r.period}</td>
                     <td className="td text-dark-5 dark:text-dark-6">{r.reviewerName}</td>
                     <td className="td">
-                      {r.score !== null ? (
+                      {r.score === null ? (
+                        <span className="text-dark-5 dark:text-dark-6">—</span>
+                      ) : (
                         <>
                           <span className="font-semibold text-dark dark:text-white">{r.score}</span>
                           <span className="text-dark-5 dark:text-dark-6">/100</span>
                         </>
-                      ) : (
-                        <span className="text-dark-5 dark:text-dark-6">—</span>
                       )}
                     </td>
                     <td className="td">
@@ -211,12 +253,12 @@ export function ReviewsClient({ reviews }: Readonly<{ reviews: Review[] }>) {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="label-field mb-1.5">Cycle Name <span className="text-rose-500">*</span></label>
-                <input type="text" value={cycleName} onChange={(e) => setCycleName(e.target.value)} placeholder="e.g. Q3 2026 Review" className="input-field h-9 w-full" />
+                <label htmlFor="cycle-name" className="label-field mb-1.5">Cycle Name <span className="text-rose-500">*</span></label>
+                <input id="cycle-name" type="text" value={cycleName} onChange={(e) => setCycleName(e.target.value)} placeholder="e.g. Q3 2026 Review" className="input-field h-9 w-full" />
               </div>
               <div>
-                <label className="label-field mb-1.5">Type</label>
-                <select value={reviewType} onChange={(e) => setReviewType(e.target.value)} className="input-field h-9 w-full">
+                <label htmlFor="review-type" className="label-field mb-1.5">Type</label>
+                <select id="review-type" value={reviewType} onChange={(e) => setReviewType(e.target.value)} className="input-field h-9 w-full">
                   <option value="Annual">Annual</option>
                   <option value="Mid-year">Mid-year</option>
                   <option value="Quarterly">Quarterly</option>
