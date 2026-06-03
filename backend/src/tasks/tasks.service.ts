@@ -155,4 +155,46 @@ export class TasksService {
       },
     });
   }
+
+  async getSummary(user: JwtPayload) {
+    const isHr = ['HR_ADMIN', 'SUPER_ADMIN'].includes(user.role);
+    
+    const where = { orgId: user.orgId };
+    if (!isHr && user.employeeId) {
+      Object.assign(where, { OR: [{ assigneeId: user.employeeId }, { createdById: user.employeeId }] });
+    }
+
+    const [pending, completed, overdue] = await Promise.all([
+      this.prisma.task.count({ where: { ...where, status: 'TODO' } }),
+      this.prisma.task.count({ where: { ...where, status: 'DONE' } }),
+      this.prisma.task.count({ 
+        where: { 
+          ...where, 
+          status: { not: 'DONE' },
+          dueDate: { lt: new Date() }
+        } 
+      }),
+    ]);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const completedToday = await this.prisma.task.count({
+      where: {
+        ...where,
+        status: 'DONE',
+        updatedAt: { gte: today, lt: tomorrow }
+      }
+    });
+
+    return {
+      pending,
+      completed,
+      overdue,
+      completedToday,
+      total: pending + completed,
+    };
+  }
 }

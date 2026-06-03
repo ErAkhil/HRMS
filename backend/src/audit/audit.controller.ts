@@ -15,6 +15,7 @@ export class AuditController {
 
   @Get('logs')
   getLogs(@Query() dto: GetAuditLogsDto, @CurrentUser() user: JwtPayload) {
-    return this.audit.getLogs(user.orgId, dto);
+    const orgId = user.role === 'SUPER_ADMIN' ? undefined : user.orgId;
+    return this.audit.getLogs(orgId, dto);
   }
 }

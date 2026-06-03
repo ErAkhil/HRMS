@@ -53,4 +53,15 @@ export class PayrollController {
   runPayroll(@Body() dto: RunPayrollDto, @CurrentUser() user: JwtPayload) {
     return this.payroll.runPayroll(dto.month, dto.year, user);
   }
+
+  @Get('summary/:year/:month')
+  @Roles('HR_ADMIN', 'SUPER_ADMIN')
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
+  getPayrollSummaryForMonth(
+    @Param('year') year: string,
+    @Param('month') month: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.payroll.getPayrollSummaryForMonth(parseInt(month), parseInt(year), user);
+  }
 }

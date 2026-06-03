@@ -88,3 +88,29 @@ export async function runPayroll(month: number, year: number) {
   revalidatePath("/payroll");
   return result;
 }
+
+export type PayrollMonthlySummary = {
+  month: number;
+  year: number;
+  totalGross: number;
+  totalNet: number;
+  totalDeductions: number;
+  employeeCount: number;
+  status: string;
+  processedAt: string | null;
+  monthName: string;
+};
+
+export async function getPayrollSummaryForMonth(
+  month: number,
+  year: number
+): Promise<PayrollMonthlySummary | null> {
+  await requireRole("SUPER_ADMIN", "HR_ADMIN");
+  try {
+    return await api.get<PayrollMonthlySummary>(
+      `/payroll/summary/${year}/${month}`
+    );
+  } catch {
+    return null;
+  }
+}

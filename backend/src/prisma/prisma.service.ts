@@ -4,6 +4,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  override get shiftAssignment(): PrismaClient['shiftAssignment'] {
+    return super.shiftAssignment;
+  }
+
   constructor() {
     const adapter = new PrismaPg({
       connectionString: process.env.DATABASE_URL,

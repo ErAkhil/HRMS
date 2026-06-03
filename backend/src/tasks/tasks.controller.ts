@@ -33,6 +33,11 @@ export class TasksController {
     return this.tasks.getTeamWorkload(user);
   }
 
+  @Get('summary')
+  getSummary(@CurrentUser() user: JwtPayload) {
+    return this.tasks.getSummary(user);
+  }
+
   @Post()
   createTask(@Body() dto: CreateTaskDto, @CurrentUser() user: JwtPayload) {
     return this.tasks.createTask(dto, user);

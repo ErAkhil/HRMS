@@ -164,9 +164,16 @@ Before adding a new pattern, check if it already exists:
 
 ```
 URL:      http://localhost:3000
-Email:    admin@unikove.com
-Password: password123
-Org:      Unikove Technologies (PRO_MAX plan)
+
+SUPER_ADMIN (platform — sees all orgs):
+  Email:    admin@Monja.com
+  Password: password123
+  Org:      Monja Technologies (PRO_MAX plan)
+
+HR_ADMIN (org-scoped):
+  Email:    admin@meridian.com   (Meridian Health Systems)
+  Email:    admin@apex.com        (Apex Financial Group)
+  Password: password123
 ```
 
 ## Dev Setup

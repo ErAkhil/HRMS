@@ -26,7 +26,7 @@ export default auth((req) => {
 
   if (
     pathname === "/" ||
-    PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))
+    PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))
   ) {
     return;
   }
@@ -39,8 +39,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  // Exclude api/auth, static files, images, and other non-page routes
-  matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|images|fonts|js).*)",
-  ],
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|images|fonts|js).*)"],
 };

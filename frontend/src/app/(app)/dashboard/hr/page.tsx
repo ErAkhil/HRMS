@@ -3,6 +3,7 @@ import { getHrDashboardData } from "@/lib/actions/dashboard";
 import { HrKpiRow } from "./_components/hr-kpi-row";
 import { HrThreeColumns } from "./_components/hr-three-columns";
 import { HrHeadcountAttrition } from "./_components/hr-headcount-attrition";
+import { HrAttendanceOverviewClient } from "./_components/hr-attendance-overview-client";
 
 export const metadata = { title: "HR Dashboard | Monja" };
 
@@ -57,17 +58,17 @@ export default async function HRDashboardPage() {
           <div className="flex flex-wrap gap-2 md:flex-col md:items-end lg:flex-row">
             {pendingLeaveCount > 0 && (
               <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-semibold text-white">
-                {pendingLeaveCount} Pending Leave{pendingLeaveCount !== 1 ? "s" : ""}
+                {pendingLeaveCount} Pending Leave{pendingLeaveCount === 1 ? "" : "s"}
               </span>
             )}
             {openJobsCount > 0 && (
               <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-semibold text-white">
-                {openJobsCount} Open Position{openJobsCount !== 1 ? "s" : ""}
+                {openJobsCount} Open Position{openJobsCount === 1 ? "" : "s"}
               </span>
             )}
             {pendingReviewsCount > 0 && (
               <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-semibold text-white">
-                {pendingReviewsCount} Pending Review{pendingReviewsCount !== 1 ? "s" : ""}
+                {pendingReviewsCount} Pending Review{pendingReviewsCount === 1 ? "" : "s"}
               </span>
             )}
             <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-semibold text-white">
@@ -96,7 +97,7 @@ export default async function HRDashboardPage() {
                     LEAVE
                   </span>
                   <p className="text-xs text-dark-5 dark:text-dark-6 leading-snug">
-                    {item.employeeName} requested {item.days} day{item.days !== 1 ? "s" : ""} of {item.leaveType.toLowerCase()} leave starting {formatDate(item.startDate)}
+                    {item.employeeName} requested {item.days} day{item.days === 1 ? "" : "s"} of {item.leaveType.toLowerCase()} leave starting {formatDate(item.startDate)}
                   </p>
                 </div>
                 <Link
@@ -114,7 +115,7 @@ export default async function HRDashboardPage() {
                     REVIEW
                   </span>
                   <p className="text-xs text-dark-5 dark:text-dark-6 leading-snug">
-                    {pendingReviewsCount} performance review{pendingReviewsCount !== 1 ? "s" : ""} pending completion
+                    {pendingReviewsCount} performance review{pendingReviewsCount === 1 ? "" : "s"} pending completion
                   </p>
                 </div>
                 <Link
@@ -135,57 +136,12 @@ export default async function HRDashboardPage() {
         <div className="md:col-span-4 flex flex-col gap-4">
 
           {/* Leave Overview */}
-          <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-dark dark:text-white">Leave Today</h2>
-              <span className="text-xs text-dark-5 dark:text-dark-6">{todayStr}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              <div className="rounded-lg bg-amber-light dark:bg-amber-dark/20 px-3 py-2 text-center">
-                <p className="text-lg font-bold text-amber-dark dark:text-amber">{att.onLeave}</p>
-                <p className="text-[10px] font-semibold text-amber-dark/80 dark:text-amber/80">On Leave</p>
-              </div>
-              <div className="rounded-lg bg-primary-50 dark:bg-primary-900/20 px-3 py-2 text-center">
-                <p className="text-lg font-bold text-primary-600 dark:text-primary-300">{att.remote}</p>
-                <p className="text-[10px] font-semibold text-primary-600/80 dark:text-primary-300/80">WFH</p>
-              </div>
-              <div className="rounded-lg bg-rose-light dark:bg-rose-dark/20 px-3 py-2 text-center">
-                <p className="text-lg font-bold text-rose-dark dark:text-rose">{att.late}</p>
-                <p className="text-[10px] font-semibold text-rose-dark/80 dark:text-rose/80">Late</p>
-              </div>
-              <div className="rounded-lg bg-emerald-light dark:bg-emerald-dark/20 px-3 py-2 text-center">
-                <p className="text-lg font-bold text-emerald-dark dark:text-emerald">{att.present}</p>
-                <p className="text-[10px] font-semibold text-emerald-dark/80 dark:text-emerald/80">Present</p>
-              </div>
-            </div>
-            <div className="space-y-2 mb-4">
-              {([
-                { label: "On Leave", count: att.onLeave, barColor: "bg-amber-500" },
-                { label: "WFH", count: att.remote, barColor: "bg-primary-500" },
-                { label: "Late", count: att.late, barColor: "bg-rose-500" },
-                { label: "Present", count: att.present, barColor: "bg-emerald-500" },
-              ] as const).map((row) => (
-                <div key={row.label} className="flex items-center gap-2">
-                  <span className="w-16 shrink-0 text-[10px] text-dark-5 dark:text-dark-6">{row.label}</span>
-                  <div className="flex-1 relative h-1.5 rounded-full bg-gray-2 dark:bg-dark-3 overflow-hidden">
-                    <div
-                      className={`absolute inset-y-0 left-0 rounded-full ${row.barColor}`}
-                      style={{ width: headcount > 0 ? `${((row.count / headcount) * 100).toFixed(1)}%` : "0%" }}
-                    />
-                  </div>
-                  <span className="w-6 shrink-0 text-[10px] font-semibold text-dark-5 dark:text-dark-6 text-right">{row.count}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center justify-between border-t border-gray-3 dark:border-dark-3 pt-3">
-              <Link href="/leave/calendar" className="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
-                View Leave Calendar →
-              </Link>
-              <Link href="/leave/approvals" className="rounded-lg bg-primary-600 px-3 py-1 text-xs font-semibold text-white hover:bg-primary-700">
-                Approvals: {pendingLeaveCount}
-              </Link>
-            </div>
-          </div>
+          <HrAttendanceOverviewClient
+            attendance={{ ...att, absent: 0, halfDay: 0 }}
+            headcount={headcount}
+            pendingLeaveCount={pendingLeaveCount}
+            todayStr={todayStr}
+          />
 
           {/* Payroll Status */}
           <div className="rounded-xl bg-white p-5 shadow-card dark:bg-dark-2 dark:border dark:border-dark-3">

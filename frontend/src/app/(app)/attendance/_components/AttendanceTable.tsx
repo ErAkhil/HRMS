@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { AttendanceRecord, MyTodayStatus } from "@/lib/actions/attendance";
+import { LocationName } from "@/components/location/location-name";
 
 const STATUS_BADGE: Record<string, string> = {
   PRESENT: "bg-emerald-light text-emerald-dark dark:bg-emerald-dark/20 dark:text-emerald",
@@ -18,6 +19,12 @@ const STATUS_LABEL: Record<string, string> = {
 function fmt(iso: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function fmtHours(hoursWorked: number | null, checkIn: string | null, checkOut: string | null) {
+  if (hoursWorked) return `${hoursWorked}h`;
+  if (checkIn && !checkOut) return "In progress";
+  return "—";
 }
 
 interface Props {
@@ -68,7 +75,13 @@ export function AttendanceTable({ records, myStatus }: Readonly<Props>) {
                   <td className="px-5 py-3.5 text-dark-5 dark:text-dark-6">{fmt(r.checkIn)}</td>
                   <td className="px-5 py-3.5 text-dark-5 dark:text-dark-6">{fmt(r.checkOut)}</td>
                   <td className="px-5 py-3.5 text-dark dark:text-white font-medium">
-                    {r.hoursWorked ? `${r.hoursWorked}h` : r.checkIn && !r.checkOut ? "In progress" : "—"}
+                    <p>{fmtHours(r.hoursWorked, r.checkIn, r.checkOut)}</p>
+                    <p className="mt-0.5 text-xs font-normal text-dark-5 dark:text-dark-6">
+                      In loc: <LocationName latitude={r.checkInLatitude} longitude={r.checkInLongitude} />
+                    </p>
+                    <p className="text-xs font-normal text-dark-5 dark:text-dark-6">
+                      Out loc: <LocationName latitude={r.checkOutLatitude} longitude={r.checkOutLongitude} />
+                    </p>
                   </td>
                   <td className="px-5 py-3.5">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE[r.status] ?? ""}`}>
@@ -87,6 +100,9 @@ export function AttendanceTable({ records, myStatus }: Readonly<Props>) {
           <p className="text-xs font-medium text-primary-600 dark:text-primary-300">
             Your session today: In {fmt(myStatus.checkIn)}
             {myStatus.checkOut ? ` · Out ${fmt(myStatus.checkOut)} · ${myStatus.hoursWorked}h worked` : " · Still active"}
+          </p>
+          <p className="mt-1 text-xs text-primary-600/90 dark:text-primary-300/90">
+            In location: <LocationName latitude={myStatus.checkInLatitude} longitude={myStatus.checkInLongitude} /> · Out location: <LocationName latitude={myStatus.checkOutLatitude} longitude={myStatus.checkOutLongitude} />
           </p>
         </div>
       )}

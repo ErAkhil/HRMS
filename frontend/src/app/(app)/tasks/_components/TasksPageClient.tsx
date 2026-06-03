@@ -20,7 +20,7 @@ interface TasksPageClientProps {
   teamWorkload: TeamMember[];
 }
 
-export function TasksPageClient({ tasks: initialTasks, projects, teamWorkload }: TasksPageClientProps) {
+export function TasksPageClient({ tasks: initialTasks, projects, teamWorkload }: Readonly<TasksPageClientProps>) {
   const router = useRouter();
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   const [tasks, setTasks] = useState(initialTasks);
@@ -248,25 +248,25 @@ export function TasksPageClient({ tasks: initialTasks, projects, teamWorkload }:
             </div>
             <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Task Title <span className="text-rose-500">*</span></label>
-                <input name="title" type="text" required placeholder="Enter task title" className="input-field" />
+                <label htmlFor="task-title" className="mb-1 block text-xs font-medium text-dark-5 dark:text-dark-6">Task Title <span className="text-rose-500">*</span></label>
+                <input id="task-title" name="title" type="text" required placeholder="Enter task title" className="input-field" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Description</label>
-                <textarea name="description" rows={3} placeholder="Describe the task..." className="input-field resize-none" />
+                <label htmlFor="task-description" className="mb-1 block text-xs font-medium text-dark-5 dark:text-dark-6">Description</label>
+                <textarea id="task-description" name="description" rows={3} placeholder="Describe the task..." className="input-field resize-none" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Priority</label>
-                  <select name="priority" className="input-field">
+                  <label htmlFor="task-priority" className="mb-1 block text-xs font-medium text-dark-5 dark:text-dark-6">Priority</label>
+                  <select id="task-priority" name="priority" className="input-field">
                     <option value="HIGH">High</option>
                     <option value="MEDIUM" defaultValue="MEDIUM">Medium</option>
                     <option value="LOW">Low</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-dark-5 dark:text-dark-6 mb-1">Due Date</label>
-                  <input name="dueDate" type="date" className="input-field" />
+                  <label htmlFor="task-due-date" className="mb-1 block text-xs font-medium text-dark-5 dark:text-dark-6">Due Date</label>
+                  <input id="task-due-date" name="dueDate" type="date" className="input-field" />
                 </div>
               </div>
               <div className="flex justify-end gap-3 pt-2">

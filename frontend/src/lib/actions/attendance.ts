@@ -5,12 +5,21 @@ import { revalidatePath } from "next/cache";
 import type { AttendanceStatus } from "@/types/domain";
 import { api } from "@/lib/api-client";
 
+type AttendanceCoordinates = {
+  latitude: number;
+  longitude: number;
+};
+
 export type AttendanceRecord = {
   id: string;
   employeeId: string;
   date: string;
   checkIn: string | null;
   checkOut: string | null;
+  checkInLatitude: number | null;
+  checkInLongitude: number | null;
+  checkOutLatitude: number | null;
+  checkOutLongitude: number | null;
   status: string;
   hoursWorked: number | null;
   employee: {
@@ -68,6 +77,10 @@ export type MyTodayStatus = {
   date: string;
   checkIn: string | null;
   checkOut: string | null;
+  checkInLatitude: number | null;
+  checkInLongitude: number | null;
+  checkOutLatitude: number | null;
+  checkOutLongitude: number | null;
   status: string;
   hoursWorked: number | null;
 } | null;
@@ -82,18 +95,33 @@ export async function getAttendanceSummary(month: number, year: number) {
   return api.get<unknown[]>(`/attendance/summary?month=${month}&year=${year}`);
 }
 
-export async function checkIn() {
+export async function checkIn(coords: AttendanceCoordinates) {
   await requireAuth();
-  const result = await api.post<unknown>("/attendance/check-in");
+  const result = await api.post<unknown>("/attendance/check-in", coords);
   revalidatePath("/attendance");
   return result;
 }
 
-export async function checkOut() {
+export async function checkOut(coords: AttendanceCoordinates) {
   await requireAuth();
-  const result = await api.post<unknown>("/attendance/check-out");
+  const result = await api.post<unknown>("/attendance/check-out", coords);
   revalidatePath("/attendance");
   return result;
+}
+
+export async function backfillLocation(coords: AttendanceCoordinates) {
+  await requireAuth();
+  try {
+    const result = await api.post<unknown>("/attendance/backfill-location", coords);
+    revalidatePath("/attendance");
+    revalidatePath("/dashboard");
+    return result;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("404")) {
+      return { success: false, skipped: true };
+    }
+    throw error;
+  }
 }
 
 export async function updateAttendanceStatus(

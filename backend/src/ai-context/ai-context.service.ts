@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
@@ -8,6 +8,21 @@ const DONE_STATUSES = ['DONE', 'CANCELLED'];
 export class AiContextService {
   constructor(private prisma: PrismaService) {}
 
+  private getRoleCapabilities(role: string): string {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return 'Full system access: manage all organizations, users, billing, and all HR data across all departments.';
+      case 'HR_ADMIN':
+        return 'HR Admin access: manage all employees, run payroll, approve/reject leave, manage recruitment, view all reports, configure org settings.';
+      case 'MANAGER':
+        return 'Manager access: view and manage team members, approve team leave requests, assign tasks, view team attendance and performance, conduct performance reviews for direct reports.';
+      case 'EMPLOYEE':
+        return 'Employee access: view own profile and payslips, apply for leave, check in/out attendance, view own tasks and performance goals, access learning modules.';
+      default:
+        return 'Standard employee access.';
+    }
+  }
+
   async getContext(user: JwtPayload): Promise<string> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -16,7 +31,10 @@ export class AiContextService {
     type TaskRow = { status: string; dueDate: Date | null };
     type BalanceRow = { leaveType: string; total: number; used: number; pending: number };
 
-    const [employee, tasks, leaveBalances, attendance] = await Promise.all([
+    const isManager =
+      user.role === 'MANAGER' || user.role === 'HR_ADMIN' || user.role === 'SUPER_ADMIN';
+
+    const [employee, tasks, leaveBalances, attendance, teamSize] = await Promise.all([
       user.employeeId
         ? this.prisma.employee.findFirst({
             where: { id: user.employeeId, orgId: user.orgId },
@@ -50,6 +68,12 @@ export class AiContextService {
             },
           })
         : Promise.resolve(null),
+
+      isManager && user.employeeId
+        ? this.prisma.employee.count({
+            where: { managerId: user.employeeId, orgId: user.orgId, isActive: true },
+          })
+        : Promise.resolve(null),
     ]);
 
     const pending = tasks.filter(
@@ -76,17 +100,23 @@ export class AiContextService {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     });
 
+    const capabilities = this.getRoleCapabilities(user.role);
+    const teamInfo = teamSize !== null ? `\n- Direct reports: ${teamSize} team members` : '';
+
     return `Current user context:
 - Name: ${fullName}
 - Role: ${user.role}
 - Organization: ${user.orgName} (Plan: ${user.plan})
 - Department: ${employee?.department?.name ?? 'Unknown'}
+- Permissions: ${capabilities}${teamInfo}
 
 Today's live data (${dateStr}):
 - Attendance: ${attendanceStatus}
 - Pending tasks: ${pending}
 - Overdue tasks: ${overdue}
-- Annual leave remaining: ${annualLeave ? `${annualLeave.total - annualLeave.used - annualLeave.pending} days` : 'N/A'}`;
+- Annual leave remaining: ${annualLeave ? `${annualLeave.total - annualLeave.used - annualLeave.pending} days` : 'N/A'}
+
+IMPORTANT: Only answer questions the user has permission to based on their role. Do not reveal data about other employees unless the user has HR_ADMIN, MANAGER (for their direct reports), or SUPER_ADMIN role. Always scope responses to what is relevant for this user's role in the HRMS.`;
   }
 
   async getInsights(user: JwtPayload) {

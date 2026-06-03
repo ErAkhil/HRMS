@@ -71,7 +71,7 @@ export default function RegisterCompanyPage() {
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Create your organization</h1>
             <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-              Set up your workspace in minutes. You&apos;ll be the Super Admin.
+              Set up your workspace in minutes. You&apos;ll be the organization Admin.
             </p>
           </div>
 

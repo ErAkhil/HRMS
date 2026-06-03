@@ -63,6 +63,7 @@ export class AdminController {
   }
 
   @Get('security')
+  @Roles('SUPER_ADMIN')
   @Throttle({ default: { ttl: 60_000, limit: 15 } })
   getSecuritySettings(@CurrentUser() user: JwtPayload) {
     return this.admin.getSecuritySettings(user);

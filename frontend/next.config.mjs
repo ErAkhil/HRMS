@@ -1,6 +1,17 @@
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // Windows cannot copy traced chunk files containing ':' into standalone output paths.
+  output: process.platform === "win32" ? undefined : "standalone",
+  turbopack: {
+    root: __dirname,
+  },
+
+  serverExternalPackages: ["groq-sdk"],
 
   experimental: {
     staleTimes: {

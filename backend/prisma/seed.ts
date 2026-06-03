@@ -17,7 +17,7 @@ import * as path from "node:path";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const db = new PrismaClient({ adapter });
 
-type OrgUserRole = "SUPER_ADMIN" | "MANAGER" | "EMPLOYEE";
+type OrgUserRole = "HR_ADMIN" | "MANAGER" | "EMPLOYEE";
 
 // â”€â”€â”€ Shared helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -117,7 +117,7 @@ const UNI_DEPTS = [
 
 // [email, role, dept, first, last, title, salary, avatar, startDate, isHead]
 const UNI_EMPS = [
-  ["admin@Monja.com",           "SUPER_ADMIN", "HR",              "Sarah",   "Johnson",  "HR Director",               180000, "/images/user/user-01.png", "2022-01-15", true ],
+  ["admin@Monja.com",           "HR_ADMIN",    "HR",              "Sarah",   "Johnson",  "HR Director",               180000, "/images/user/user-01.png", "2022-01-15", true ],
   ["chris.walker@Monja.com",    "EMPLOYEE",    "HR",              "Chris",   "Walker",   "HR Specialist",              85000, "/images/user/user-02.png", "2023-06-01", false],
   ["james.williams@Monja.com",  "MANAGER",     "Engineering",     "James",   "Williams", "VP of Engineering",         200000, "/images/user/user-03.png", "2021-06-01", true ],
   ["sarah.mitchell@Monja.com",  "EMPLOYEE",    "Engineering",     "Sarah",   "Mitchell", "Senior Software Engineer",  150000, "/images/user/user-15.png", "2023-03-10", false],
@@ -373,7 +373,7 @@ async function seedMonja(hash: string) {
 // â”€â”€â”€ Org 2: Meridian Health Systems â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MER_EMPS = [
-  { email: "admin@meridian.com",     role: "SUPER_ADMIN", dept: "Administration", first: "Sarah",   last: "Thompson", title: "HR Director",            salary: 165000, avatar: "/images/user/user-01.png", start: "2021-03-01", isHead: true  },
+  { email: "admin@meridian.com",     role: "HR_ADMIN",    dept: "Administration", first: "Sarah",   last: "Thompson", title: "HR Director",            salary: 165000, avatar: "/images/user/user-01.png", start: "2021-03-01", isHead: true  },
   { email: "dr.kane@meridian.com",   role: "MANAGER",     dept: "Clinical",       first: "Robert",  last: "Kane",     title: "Chief Medical Officer",  salary: 290000, avatar: "/images/user/user-03.png", start: "2020-07-01", isHead: true  },
   { email: "dr.patel@meridian.com",  role: "EMPLOYEE",    dept: "Clinical",       first: "Lisa",    last: "Patel",    title: "Senior Physician",        salary: 230000, avatar: "/images/user/user-08.png", start: "2022-01-15", isHead: false },
   { email: "dr.james@meridian.com",  role: "EMPLOYEE",    dept: "Clinical",       first: "James",   last: "Okoye",    title: "General Practitioner",   salary: 195000, avatar: "/images/user/user-05.png", start: "2023-06-01", isHead: false },
@@ -532,7 +532,7 @@ async function seedMeridian(hash: string) {
 // â”€â”€â”€ Org 3: Apex Financial Group â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const APX_EMPS = [
-  { email: "admin@apex.com",      role: "SUPER_ADMIN", dept: "HR",                 first: "Victoria", last: "Clarke",  title: "HR Director",            salary: 165000, avatar: "/images/user/user-01.png", start: "2020-09-01", isHead: true  },
+  { email: "admin@apex.com",      role: "HR_ADMIN",    dept: "HR",                 first: "Victoria", last: "Clarke",  title: "HR Director",            salary: 165000, avatar: "/images/user/user-01.png", start: "2020-09-01", isHead: true  },
   { email: "j.ford@apex.com",     role: "MANAGER",     dept: "Investment Banking", first: "James",    last: "Ford",    title: "Managing Director",       salary: 380000, avatar: "/images/user/user-03.png", start: "2019-03-01", isHead: true  },
   { email: "s.chen@apex.com",     role: "EMPLOYEE",    dept: "Investment Banking", first: "Sarah",    last: "Chen",    title: "Senior Analyst",          salary: 185000, avatar: "/images/user/user-08.png", start: "2021-07-01", isHead: false },
   { email: "p.kapoor@apex.com",   role: "EMPLOYEE",    dept: "Investment Banking", first: "Priya",    last: "Kapoor",  title: "Analyst",                 salary: 145000, avatar: "/images/user/user-14.png", start: "2023-06-01", isHead: false },
@@ -729,19 +729,26 @@ async function main() {
   await seedMeridian(hash);
   console.log("  âœ… Meridian Health Systems â€” 10 employees");
 
-  console.log("Seeding Org 3: Apex Financial Groupâ€¦");
+  console.log(“Seeding Org 3: Apex Financial Group…”);
   await seedApex(hash);
-  console.log("  âœ… Apex Financial Group â€” 8 employees");
+  console.log(“  ✅ Apex Financial Group — 8 employees”);
 
-  console.log("\nâœ… Seed complete â€” 3 organisations, 45 employees total\n");
-  console.log("ðŸ“‹ Demo accounts (all passwords: password123)");
-  console.log("  Monja    : admin@Monja.com      (Super Admin)");
-  console.log("               james.williams@Monja.com  (Manager)");
-  console.log("               sarah.mitchell@Monja.com  (Employee)");
-  console.log("  Meridian   : admin@meridian.com     (Super Admin)");
-  console.log("               dr.kane@meridian.com   (Manager / CMO)");
-  console.log("  Apex       : admin@apex.com         (Super Admin)");
-  console.log("               j.ford@apex.com        (Manager / MD)");
+  // Promote the Monja Technologies admin to platform SUPER_ADMIN.
+  // SUPER_ADMIN must belong to an org; Monja is the primary platform org.
+  await db.user.update({
+    where: { email: “admin@Monja.com” },
+    data: { role: “SUPER_ADMIN” },
+  });
+
+  console.log(“\n✅ Seed complete — 3 organisations, 45 employees total\n”);
+  console.log(“📋 Demo accounts (all passwords: password123)”);
+  console.log(“  SUPER_ADMIN : admin@Monja.com          (platform admin — sees all orgs)”);
+  console.log(“               james.williams@Monja.com  (Manager)”);
+  console.log(“               sarah.mitchell@Monja.com  (Employee)”);
+  console.log(“  HR_ADMIN    : admin@meridian.com        (Meridian Health Systems)”);
+  console.log(“               dr.kane@meridian.com      (Manager / CMO)”);
+  console.log(“  HR_ADMIN    : admin@apex.com             (Apex Financial Group)”);
+  console.log(“               j.ford@apex.com            (Manager / MD)”);
 }
 
 main()

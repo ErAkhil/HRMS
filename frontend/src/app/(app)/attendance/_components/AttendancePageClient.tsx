@@ -10,6 +10,8 @@ import { AttendanceKpiCards } from "./KpiCards";
 import { AttendanceTable } from "./AttendanceTable";
 import { LiveStatusPanel } from "./LiveStatusPanel";
 import { AttendanceHeatmap } from "./AttendanceHeatmap";
+import { getAttendanceCoordinates } from "@/lib/attendance-geolocation";
+import { applyAttendanceStatusChange, attendanceStatusToBucket, type AttendanceStatusChangePayload } from "@/lib/attendance-live";
 
 interface Props {
   records: AttendanceRecord[];
@@ -26,8 +28,10 @@ export function AttendancePageClient({ records, myStatus, stats: initialStats, h
   const [isPending, startTransition] = useTransition();
   const [stats, setStats] = useState<AttendanceStats>(initialStats);
 
-  const onCheckIn = useCallback((_data: unknown) => {
-    setStats((prev) => ({ ...prev, present: prev.present + 1 }));
+  const onCheckIn = useCallback((data: unknown) => {
+    const payload = (data ?? {}) as { status?: string };
+    const incomingStatus = payload.status && attendanceStatusToBucket[payload.status] ? payload.status : "PRESENT";
+    setStats((prev) => applyAttendanceStatusChange(prev, null, incomingStatus));
     router.refresh();
   }, [router]);
 
@@ -35,15 +39,22 @@ export function AttendancePageClient({ records, myStatus, stats: initialStats, h
     router.refresh();
   }, [router]);
 
+  const onStatusChanged = useCallback((data: unknown) => {
+    const payload = (data ?? {}) as AttendanceStatusChangePayload;
+    setStats((prev) => applyAttendanceStatusChange(prev, payload.previousStatus, payload.status));
+  }, []);
+
   useSocket({
     "attendance:checkin": onCheckIn,
     "attendance:checkout": onCheckOut,
+    "attendance:status-changed": onStatusChanged,
   });
 
   function handleCheckIn() {
     startTransition(async () => {
       try {
-        await checkIn();
+        const coords = await getAttendanceCoordinates();
+        await checkIn(coords);
         setToast("Checked in successfully!");
         router.refresh();
       } catch (err) {
@@ -55,7 +66,8 @@ export function AttendancePageClient({ records, myStatus, stats: initialStats, h
   function handleCheckOut() {
     startTransition(async () => {
       try {
-        await checkOut();
+        const coords = await getAttendanceCoordinates();
+        await checkOut(coords);
         setToast("Checked out successfully!");
         router.refresh();
       } catch (err) {

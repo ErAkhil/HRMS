@@ -87,3 +87,11 @@ export async function rejectLeave(requestId: string, reason?: string) {
   revalidatePath("/calendar");
   return result;
 }
+
+export async function cancelLeave(requestId: string) {
+  await requireAuth();
+  const result = await api.patch<{ success: boolean }>(`/leave/requests/${requestId}/cancel`);
+  revalidatePath("/leave");
+  revalidatePath("/leave/calendar");
+  return result;
+}

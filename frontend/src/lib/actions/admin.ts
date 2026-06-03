@@ -15,6 +15,8 @@ export type OrgUser = {
   createdAt: string;
   lastLoginAt: string | null;
   name: string;
+  orgId: string;
+  orgName: string;
   avatarUrl: string | null;
   department: string;
   title: string;
@@ -29,6 +31,24 @@ export type Workflow = {
   runsCount: number;
   lastRunAt: string | null;
   createdAt: string;
+  orgName: string | null;
+};
+
+export type SecuritySettings = {
+  org: {
+    id: string;
+    name: string;
+    plan: string;
+  };
+  orgCount: number;
+  userCount: number;
+  activeCount: number;
+  recentLogins: Array<{
+    email: string;
+    role: UserRole;
+    lastLoginAt: string | null;
+    orgName: string;
+  }>;
 };
 
 export async function getOrgUsers(): Promise<OrgUser[]> {
@@ -84,7 +104,7 @@ export async function toggleWorkflow(workflowId: string) {
   revalidatePath("/admin/workflows");
 }
 
-export async function getSecuritySettings() {
-  await requireRole("SUPER_ADMIN", "HR_ADMIN");
-  return api.get<unknown>("/admin/security");
+export async function getSecuritySettings(): Promise<SecuritySettings> {
+  await requireRole("SUPER_ADMIN");
+  return api.get<SecuritySettings>("/admin/security");
 }

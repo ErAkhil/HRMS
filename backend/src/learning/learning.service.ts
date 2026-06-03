@@ -1,10 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
 @Injectable()
 export class LearningService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getLearningData(user: JwtPayload) {
     if (!user.employeeId) return { enrollments: [], certifications: [], allCourses: [] };
@@ -42,6 +42,14 @@ export class LearningService {
 
   async updateProgress(enrollmentId: string, progress: number, user: JwtPayload) {
     if (!user.employeeId) throw new BadRequestException('No employee profile');
+
+    const enrollment = await this.prisma.courseEnrollment.findFirst({
+      where: { id: enrollmentId, employeeId: user.employeeId },
+      select: { id: true },
+    });
+
+    if (!enrollment) throw new NotFoundException('Enrollment not found');
+
     await this.prisma.courseEnrollment.update({
       where: { id: enrollmentId },
       data: { progress, completedAt: progress >= 100 ? new Date() : null },

@@ -2,6 +2,7 @@ import type { SerializedLeaveRequest } from "@/lib/actions/leave";
 
 interface LeaveRequestsTableProps {
   requests: SerializedLeaveRequest[];
+  onView?: (req: SerializedLeaveRequest) => void;
 }
 
 type DisplayStatus = "Approved" | "Pending" | "Rejected";
@@ -42,7 +43,7 @@ function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function LeaveRequestsTable({ requests }: LeaveRequestsTableProps) {
+export function LeaveRequestsTable({ requests, onView }: Readonly<LeaveRequestsTableProps>) {
   if (requests.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -88,11 +89,17 @@ export function LeaveRequestsTable({ requests }: LeaveRequestsTableProps) {
                 <td className="px-5 py-3 text-sm text-dark-5 dark:text-dark-6">{formatDate(req.createdAt)}</td>
                 <td className="px-5 py-3">
                   {displayStatus === "Pending" ? (
-                    <button className="rounded-lg border border-gray-3 px-3 py-1.5 text-xs font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6">
+                    <button
+                      onClick={() => onView?.(req)}
+                      className="rounded-lg border border-gray-3 px-3 py-1.5 text-xs font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+                    >
                       Cancel
                     </button>
                   ) : (
-                    <button className="rounded-lg border border-gray-3 px-3 py-1.5 text-xs font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6">
+                    <button
+                      onClick={() => onView?.(req)}
+                      className="rounded-lg border border-gray-3 px-3 py-1.5 text-xs font-medium text-dark-5 hover:bg-gray-2 dark:border-dark-3 dark:text-dark-6"
+                    >
                       View
                     </button>
                   )}

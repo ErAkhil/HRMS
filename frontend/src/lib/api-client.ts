@@ -46,9 +46,11 @@ async function apiRequest<T>(
 
   if (!res.ok) {
     let message = `HTTP ${res.status}`;
-    const err = await res.json().catch(() => null) as { message?: string | string[] } | null;
+    const err = await res.json().catch(() => null) as { message?: string | string[]; error?: string } | null;
     if (err?.message) {
       message = Array.isArray(err.message) ? err.message[0] : err.message;
+    } else if (typeof err?.error === "string" && err.error.length > 0) {
+      message = err.error;
     }
     throw new Error(message);
   }

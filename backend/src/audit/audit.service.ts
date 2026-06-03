@@ -50,8 +50,8 @@ export class AuditService {
     }
   }
 
-  async getLogs(orgId: string, filters?: LogFilters) {
-    const where: Record<string, unknown> = { orgId };
+  async getLogs(orgId: string | undefined, filters?: LogFilters) {
+    const where: Record<string, unknown> = orgId ? { orgId } : {};
 
     if (filters?.from && filters?.to) {
       where.createdAt = {

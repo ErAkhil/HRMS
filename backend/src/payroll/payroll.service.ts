@@ -173,4 +173,36 @@ export class PayrollService {
 
     return { trend, latestTotal, latestNet, latestDeductions, avgSalary, headcount, deptCosts, hasData: payrollRuns.length > 0 };
   }
+
+  async getPayrollSummaryForMonth(month: number, year: number, user: JwtPayload) {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    const payrollRun = await this.prisma.payrollRun.findFirst({
+      where: {
+        orgId: user.orgId,
+        month,
+        year,
+      },
+      include: {
+        _count: { select: { payslips: true } },
+      },
+    });
+
+    if (!payrollRun) {
+      return null;
+    }
+
+    return {
+      month,
+      year,
+      monthName: monthNames[month - 1] ?? `Month ${month}`,
+      totalGross: Number(payrollRun.totalGross),
+      totalNet: Number(payrollRun.totalNet),
+      totalDeductions: Number(payrollRun.totalDeductions),
+      employeeCount: payrollRun._count.payslips,
+      status: payrollRun.status,
+      processedAt: payrollRun.processedAt?.toISOString() ?? null,
+    };
+  }
 }
+

@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useMemo, useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
+import { useSocket } from "@/hooks/use-socket";
+import type { AttendanceStatusChangePayload } from "@/lib/attendance-live";
 
 type TeamMember = {
   id: string;
@@ -39,6 +42,15 @@ const statusIcon: Record<string, string> = {
   amber: "🏖️",
   indigo: "🌐",
   rose: "⏰",
+};
+
+const statusMetaByAttendanceStatus: Record<string, { status: string; statusColor: string }> = {
+  PRESENT: { status: "Present", statusColor: "emerald" },
+  LATE: { status: "Late", statusColor: "rose" },
+  REMOTE: { status: "Remote", statusColor: "indigo" },
+  ON_LEAVE: { status: "On Leave", statusColor: "amber" },
+  ABSENT: { status: "Absent", statusColor: "rose" },
+  HALF_DAY: { status: "Half Day", statusColor: "amber" },
 };
 
 function getInitials(name: string) {
@@ -279,27 +291,101 @@ function SidePanel({ metrics, overdueTasks }: Readonly<{ metrics: DashboardMetri
 
 export function ManagerDashboardClient({ data, userName }: Readonly<{ data: DashboardData; userName: string }>) {
   const { toast } = useToast();
-  const metrics: DashboardMetrics = {
-    todo: data.taskMap["TODO"] ?? 0,
-    inProgress: data.taskMap["IN_PROGRESS"] ?? 0,
-    inReview: data.taskMap["IN_REVIEW"] ?? 0,
-    done: data.taskMap["DONE"] ?? 0,
-    totalTasks: (data.taskMap["TODO"] ?? 0) + (data.taskMap["IN_PROGRESS"] ?? 0) + (data.taskMap["IN_REVIEW"] ?? 0) + (data.taskMap["DONE"] ?? 0),
-  };
+  const [liveData, setLiveData] = useState<DashboardData>(data);
+
+  const metrics: DashboardMetrics = useMemo(() => ({
+    todo: liveData.taskMap["TODO"] ?? 0,
+    inProgress: liveData.taskMap["IN_PROGRESS"] ?? 0,
+    inReview: liveData.taskMap["IN_REVIEW"] ?? 0,
+    done: liveData.taskMap["DONE"] ?? 0,
+    totalTasks:
+      (liveData.taskMap["TODO"] ?? 0)
+      + (liveData.taskMap["IN_PROGRESS"] ?? 0)
+      + (liveData.taskMap["IN_REVIEW"] ?? 0)
+      + (liveData.taskMap["DONE"] ?? 0),
+  }), [liveData.taskMap]);
+
+  const recalcSummary = useCallback((teamMembers: TeamMember[]) => {
+    const presentCount = teamMembers.filter((m) => m.status === "Present" || m.status === "Remote").length;
+    const onLeaveCount = teamMembers.filter((m) => m.status === "On Leave").length;
+    const teamSize = teamMembers.length;
+    const attendancePct = teamSize > 0 ? Math.round((presentCount / teamSize) * 100) : 0;
+
+    return { presentCount, onLeaveCount, attendancePct };
+  }, []);
+
+  const onAttendanceCheckIn = useCallback((eventData: unknown) => {
+    const payload = (eventData ?? {}) as { employeeId?: string; checkIn?: string | null; status?: string | null };
+    if (!payload.employeeId) return;
+
+    setLiveData((prev) => {
+      const teamMembers = prev.teamMembers.map((member) => {
+        if (member.id !== payload.employeeId) return member;
+
+        const meta = statusMetaByAttendanceStatus[payload.status ?? "PRESENT"] ?? statusMetaByAttendanceStatus.PRESENT;
+        const checkin = payload.checkIn
+          ? new Date(payload.checkIn).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+          : member.checkin;
+
+        return {
+          ...member,
+          status: meta.status,
+          statusColor: meta.statusColor,
+          checkin,
+        };
+      });
+
+      return {
+        ...prev,
+        teamMembers,
+        ...recalcSummary(teamMembers),
+      };
+    });
+  }, [recalcSummary]);
+
+  const onAttendanceStatusChanged = useCallback((eventData: unknown) => {
+    const payload = (eventData ?? {}) as AttendanceStatusChangePayload;
+    if (!payload.employeeId || !payload.status) return;
+
+    setLiveData((prev) => {
+      const teamMembers = prev.teamMembers.map((member) => {
+        if (member.id !== payload.employeeId) return member;
+
+        const meta = statusMetaByAttendanceStatus[payload.status ?? "ABSENT"] ?? statusMetaByAttendanceStatus.ABSENT;
+        return {
+          ...member,
+          status: meta.status,
+          statusColor: meta.statusColor,
+          checkin: payload.status === "ABSENT" || payload.status === "ON_LEAVE" ? "—" : member.checkin,
+        };
+      });
+
+      return {
+        ...prev,
+        teamMembers,
+        ...recalcSummary(teamMembers),
+      };
+    });
+  }, [recalcSummary]);
+
+  useSocket({
+    "attendance:checkin": onAttendanceCheckIn,
+    "attendance:status-changed": onAttendanceStatusChanged,
+  });
 
   return (
     <div className="page-container">
       <DashboardHeader
         userName={userName}
-        teamSize={data.teamSize}
-        pendingLeave={data.pendingLeave}
-        overdueTasks={data.overdueTasks}
-        pendingReviews={data.pendingReviews}
+        teamSize={liveData.teamSize}
+        pendingLeave={liveData.pendingLeave}
+        overdueTasks={liveData.overdueTasks}
+        pendingReviews={liveData.pendingReviews}
       />
-      <KpiRow data={data} metrics={metrics} />
+      <KpiRow data={liveData} metrics={metrics} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-6">
-        <TeamStatusCard teamMembers={data.teamMembers} />
-        <SidePanel metrics={metrics} overdueTasks={data.overdueTasks} />
+        <TeamStatusCard teamMembers={liveData.teamMembers} />
+        <SidePanel metrics={metrics} overdueTasks={liveData.overdueTasks} />
       </div>
 
       <Toast message={toast} />

@@ -68,3 +68,89 @@ export async function createMeeting(data: {
   await api.post<unknown>("/meetings", parsed.data);
   revalidatePath("/collaboration/meetings");
 }
+
+/**
+ * Add notes to meeting
+ */
+export async function addMeetingNote(
+  meetingId: string,
+  content: string,
+): Promise<{ readonly id: string; readonly content: string }> {
+  const user = await requireAuth();
+
+  if (!content.trim()) {
+    throw new Error("Note content cannot be empty");
+  }
+
+  try {
+    return await api.post<{ id: string; content: string }>(`/meetings/${meetingId}/notes`, {
+      content,
+    });
+  } catch (error) {
+    console.error("Failed to add meeting note:", error);
+    throw new Error("Failed to add meeting note");
+  }
+}
+
+/**
+ * Get meeting notes
+ */
+export async function getMeetingNotes(
+  meetingId: string,
+): Promise<Array<{ id: string; content: string; createdAt: string; createdBy: string }>> {
+  await requireAuth();
+
+  try {
+    return await api.get(`/meetings/${meetingId}/notes`);
+  } catch (error) {
+    console.error("Failed to fetch meeting notes:", error);
+    return [];
+  }
+}
+
+/**
+ * Generate AI summary for meeting notes
+ */
+export async function generateMeetingSummary(
+  meetingId: string,
+  notes: string,
+): Promise<{
+  readonly summary: string;
+  readonly keyPoints: string[];
+  readonly actionItems: Array<{ task: string; owner?: string }>;
+}> {
+  const user = await requireAuth();
+
+  if (!notes.trim()) {
+    throw new Error("Notes required for summary");
+  }
+
+  try {
+    return await api.post(`/meetings/${meetingId}/summarize`, { notes });
+  } catch (error) {
+    console.error("Failed to generate summary:", error);
+    throw new Error("Failed to generate meeting summary");
+  }
+}
+
+/**
+ * Record meeting attendance
+ */
+export async function recordAttendance(
+  meetingId: string,
+  userId: string,
+  joinedAt: Date,
+): Promise<void> {
+  await requireAuth();
+
+  try {
+    await api.post(`/meetings/${meetingId}/attendance`, {
+      userId,
+      joinedAt,
+    });
+    revalidatePath(`/meetings/${meetingId}`);
+  } catch (error) {
+    console.error("Failed to record attendance:", error);
+    throw new Error("Failed to record attendance");
+  }
+}

@@ -45,6 +45,7 @@ function WorkflowCard({ workflow, onToggle }: Readonly<{ workflow: Workflow; onT
           </div>
           {workflow.description && <p className="mt-1 empty-state-text">{workflow.description}</p>}
           <div className="mt-2 flex flex-wrap gap-3 text-muted">
+            {workflow.orgName && <span>Organization: <strong className="text-dark dark:text-white">{workflow.orgName}</strong></span>}
             <span>Trigger: <strong className="text-dark dark:text-white">{workflow.trigger}</strong></span>
             <span>Runs: <strong className="text-dark dark:text-white">{workflow.runsCount}</strong></span>
             <span>Last run: <strong className="text-dark dark:text-white">{formatDate(workflow.lastRunAt)}</strong></span>

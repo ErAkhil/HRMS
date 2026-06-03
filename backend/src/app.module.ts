@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './prisma/prisma.module';
@@ -29,6 +30,7 @@ import { OnboardingModule } from './onboarding/onboarding.module';
 import { ReimbursementsModule } from './reimbursements/reimbursements.module';
 import { AiContextModule } from './ai-context/ai-context.module';
 import { HealthModule } from './health/health.module';
+import { AiConversationsModule } from './ai-conversations/ai-conversations.module';
 
 @Module({
   providers: [
@@ -39,6 +41,7 @@ import { HealthModule } from './health/health.module';
   ],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         name: 'default',
@@ -73,6 +76,7 @@ import { HealthModule } from './health/health.module';
     ReimbursementsModule,
     AiContextModule,
     HealthModule,
+      AiConversationsModule,
   ],
 })
 export class AppModule {}

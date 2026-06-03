@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { checkIn, checkOut } from "@/lib/actions/attendance";
+import { useEffect, useState, useTransition } from "react";
+import { backfillLocation, checkIn, checkOut } from "@/lib/actions/attendance";
 import type { MyTodayStatus } from "@/lib/actions/attendance";
 import { useRouter } from "next/navigation";
 import {
@@ -10,6 +10,9 @@ import {
   WeeklyMiniChart,
   getAttendanceState,
 } from "./attendance-widget-parts";
+import { getAttendanceCoordinates } from "@/lib/attendance-geolocation";
+import { LocationName } from "@/components/location/location-name";
+import { useSocket } from "@/hooks/use-socket";
 interface Props {
   todayRecord: MyTodayStatus;
 }
@@ -47,16 +50,36 @@ function AttendanceHeader({ attendanceState }: Readonly<{ attendanceState: "pres
 function AttendanceTiming({
   checkInTime,
   checkOutTime,
+  checkInLatitude,
+  checkInLongitude,
+  checkOutLatitude,
+  checkOutLongitude,
   hasAttendanceRecord,
-}: Readonly<{ checkInTime: string | null | undefined; checkOutTime: string | null | undefined; hasAttendanceRecord: boolean }>) {
+}: Readonly<{
+  checkInTime: string | null | undefined;
+  checkOutTime: string | null | undefined;
+  checkInLatitude: number | null | undefined;
+  checkInLongitude: number | null | undefined;
+  checkOutLatitude: number | null | undefined;
+  checkOutLongitude: number | null | undefined;
+  hasAttendanceRecord: boolean;
+}>) {
   return (
     <div>
       <p className="text-muted">{hasAttendanceRecord ? "Clocked in at" : "Not clocked in"}</p>
       <p className="text-body font-bold">{formatTime(checkInTime)}</p>
       {hasAttendanceRecord && (
-        <p className="text-muted">
-          Working: <span className="font-medium text-dark dark:text-white">{formatHours(checkInTime, checkOutTime)}</span>
-        </p>
+        <>
+          <p className="text-muted">
+            Working: <span className="font-medium text-dark dark:text-white">{formatHours(checkInTime, checkOutTime)}</span>
+          </p>
+          <p className="text-muted">
+            In loc: <span className="font-medium text-dark dark:text-white"><LocationName latitude={checkInLatitude} longitude={checkInLongitude} /></span>
+          </p>
+          <p className="text-muted">
+            Out loc: <span className="font-medium text-dark dark:text-white"><LocationName latitude={checkOutLatitude} longitude={checkOutLongitude} /></span>
+          </p>
+        </>
       )}
     </div>
   );
@@ -72,12 +95,39 @@ export function AttendanceWidget({ todayRecord }: Readonly<Props>) {
   const attendanceState = getAttendanceState(isClockedIn, isCheckedOut);
   const hasAttendanceRecord = isClockedIn || isCheckedOut;
 
+  useEffect(() => {
+    if (!todayRecord?.checkIn) return;
+    if (todayRecord.checkInLatitude !== null && todayRecord.checkInLongitude !== null) return;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const coords = await getAttendanceCoordinates();
+        await backfillLocation(coords);
+        if (!cancelled) router.refresh();
+      } catch {
+        // Keep UI non-blocking if location backfill permission is denied.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [todayRecord?.checkIn, todayRecord?.checkInLatitude, todayRecord?.checkInLongitude, router]);
+
+  useSocket({
+    "attendance:checkin": () => router.refresh(),
+    "attendance:checkout": () => router.refresh(),
+    "attendance:status-changed": () => router.refresh(),
+  });
+
   function handleToggle() {
     setError("");
     startTransition(async () => {
       try {
         const action = isClockedIn ? checkOut : checkIn;
-        await action();
+        const coords = await getAttendanceCoordinates();
+        await action(coords);
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Action failed");
@@ -97,7 +147,15 @@ export function AttendanceWidget({ todayRecord }: Readonly<Props>) {
       {error && <p className="mt-2 text-xs text-rose-600 dark:text-rose-400">{error}</p>}
 
       <div className="mt-4 flex items-center justify-between gap-3">
-        <AttendanceTiming checkInTime={todayRecord?.checkIn} checkOutTime={todayRecord?.checkOut} hasAttendanceRecord={hasAttendanceRecord} />
+        <AttendanceTiming
+          checkInTime={todayRecord?.checkIn}
+          checkOutTime={todayRecord?.checkOut}
+          checkInLatitude={todayRecord?.checkInLatitude}
+          checkInLongitude={todayRecord?.checkInLongitude}
+          checkOutLatitude={todayRecord?.checkOutLatitude}
+          checkOutLongitude={todayRecord?.checkOutLongitude}
+          hasAttendanceRecord={hasAttendanceRecord}
+        />
         {!isCheckedOut && <ClockButton isPending={isPending} isClockedIn={isClockedIn} onClick={handleToggle} />}
       </div>
 

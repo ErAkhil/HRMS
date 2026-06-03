@@ -5,6 +5,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UpdateAttendanceStatusDto } from './dto/update-status.dto';
+import { CheckLocationDto } from './dto/check-location.dto';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
 
 @Controller('attendance')
@@ -55,18 +56,29 @@ export class AttendanceController {
   }
 
   @Post('check-in')
-  checkIn(@CurrentUser() user: JwtPayload) {
-    return this.attendance.checkIn(user);
+  checkIn(@CurrentUser() user: JwtPayload, @Body() dto: CheckLocationDto) {
+    return this.attendance.checkIn(user, dto.latitude, dto.longitude);
   }
 
   @Post('check-out')
-  checkOut(@CurrentUser() user: JwtPayload) {
-    return this.attendance.checkOut(user);
+  checkOut(@CurrentUser() user: JwtPayload, @Body() dto: CheckLocationDto) {
+    return this.attendance.checkOut(user, dto.latitude, dto.longitude);
+  }
+
+  @Post('backfill-location')
+  backfillLocation(@CurrentUser() user: JwtPayload, @Body() dto: CheckLocationDto) {
+    return this.attendance.backfillLocation(user, dto.latitude, dto.longitude);
   }
 
   @Patch('status')
   @Roles('HR_ADMIN', 'SUPER_ADMIN', 'MANAGER')
   updateStatus(@Body() dto: UpdateAttendanceStatusDto) {
     return this.attendance.updateStatus(dto.employeeId, dto.date, dto.status);
+  }
+
+  @Post('mark-absent-no-shows')
+  @Roles('HR_ADMIN', 'SUPER_ADMIN')
+  markAbsentForNoShows(@CurrentUser() user: JwtPayload) {
+    return this.attendance.markAbsentForNoShows(user);
   }
 }

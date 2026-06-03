@@ -176,7 +176,7 @@ export class AuthService {
       });
 
       const user = await tx.user.create({
-        data: { email: data.email.toLowerCase(), passwordHash, role: 'SUPER_ADMIN', orgId: org.id },
+        data: { email: data.email.toLowerCase(), passwordHash, role: 'HR_ADMIN', orgId: org.id },
       });
 
       const employee = await tx.employee.create({

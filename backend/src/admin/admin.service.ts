@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import type { JwtPayload } from '../auth/types/jwt-payload.type';
@@ -13,9 +13,16 @@ export class AdminService {
   ) {}
 
   async getOrgUsers(user: JwtPayload) {
+    const isSuperAdmin = user.role === 'SUPER_ADMIN';
     const users = await this.prisma.user.findMany({
-      where: { orgId: user.orgId },
+      where: isSuperAdmin ? undefined : { orgId: user.orgId },
       include: {
+        org: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         employee: {
           select: {
             firstName: true, lastName: true, avatarUrl: true, title: true,
@@ -36,6 +43,8 @@ export class AdminService {
       name: u.employee
         ? `${u.employee.firstName} ${u.employee.lastName}`
         : u.email.split('@')[0],
+      orgId: u.org.id,
+      orgName: u.org.name,
       avatarUrl: u.employee?.avatarUrl ?? null,
       department: u.employee?.department?.name ?? '—',
       title: u.employee?.title ?? '—',
@@ -48,8 +57,24 @@ export class AdminService {
       select: { orgId: true, role: true },
     });
 
-    if (target?.orgId !== user.orgId) {
+    if (!target) {
       throw new NotFoundException('User not found');
+    }
+
+    const isRequesterSuperAdmin = user.role === 'SUPER_ADMIN';
+
+    if (!isRequesterSuperAdmin && target.orgId !== user.orgId) {
+      throw new NotFoundException('User not found');
+    }
+    const isTargetSuperAdmin = target.role === 'SUPER_ADMIN';
+    const isPromotingToSuperAdmin = dto.role === 'SUPER_ADMIN';
+
+    if (!isRequesterSuperAdmin && (isTargetSuperAdmin || isPromotingToSuperAdmin)) {
+      throw new ForbiddenException('Only platform super admins can manage SUPER_ADMIN role');
+    }
+
+    if (user.sub === dto.userId && user.role === 'SUPER_ADMIN' && dto.role !== 'SUPER_ADMIN') {
+      throw new ForbiddenException('Super admins cannot remove their own SUPER_ADMIN access');
     }
 
     await this.prisma.user.update({
@@ -71,7 +96,11 @@ export class AdminService {
       select: { orgId: true, isActive: true },
     });
 
-    if (target?.orgId !== user.orgId) {
+    if (!target) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.role !== 'SUPER_ADMIN' && target.orgId !== user.orgId) {
       throw new NotFoundException('User not found');
     }
 
@@ -89,10 +118,34 @@ export class AdminService {
   }
 
   async getWorkflows(user: JwtPayload) {
-    return this.prisma.workflow.findMany({
+    const isSuperAdmin = user.role === 'SUPER_ADMIN';
+    if (isSuperAdmin) {
+      const workflows = await this.prisma.workflow.findMany({
+        include: {
+          org: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return workflows.map((workflow) => ({
+        ...workflow,
+        orgName: workflow.org.name,
+      }));
+    }
+
+    const workflows = await this.prisma.workflow.findMany({
       where: { orgId: user.orgId },
       orderBy: { createdAt: 'desc' },
     });
+
+    return workflows.map((workflow) => ({
+      ...workflow,
+      orgName: null,
+    }));
   }
 
   async createWorkflow(dto: CreateWorkflowDto, user: JwtPayload) {
@@ -112,7 +165,11 @@ export class AdminService {
       select: { orgId: true, isEnabled: true },
     });
 
-    if (wf?.orgId !== user.orgId) throw new NotFoundException('Workflow not found');
+    if (!wf) throw new NotFoundException('Workflow not found');
+
+    if (user.role !== 'SUPER_ADMIN' && wf.orgId !== user.orgId) {
+      throw new NotFoundException('Workflow not found');
+    }
 
     await this.prisma.workflow.update({
       where: { id: workflowId },
@@ -121,30 +178,45 @@ export class AdminService {
   }
 
   async getSecuritySettings(user: JwtPayload) {
-    const org = await this.prisma.organization.findUnique({
-      where: { id: user.orgId },
-      select: { id: true, name: true, plan: true },
-    });
+    const isSuperAdmin = user.role === 'SUPER_ADMIN';
+    const org = isSuperAdmin
+      ? { id: 'platform', name: 'Platform Overview', plan: 'MULTI_ORG' }
+      : await this.prisma.organization.findUnique({
+        where: { id: user.orgId },
+        select: { id: true, name: true, plan: true },
+      });
 
-    const [userCount, activeCount, recentLogins] = await Promise.all([
-      this.prisma.user.count({ where: { orgId: user.orgId } }),
-      this.prisma.user.count({ where: { orgId: user.orgId, isActive: true } }),
+    const [orgCount, userCount, activeCount, recentLogins] = await Promise.all([
+      isSuperAdmin ? this.prisma.organization.count() : Promise.resolve(1),
+      this.prisma.user.count({ where: isSuperAdmin ? undefined : { orgId: user.orgId } }),
+      this.prisma.user.count({ where: isSuperAdmin ? { isActive: true } : { orgId: user.orgId, isActive: true } }),
       this.prisma.user.findMany({
-        where: { orgId: user.orgId, lastLoginAt: { not: null } },
+        where: isSuperAdmin ? { lastLoginAt: { not: null } } : { orgId: user.orgId, lastLoginAt: { not: null } },
         orderBy: { lastLoginAt: 'desc' },
         take: 5,
-        select: { email: true, lastLoginAt: true, role: true },
+        select: {
+          email: true,
+          lastLoginAt: true,
+          role: true,
+          org: {
+            select: {
+              name: true,
+            },
+          },
+        },
       }),
     ]);
 
     return {
       org,
+      orgCount,
       userCount,
       activeCount,
       recentLogins: recentLogins.map((u) => ({
         email: u.email,
         role: u.role,
         lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
+        orgName: u.org.name,
       })),
     };
   }

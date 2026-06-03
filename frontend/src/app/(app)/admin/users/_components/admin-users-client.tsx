@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
 import { updateUserRole, toggleUserActive } from "@/lib/actions/admin";
@@ -17,6 +18,8 @@ type OrgUser = {
   createdAt: string;
   lastLoginAt: string | null;
   name: string;
+  orgId: string;
+  orgName: string;
   avatarUrl: string | null;
   department: string;
   title: string;
@@ -56,8 +59,12 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<UserRole | "All">("All");
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const { data: session } = useSession();
   const { toast, setToast } = useToast();
   const router = useRouter();
+  const currentUserRole = session?.user?.role;
+  const canManageSuperAdmin = currentUserRole === "SUPER_ADMIN";
+  const showOrganizationColumn = currentUserRole === "SUPER_ADMIN";
 
   const filtered = users.filter((u) => {
     const matchSearch = !search
@@ -118,7 +125,7 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
           className="input-field"
         >
           <option value="All">All Roles</option>
-          <option value="SUPER_ADMIN">Super Admin</option>
+          {canManageSuperAdmin && <option value="SUPER_ADMIN">Super Admin</option>}
           <option value="HR_ADMIN">HR Admin</option>
           <option value="MANAGER">Manager</option>
           <option value="EMPLOYEE">Employee</option>
@@ -132,6 +139,7 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
             <thead>
               <tr className="thead-row">
                 <th className="th">User</th>
+                {showOrganizationColumn && <th className="th">Organization</th>}
                 <th className="th">Role</th>
                 <th className="th">Department</th>
                 <th className="th">Status</th>
@@ -163,13 +171,14 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
                       </div>
                     </div>
                   </td>
+                  {showOrganizationColumn && <td className="td text-muted">{u.orgName}</td>}
                   <td className="td">
                     <select
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
                       className="input-field py-1 text-xs"
                     >
-                      <option value="SUPER_ADMIN">Super Admin</option>
+                      {canManageSuperAdmin && <option value="SUPER_ADMIN">Super Admin</option>}
                       <option value="HR_ADMIN">HR Admin</option>
                       <option value="MANAGER">Manager</option>
                       <option value="EMPLOYEE">Employee</option>
@@ -198,7 +207,7 @@ export function AdminUsersClient({ users }: Readonly<{ users: OrgUser[] }>) {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-muted">
+                  <td colSpan={showOrganizationColumn ? 7 : 6} className="px-5 py-8 text-center text-muted">
                     No users match your filter.
                   </td>
                 </tr>
